@@ -34,7 +34,7 @@ def second():
 
     score = 0
 
-    foo = 0
+    sack = 0
     common = {}
     for line in lines:
         m = line.strip()
@@ -43,16 +43,16 @@ def second():
                 common[char] = 1
             else:
                 common[char] = common[char] + 1
-        foo = foo + 1
+        sack = sack + 1
 
-        if foo == 3:
+        if sack == 3:
             for k in common:
                 print(k, common[k])
                 if common[k] == 3:
                     score = score + char_to_score(k)
                     print(k)
                     break
-            foo = 0
+            sack = 0
             common = {}
     print(score)
 
