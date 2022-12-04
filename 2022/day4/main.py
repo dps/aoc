@@ -1,5 +1,4 @@
 input = [i.strip() for i in open("input.txt","r").readlines()]
-print(input)
 count = 0
 for x in input:
     z = [[int(z) for z in y.split('-')] for y in x.split(',')]
