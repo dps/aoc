@@ -1,49 +1,10 @@
-def first():
-    inp = open('input.txt', 'r')
-    lines = inp.readlines()
-
-    score = 0
-    for l in lines:
-        line = l.strip()
-        pairs = line.split(',')
-        first = [i for i in range(int(pairs[0].split('-')[0]), int(pairs[0].split('-')[1])+1)]
-        second = [i for i in range(int(pairs[1].split('-')[0]), int(pairs[1].split('-')[1])+1)]
-        all_f_in_s = True
-        all_s_in_f = True
-        for a in first:
-            if not a in second:
-                all_f_in_s = False
-                break
-        for a in second:
-            if not a in first:
-                all_s_in_f = False
-                break
-        if (all_f_in_s or all_s_in_f):
-            score = score + 1
-    print(score)
-
-def second():
-    inp = open('input.txt', 'r')
-    lines = inp.readlines()
-
-    score = 0
-    for l in lines:
-        line = l.strip()
-        pairs = line.split(',')
-        first = [i for i in range(int(pairs[0].split('-')[0]), int(pairs[0].split('-')[1])+1)]
-        second = [i for i in range(int(pairs[1].split('-')[0]), int(pairs[1].split('-')[1])+1)]
-        any_f_in_s = False
-        any_s_in_f = False
-        for a in first:
-            if a in second:
-                any_f_in_s = True
-        for a in second:
-            if a in first:
-                any_s_in_f = True
-        if (any_f_in_s or any_s_in_f):
-            score = score + 1
-    print(score)
-
-
-if __name__ == '__main__':
-    second()
+input = [i.strip() for i in open("input.txt","r").readlines()]
+print(input)
+count = 0
+for x in input:
+    z = [[int(z) for z in y.split('-')] for y in x.split(',')]
+    r = [set(range(x[0],x[1]+1)) for x in z]
+    i = r[0].intersection(r[1])
+    if len(i) > 0: #== len(r[0]) or len(i) == len(r[1]):
+        count = count + 1
+print(count)
