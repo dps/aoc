@@ -1,10 +1,3 @@
-def char_to_score(ch):
-    t = ord(ch)
-    if t >= ord('a') and t <= ord('z'):
-        return t - ord('a') + 1
-    if t >= ord('A') and t <= ord('Z'):
-        return t - ord('A') + 27
-
 def first():
     inp = open('input.txt', 'r')
     lines = inp.readlines()
