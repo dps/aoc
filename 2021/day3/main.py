@@ -10,8 +10,8 @@ def part1():
         gamma = ""
         epsilon = ""
         for k in range(len(acc.keys())):
-            ones = sum(map(lambda x : x == "1", sorted(acc[k])))
-            zeroes = sum(map(lambda x : x == "0", sorted(acc[k])))
+            ones = sum(map(lambda x : x == "1", acc[k]))
+            zeroes = sum(map(lambda x : x == "0", acc[k]))
             if ones > zeroes:
                 gamma = gamma + "1"
                 epsilon = epsilon + "0"
