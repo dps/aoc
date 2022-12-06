@@ -32,10 +32,14 @@ c = copy.deepcopy(input)
 Lists -- sum elements matching filter
 ```
 ones = sum(map(lambda x : x == "1", list_var))
+# more pythonic
+ones = sum([x == "1" for x in list_var])
 ```
 Lists -- filter
 ```
 oxy = [x for x in filter(lambda x : x[pos] == selected, oxy)]
+# more pythonic
+oxy = [x for x in oxy if x[pos] == selected]
 ```
 
 `itertools`
