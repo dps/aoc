@@ -34,6 +34,8 @@ Lists -- sum elements matching filter
 ones = sum(map(lambda x : x == "1", list_var))
 # more pythonic
 ones = sum([x == "1" for x in list_var])
+# simpler
+ones = list_var.count("1")
 ```
 Lists -- filter
 ```
