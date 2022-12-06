@@ -56,3 +56,6 @@ Char positions
 >>> list(zip(itertools.count(), 'David')) 
 [(0, 'D'), (1, 'a'), (2, 'v'), (3, 'i'), (4, 'd')]
 ```
+
+## References
+https://gist.github.com/mcpower/87427528b9ba5cac6f0c679370789661
