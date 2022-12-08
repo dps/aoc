@@ -92,20 +92,14 @@ def cs(g, x, y):
 
 
 def part2():
-    score=set()
     g = grid_from_strs(input)
-    print(g)
     max_scene = 0
-    mt = None
     for row in range(1,len(g.g()[0])-1):
         for col in range(1,len(g.g()[0])-1):
             x = cs(g, row, col)
             if x > max_scene:
-                print(max_scene, mt)
                 max_scene = x
-                mt = (row,col)
     print(max_scene)
-    print(mt)
 
 
 if __name__ == '__main__':
