@@ -52,55 +52,47 @@ def cs(g, x, y):
     g.set_cursor(x,y)
     max = int(g.get())
     # up
-    h = -1
     c = 0
     while g._cursor[1] > 0:
         g.move(0,-1)
+        c+=1
         if int(g.get()) >= max:
-            c+=1
             break
-        if int(g.get()) >= h:
-            c+=1
     cs.append(c)
     # down
-    h = -1
     c = 0
     g.set_cursor(x,y)
     while g._cursor[1] < s-1:
         g.move(0,1)
+        c+=1
         if int(g.get()) >= max:
-            c+=1
             break
-        if int(g.get()) >= h:
-            c+=1
     cs.append(c)
     # left
-    h = -1
     c = 0
     g.set_cursor(x,y)
     while g._cursor[0] > 0:
         g.move(-1,0)
+        c+=1
         if int(g.get()) >= max:
-            c+=1
             break
-        if int(g.get()) >= h:
-            c+=1
     cs.append(c)
     # right
-    h = -1
     c = 0
     g.set_cursor(x,y)
     while g._cursor[0] < s-1:
         g.move(1,0)
+        c+=1
         if int(g.get()) >= max:
-            c+=1
             break
-        if int(g.get()) >= h:
-            c+=1
     cs.append(c)
     return reduce(operator.mul, cs, 1)
 
+
+
+
 def part2():
+    score=set()
     g = grid_from_strs(input)
     print(g)
     max_scene = 0
@@ -113,6 +105,7 @@ def part2():
                 max_scene = x
                 mt = (row,col)
     print(max_scene)
+    print(mt)
 
 
 if __name__ == '__main__':
