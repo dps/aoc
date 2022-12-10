@@ -29,7 +29,7 @@ def part2():
             print('#', end='')
         else:
             print('.', end='')
-        if (cycle % 40) == 0:
+        if (cycle % 40) == 39:
             print()
     
     for line in input:
