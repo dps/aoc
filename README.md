@@ -61,3 +61,17 @@ Char positions
 
 ## References
 https://gist.github.com/mcpower/87427528b9ba5cac6f0c679370789661
+
+## My setup
+
+```
+[browser window][VS Code           ]
+[terminal A][terminal B][terminal C]
+```
+
+terminal A is in `~/Downloads` and running `watchexec -- cp input.txt [path to current day problem]`
+terminal B is in the current day working directory running a python REPL.
+terminal C is in the current day working directory running `watchexec -- python3.10 main.py`
+
+### Get `watchexec`
+`brew install watchexec`
