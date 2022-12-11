@@ -30,8 +30,8 @@ def solve(part, rounds):
     for _ in range(rounds):
         for monk in range(monkey + 1):
             M = m[monk]
-            for item in m[monk]["starting"]:
-                m[monk]["inspected"] += 1
+            for item in M["starting"]:
+                M["inspected"] += 1
                 l = operate(item, M["op"])
                 if part == 1:
                     l = l // 3
@@ -46,7 +46,7 @@ def solve(part, rounds):
                 items = deepcopy(m[throw_to]["starting"])
                 items.append(l)
                 m[throw_to]["starting"] = items
-            m[monk]["starting"] = []
+            M["starting"] = []
 
     l = [i["inspected"] for k,i in m.items()]
     l.sort(reverse=True)
