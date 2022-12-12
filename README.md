@@ -61,3 +61,19 @@ Char positions
 
 ## References
 https://gist.github.com/mcpower/87427528b9ba5cac6f0c679370789661
+
+## My setup
+
+```
+[browser window][VS Code           ]
+[terminal A][terminal B][terminal C]
+```
+
+* Terminal A is in `~/Downloads` and running `watchexec -- cp input.txt [path to current day problem]`
+   * This means as soon as I right click to download input.txt in Chrome it gets copied to the right place without me messing with the finder window. Most other folks going for speed seem to just select the content and copy to the clipboard then paste in the editor so maybe that's faster.
+* Terminal B is in the current day working directory running a python REPL.
+   * I use this for trying little code fragments
+* Terminal C is in the current day working directory running `watchexec -- python3.10 main.py`
+   * This is the one that matters - re-runs my code every time I save the source code
+### Get `watchexec`
+`brew install watchexec`
