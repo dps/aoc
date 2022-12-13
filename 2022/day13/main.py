@@ -8,6 +8,12 @@ def validate(left, right):
                 return True
             if l > r:
                 return False
+
+        if l is None and not r is None:
+            return True
+        if r is None and not l is None:
+            return False
+
         cmp = None
         if isinstance(l, list) and isinstance(r, list):
             cmp = validate(l, r)
@@ -16,12 +22,7 @@ def validate(left, right):
         if isinstance(l, int) and isinstance(r, list):
             cmp = validate([l], r)
 
-        if l is None and not r is None:
-            return True
-        if r is None and not l is None:
-            return False
-
-        if cmp == True or cmp ==False:
+        if cmp == True or cmp == False:
             # can also be None to continue comparing
             return cmp
 
@@ -55,7 +56,7 @@ def part2():
     input.append([[6]])
 
     input = sorted(input, key=functools.cmp_to_key(wrap_validate))
-    print((input.index([[2]])+1) *(input.index([[6]])+1))
+    print((input.index([[2]])+1) * (input.index([[6]])+1))
 
 if __name__ == '__main__':
     part1()
