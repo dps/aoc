@@ -1,24 +1,17 @@
 from utils import *
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
-def delt(here, there):
-    if there == 'S':
-        return ord("a") - ord(here)
-    if there == 'E':
-        return ord("z") - ord(here)
-    if here == 'S':
-        return ord(there) - ord("a")
-    if here == 'E':
-        return ord(there) - ord("z")
-
-    return ord(there) - ord(here)
+def delta(here, there):
+    return (ord(there if there not in "SE" else {"S":"a","E":"z"}[there])
+            -
+            ord(here if here not in "SE" else {"S":"a","E":"z"}[here]))
 
 def can_walk(r,c,ch):
     ret = []
     for _,i in DIR.items():
         if r + i[1] < len(input) and r + i[1] >= 0 and c + i[0] < len(input[0]) and c + i[0] >= 0:
-            if delt(ch, input[r+i[1]][c + i[0]]) <= 1:
-                ret.append((r+i[1], c+i[0]))
+            if delta(ch, input[r+i[1]][c + i[0]]) <= 1:
+                ret.append((r + i[1], c + i[0]))
     return ret
 
 def solve():
