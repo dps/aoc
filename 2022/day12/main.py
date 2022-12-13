@@ -18,7 +18,7 @@ def can_walk(r,c,ch):
     for _,i in DIR.items():
         if r + i[1] < len(input) and r + i[1] >= 0 and c + i[0] < len(input[0]) and c + i[0] >= 0:
             if delt(ch, input[r+i[1]][c + i[0]]) <= 1:
-                ret.append(str(r+i[1])+","+str(c+i[0]))
+                ret.append((r+i[1], c+i[0]))
     return ret
 
 def solve():
@@ -27,15 +27,15 @@ def solve():
     start, end = None, None
     for r, row in enumerate(input):
         for c, ch in enumerate(row):
-            key = str(r)+","+str(c)
+            key = (r, c)
             graph[key] = can_walk(r,c,ch)
             if ch == 'S':
-                start = str(r)+","+str(c)
-                ayes.append(str(r)+","+str(c))
+                start = key
+                ayes.append(key)
             if ch == 'E':
-                end = str(r)+","+str(c)
+                end = key
             if ch == 'a':
-                ayes.append(str(r)+","+str(c))
+                ayes.append(key)
 
     print(len(find_shortest_path(graph, start, end)) - 1)
 
