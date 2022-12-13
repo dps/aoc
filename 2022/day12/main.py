@@ -38,15 +38,8 @@ def solve():
                 ayes.append(key)
 
     print(len(find_shortest_path(graph, start, end)) - 1)
+    print(min(len(x) - 1 for x in [v for v in [find_shortest_path(graph, a, end) for a in ayes] if v is not None]))
 
-    min_path = 9999999
-    for a in ayes:
-        path = find_shortest_path(graph, a, end)
-        if path:
-            t = len(path) - 1
-            if t < min_path:
-                min_path = t
-    print(min_path)
 
 if __name__ == '__main__':
     solve()
