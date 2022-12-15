@@ -1,4 +1,4 @@
-import utils
+from utils import *
 import sys
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
@@ -14,8 +14,8 @@ def part1():
     for row in input:
         p = ints(row)
         s = p[0] + (p[1])*1j
-        b = (p[2] + p[3]*1j)
-        mh = abs(s.real - b.real) + abs(s.imag - b.imag)
+        b = p[2] + p[3]*1j
+        mh = manhattan(s, b)
         if p[0]+mh > mx:
             mx = int(p[0]+mh)
         if p[0]-mh < lx:
@@ -28,12 +28,6 @@ def part1():
 
         w[s]=int(mh)
         w[b]=int(0)
-
-    for row in input:
-        p = ints(row)
-        b = (p[2] + p[3]*1j)
-        w[b]=int(0)
-            
 
     i = 0
     for x in range(lx,mx):
@@ -82,11 +76,6 @@ def part2():
         w[b]=int(0)
 
         paint_around(s, mh + 1, candidates, max_dim)
-
-    for row in input:
-        p = ints(row)
-        b = (p[2] + p[3]*1j)
-        w[b]=int(0)
 
     res = deepcopy(candidates)
     iter = 0
