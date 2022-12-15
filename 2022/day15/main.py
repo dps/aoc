@@ -1,3 +1,4 @@
+import utils
 import sys
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
