@@ -46,9 +46,9 @@ def part1():
 
 def paint_around(p, dist, c, stop):
     res = []
-    y=int(dist)
+    y=dist
     x=0
-    for i in range(y):
+    for i in range(dist):
         if p.real+x > 0 and p.real+x < stop and p.imag - y >0 and p.imag -y < stop:
             c.add(p +x - y*1j)
         if p.real-x > 0 and p.real-x < stop and p.imag - y >0 and p.imag -y < stop:
@@ -75,7 +75,7 @@ def part2():
         w[s]=int(mh)
         w[b]=int(0)
 
-        paint_around(s, mh + 1, candidates, max_dim)
+        paint_around(s, int(mh + 1), candidates, max_dim)
 
     res = deepcopy(candidates)
     iter = 0
@@ -105,5 +105,5 @@ def part2():
 
 
 if __name__ == '__main__':
-    part1()
+    #part1()
     part2()
