@@ -7,13 +7,12 @@ def manhattan(p, q):
 
 def part1():
     w = {}
-    mx = 0
-    lx = sys.maxsize
+    mx, lx = 0, sys.maxsize
     test_row = 2000000
 
     for row in input:
         p = ints(row)
-        s = p[0] + (p[1])*1j
+        s = p[0] + p[1]*1j
         b = p[2] + p[3]*1j
         mh = manhattan(s, b)
         if p[0]+mh > mx:
@@ -33,14 +32,12 @@ def part1():
     for x in range(lx,mx):
         if x + test_row*1j in w:
             continue
-        t = False
         for p,s in w.items():
             if s == 0:
                 continue
             if manhattan(x + test_row*1j, p) <= s:
-                t = True
-        if t:
-            i+=1
+                i += 1
+                break
 
     print(i)
 
@@ -105,5 +102,5 @@ def part2():
 
 
 if __name__ == '__main__':
-    #part1()
-    part2()
+    part1()
+    #part2()
