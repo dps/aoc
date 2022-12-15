@@ -129,18 +129,6 @@ class Grid(object):
     def down_wrap(self, y, steps=1):
         return (y + steps) #% self._height
 
-    def draw_line(self, x, y, px, py, ch="#"):
-        assert(self.set_cursor(px, py) != None)
-        self.set(ch)
-        if x == px:
-            for _ in range(abs(y - py)):
-                self.move(0, sign(y - py))
-                self.set(ch)
-        if y == py:
-            for _ in range(abs(x - px)):
-                self.move(sign(x - px), 0)
-                self.set(ch)
-
 def grid_from_strs(lines, spl=''):
     l = lines[0].strip()
     if spl != '':
