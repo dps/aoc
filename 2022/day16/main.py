@@ -1,27 +1,20 @@
 from utils import *
-import networkx as nx
-from networkx.algorithms import tournament
+from functools import cache
 
-input = [i.strip() for i in open("simple.txt","r").readlines()]
+input = [i.strip() for i in open("input.txt","r").readlines()]
 
 flow = {}
 connect = {}
 tvalves = 0
+memo={}
 
-memo = {}
-
+@cache
 def dfs(here, mins_remaining, opened):
-    #print(here, mins_remaining, opened)
-    if (here, mins_remaining, opened) in memo:
-        return memo[(here, mins_remaining, opened)]
     acc = 0
     if mins_remaining <= 1: # it takes a min to open a valve
-        memo[(here, mins_remaining, opened)] = 0
         return 0
     nowopened = opened
 
-
-    #print("NO", nowopened)
     ## Run past case!
     best = max([dfs(c, mins_remaining-1, nowopened) for c in connect[here]])
 
@@ -32,15 +25,39 @@ def dfs(here, mins_remaining, opened):
         nowopened = tuple(sorted(nowopened)) # gah need to make them equal like sets!
         mins_remaining -= 1 # It takes a min to open the valve
         if len(nowopened) == tvalves:
-            memo[(here, mins_remaining, opened)] = acc
             return acc
         # It takes a min to traverse the tunnel
         best = max(best, acc + max([dfs(c, mins_remaining-1, nowopened) for c in connect[here]]))
 
-    memo[(here, mins_remaining, opened)] = best
     return best
 
-def dfs_with_elephant(here, elephant, mins_remaining, opened):
+
+@cache
+def dfs_with_elephant(here, mins_remaining, opened):
+    acc = 0
+    if mins_remaining <= 1: # it takes a min to open a valve
+        #print(len(opened), tvalves)
+        return dfs("AA", 26, opened)
+    nowopened = opened
+
+    ## Run past case!
+    best = max([dfs_with_elephant(c, mins_remaining-1, nowopened) for c in connect[here]])
+
+    ## Hmm, you can also run past
+    if flow[here] > 0 and not here in opened:
+        acc = (mins_remaining-1) * flow[here]
+        nowopened = opened + (here,)
+        nowopened = tuple(sorted(nowopened)) # gah need to make them equal like sets!
+        mins_remaining -= 1 # It takes a min to open the valve
+        if len(nowopened) == tvalves:
+            return acc
+        # It takes a min to traverse the tunnel
+        best = max(best, acc + max([dfs_with_elephant(c, mins_remaining-1, nowopened) for c in connect[here]]))
+
+    return best
+
+@cache
+def dfs_with_elephanto(here, elephant, mins_remaining, opened):
     #(here, elephant, mins_remaining, opened)
     if (here, elephant, mins_remaining, opened) in memo:
         return memo[(here, elephant, mins_remaining, opened)]
@@ -104,7 +121,6 @@ def dfs_with_elephant(here, elephant, mins_remaining, opened):
 
 def part1():
     global tvalves
-    graph = nx.DiGraph()
 
     for row in input:
         # Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
@@ -118,9 +134,6 @@ def part1():
             tunnels = [row.split("leads to valve ")[1]]
         flow[valve] = rate
         connect[valve] = tunnels
-        graph.add_node(valve)
-        for tunnel in tunnels:
-            graph.add_edge(valve, tunnel)
 
     #print(tvalves)
     # # Idea 1: DFS stopping at 30 mins... big input has 60 valves
@@ -134,7 +147,6 @@ def part1():
 
 def part2():
     global tvalves
-    graph = nx.DiGraph()
 
     for row in input:
         # Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
@@ -148,13 +160,10 @@ def part2():
             tunnels = [row.split("leads to valve ")[1]]
         flow[valve] = rate
         connect[valve] = tunnels
-        graph.add_node(valve)
-        for tunnel in tunnels:
-            graph.add_edge(valve, tunnel)
 
     #print(tvalves)
     # # Idea 1: DFS stopping at 30 mins... big input has 60 valves
-    max = dfs_with_elephant("AA", "AA", 26, ())
+    max = dfs_with_elephant("AA", 26, ())
     print(max)
 
 
