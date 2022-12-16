@@ -74,7 +74,7 @@ def solve(part=1):
     if part == 1:
         print(dfs("AA", 30, ()))
     if part == 2:
-        print(dfs_with_elephant("AA", 30, ()))
+        print(dfs_with_elephant("AA", 26, ()))
 
 
 if __name__ == '__main__':
