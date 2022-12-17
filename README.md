@@ -2,6 +2,23 @@
 
 ## Cookbooks
 
+A hashable `set`
+```
+s = frozenset([1,2])
+t = set(s)
+t.add(3)
+t = frozenset(t)
+>>> t
+frozenset({1, 2, 3})
+```
+
+##### `functools.cache`
+```
+@cache
+def expensive_fn(hashable_args):
+  expensive()
+```
+
 Binary => decimal
 ```
 int("1001", 2)
