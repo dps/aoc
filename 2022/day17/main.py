@@ -48,7 +48,7 @@ def stop_rock(world, rock):
 
 def top_twenty(world, wmax):
     res = ""
-    for y in range(wmax, wmax-20, -1):
+    for y in range(wmax, wmax-39, -1):
         o = set()
         for x in range(7):
             if (x,y) in world:
@@ -146,7 +146,7 @@ def part2():
             print()
     def print_top_of_world(wmax, owmax):
         delta = wmax - owmax
-        for y in range(wmax,wmax-30,-1):
+        for y in range(wmax,wmax-39,-1):
             for x in range(7):
                 if (x,y) in world:
                     print("#", end="")
@@ -177,6 +177,7 @@ def part2():
             print(r, len(state))
         if not start_decr and (move_idx, rock_idx, state) in seen_before:
             print("SEEN BEFORE!", r, world_max, wmaxes_seen[(move_idx, rock_idx, state)], blocks_seen[(move_idx, rock_idx, state)])
+            print_top_of_world(world_max, world_max)
 
             #Between blocks_seen[(move_idx, rock_idx, state)] nBLOCKS and r we have a cycle
             cycle_blocks = r - blocks_seen[(move_idx, rock_idx, state)]
@@ -189,7 +190,8 @@ def part2():
             cycle_height = world_max-wmaxes_seen[(move_idx, rock_idx, state)]
             print("cycle height=", cycle_height)
             # we'll also need to simulate the remaining falling on top. How many blocks?
-            print("heights", heights[-cycle_blocks:])
+            print("heights", heights[-cycle_blocks:]) #.  <<<-- the first of these should be the same as next line 
+            print("hs ", heights[blocks_seen[(move_idx, rock_idx, state)]])
             # blocks after start bit
             nblocks = 1000000000000 - blocks_seen[(move_idx, rock_idx, state)] - cycle_blocks
             # middle part is cycles
@@ -210,7 +212,7 @@ def part2():
             # print()
             hh = heights[-cycle_blocks:]
             nblock = 0
-            print("DDD", hh[more_blocks]-hh[0])
+            print("height added at start of cycle by that number extras:", hh[more_blocks]-hh[0])
             start_decr = True
 
         if start_decr:
