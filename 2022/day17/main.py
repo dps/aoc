@@ -39,22 +39,20 @@ def hash_top_lines(world, wmax):
         res += str(o)
     return res
 
-def part2():
+
+def solve(part=1):
     # The system loops after some length, you just have to find when it loops
 
+    drop_rocks = 2022 if part == 1 else 1000000000000
     seen_before = set()
-    wmaxes_seen = {}
-    blocks_seen = {}
+    wmaxes_seen, blocks_seen = {}, {}
 
     moves = [m for m in input[0].strip()]
-    move_idx = 0
-    rock_idx = 0
+    move_idx, rock_idx, world_max = 0, 0, 0
     # Just put a solid line at the bottom as the floor.
     world = set([(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0)])
-    world_max = 0
     r = -1
-    heights = [0]
-    deltas = []
+    heights, deltas = [0], []
     while True:
         state = hash_top_lines(world, world_max)
         heights.append(world_max)
@@ -62,10 +60,10 @@ def part2():
 
         r += 1
         if (move_idx, rock_idx, state) in seen_before:
-            # We found a cycle
+            # We found the cycle
             cycle_blocks = r - blocks_seen[(move_idx, rock_idx, state)]
             cycle_height = world_max-wmaxes_seen[(move_idx, rock_idx, state)]
-            remain = 1000000000000 - r
+            remain = drop_rocks - r
             tot = world_max
             add_cycles = remain // cycle_blocks
             tot += add_cycles * cycle_height
@@ -78,17 +76,14 @@ def part2():
         seen_before.add((move_idx, rock_idx, state))
         wmaxes_seen[(move_idx, rock_idx, state)] = world_max
         blocks_seen[(move_idx, rock_idx, state)] = r
+
         next_rock = rocks[rock_idx]
-        rock_idx += 1
-        rock_idx = rock_idx % len(rocks)
-        rock = set()
-        for point in next_rock:
-            rock.add((point[0], point[1] + world_max + 4))
+        rock_idx = (rock_idx + 1) % len(rocks)
+        rock = set([(p[0], p[1] + world_max + 4) for p in next_rock])
 
         while True:
             move = moves[move_idx]
-            move_idx += 1
-            move_idx = move_idx % len(moves)
+            move_idx = (move_idx + 1) % len(moves)
             rock = shift(world, rock, move)
             if stop_rock(world, rock):
                 world = world.union(rock)
@@ -96,40 +91,7 @@ def part2():
                 break
             else:
                 rock = drop_rock(rock)
-
-
-def part1():
-    moves = [m for m in input[0].strip()]
-    move_idx = 0
-    rock_idx = 0
-    # Just put a solid line at the bottom as the floor.
-    world = set([(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0)])
-    world_max = 0
-    for _ in range(2022):
-        next_rock = rocks[rock_idx]
-        rock_idx += 1
-        rock_idx = rock_idx % len(rocks)
-        rock = set()
-        for point in next_rock:
-            rock.add((point[0], point[1] + world_max + 4))
-
-        while True:
-            move = moves[move_idx]
-            move_idx += 1
-            move_idx = move_idx % len(moves)
-            rock = shift(world, rock, move)
-            if stop_rock(world, rock):
-                world = world.union(rock)
-                world_max = max([p[1] for p in world])
-                break
-            else:
-                rock = drop_rock(rock)
-
-    print(world_max)
-    return(world_max)
-
-
 
 if __name__ == '__main__':
-    assert(part1() == 3153)
-    assert(part2() == 1553665689155)
+    assert(solve(1) == 3153)
+    assert(solve(2) == 1553665689155)
