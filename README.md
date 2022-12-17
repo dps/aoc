@@ -12,7 +12,7 @@ t = frozenset(t)
 frozenset({1, 2, 3})
 ```
 
-# `functools.cache`
+##### `functools.cache`
 ```
 @cache
 def expensive_fn(hashable_args):
