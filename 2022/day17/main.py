@@ -1,6 +1,6 @@
 from utils import *
 
-input = [i.strip() for i in open("simple.txt","r").readlines()]
+input = [i.strip() for i in open("input.txt","r").readlines()]
 
 rocks = [
     {(2,0), (3,0), (4,0), (5,0)},       # -
@@ -48,7 +48,7 @@ def stop_rock(world, rock):
 
 def top_twenty(world, wmax):
     res = ""
-    for y in range(wmax, wmax-39, -1):
+    for y in range(wmax, wmax-39, -1): #39 needed for input.txt, 14 enough for simple
         o = set()
         for x in range(7):
             if (x,y) in world:
@@ -164,10 +164,13 @@ def part2():
     nblock = 999
     before_extra_wm = 0
     almost_there = 0
-    heights = []
+    heights = [0]
+    deltas = []
     while nblock > 0:
         state = top_twenty(world, world_max)
         heights.append(world_max)
+        deltas.append(heights[-1] - heights[-2])
+
 
         if (start_decr):
             nblock -= 1
@@ -176,7 +179,7 @@ def part2():
         if (r % 1000 ==0):
             print(r, len(state))
         if not start_decr and (move_idx, rock_idx, state) in seen_before:
-            print("SEEN BEFORE!", r, world_max, wmaxes_seen[(move_idx, rock_idx, state)], blocks_seen[(move_idx, rock_idx, state)])
+            print("SEEN BEFORE! ", r, blocks_seen[(move_idx, rock_idx, state)], world_max, wmaxes_seen[(move_idx, rock_idx, state)] )
             print_top_of_world(world_max, world_max)
 
             #Between blocks_seen[(move_idx, rock_idx, state)] nBLOCKS and r we have a cycle
@@ -190,8 +193,9 @@ def part2():
             cycle_height = world_max-wmaxes_seen[(move_idx, rock_idx, state)]
             print("cycle height=", cycle_height)
             # we'll also need to simulate the remaining falling on top. How many blocks?
+            print("deltas", deltas[-cycle_blocks:])
             print("heights", heights[-cycle_blocks:]) #.  <<<-- the first of these should be the same as next line 
-            print("hs ", heights[blocks_seen[(move_idx, rock_idx, state)]])
+            print("hs ", heights[blocks_seen[(move_idx, rock_idx, state)]], heights[-cycle_blocks])
             # blocks after start bit
             nblocks = 1000000000000 - blocks_seen[(move_idx, rock_idx, state)] - cycle_blocks
             # middle part is cycles
@@ -202,7 +206,7 @@ def part2():
 
             more_blocks = round(remainder * cycle_blocks)
             print("more blocks", more_blocks)
-            almost_there = after_first_cycle + ((nblocks/cycle_blocks) - 1 ) * cycle_height
+            almost_there = after_first_cycle + ((nblocks//cycle_blocks) - 1 ) * cycle_height
             print("height before final blocks:", almost_there)
             print("wmax now", world_max)
             before_extra_wm = world_max
@@ -211,8 +215,28 @@ def part2():
             # print_top_of_world(world_max, wmaxes_seen[(move_idx, rock_idx, state)])
             # print()
             hh = heights[-cycle_blocks:]
-            nblock = 0
+            nblock = more_blocks
             print("height added at start of cycle by that number extras:", hh[more_blocks]-hh[0])
+
+            print("height now", world_max, "blocks_now", r)
+            remain = 1000000000000 - r
+            tot = world_max
+            i=0
+            add_cycles = remain // cycle_blocks
+            tot += add_cycles * cycle_height
+            remain -= add_cycles * cycle_blocks
+            print("remaining ", remain)
+            while remain > 0:
+                if (remain % 10000000000) == 0:
+                    print(remain)
+                tot += deltas[-cycle_blocks:][i]
+                remain -= 1
+                i += 1
+                i = i % cycle_blocks
+
+            print(tot)
+            for i in range(cycle_blocks):
+                print(i, world_max + sum(deltas[-cycle_blocks:][0:i]))
             start_decr = True
 
         if start_decr:
@@ -248,6 +272,8 @@ def part2():
 
     print(world_max)
     print(almost_there + (world_max-before_extra_wm))
+    print(1514285714288 - (almost_there + (world_max-before_extra_wm)))
+    print("deltas", deltas[-35:])
 
 def part1():
     moves = [m for m in input[0].strip()]
