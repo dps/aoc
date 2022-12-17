@@ -64,15 +64,15 @@ def solve(part=1):
         if (move_idx, rock_idx, state) in seen_before:
             # We found the cycle
             cycle_blocks = r - blocks_seen[(move_idx, rock_idx, state)]
-            cycle_height = world_max-wmaxes_seen[(move_idx, rock_idx, state)]
-            remain = drop_rocks - r
-            tot = world_max
-            add_cycles = remain // cycle_blocks
-            tot += add_cycles * cycle_height
-            remain -= add_cycles * cycle_blocks
-            tot += sum(deltas[-cycle_blocks:][0:remain])
-            print(tot)
-            return tot
+            cycle_height = world_max - wmaxes_seen[(move_idx, rock_idx, state)]
+            remaining_rocks = drop_rocks - r
+            final_height = world_max
+            add_cycles = remaining_rocks // cycle_blocks
+            final_height += add_cycles * cycle_height
+            remaining_rocks -= add_cycles * cycle_blocks
+            final_height += sum(deltas[-cycle_blocks:][0:remaining_rocks])
+            print(final_height)
+            return final_height
 
         
         seen_before.add((move_idx, rock_idx, state))
