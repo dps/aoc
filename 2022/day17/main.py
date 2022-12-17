@@ -31,7 +31,9 @@ def stop_rock(world, rock):
 
 def hash_top_lines(world, wmax):
     res = ""
-    for y in range(wmax, wmax-39, -1): #39 needed for input.txt, 14 enough for simple
+    # Other input.txt may need a longer window than 14, but 14 works for
+    # mine and the simple example in the problem.
+    for y in range(wmax, wmax - 14, -1):
         o = set()
         for x in range(7):
             if (x,y) in world:
