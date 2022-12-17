@@ -12,16 +12,16 @@ def dfs(here, mins_remaining, opened):
     acc = 0
     if mins_remaining <= 1: # it takes a min to open a valve
         return 0
-    nowopened = opened
 
     ## Run past case!
-    best = max([dfs(c, mins_remaining-1, nowopened) for c in connect[here]])
+    best = max([dfs(c, mins_remaining-1, opened) for c in connect[here]])
 
-    ## Hmm, you can also run past
+    ## Open valve case
     if flow[here] > 0 and not here in opened:
+        nowopened = set(opened)
         acc = (mins_remaining-1) * flow[here]
-        nowopened = opened + (here,)
-        nowopened = tuple(sorted(nowopened)) # gah need to make them equal like sets!
+        nowopened.add(here)
+        nowopened = frozenset(nowopened)
         mins_remaining -= 1 # It takes a min to open the valve
         if len(nowopened) == tvalves:
             return acc
@@ -37,16 +37,16 @@ def dfs_with_elephant(here, mins_remaining, opened):
     if mins_remaining <= 1: # it takes a min to open a valve
         # Let the elephant run from the top
         return dfs("AA", 26, opened)
-    nowopened = opened
 
     ## Run past case!
-    best = max([dfs_with_elephant(c, mins_remaining-1, nowopened) for c in connect[here]])
+    best = max([dfs_with_elephant(c, mins_remaining-1, opened) for c in connect[here]])
 
-    ## Hmm, you can also run past
+    ## Open valve case
     if flow[here] > 0 and not here in opened:
+        nowopened = set(opened)
         acc = (mins_remaining-1) * flow[here]
-        nowopened = opened + (here,)
-        nowopened = tuple(sorted(nowopened)) # gah need to make them equal like sets!
+        nowopened.add(here)
+        nowopened = frozenset(nowopened)
         mins_remaining -= 1 # It takes a min to open the valve
         if len(nowopened) == tvalves:
             return acc
@@ -72,11 +72,18 @@ def solve(part=1):
         connect[valve] = tunnels
 
     if part == 1:
-        print(dfs("AA", 30, ()))
+        return(dfs("AA", 30, frozenset()))
     if part == 2:
-        print(dfs_with_elephant("AA", 26, ()))
+        return(dfs_with_elephant("AA", 26, frozenset()))
 
 
 if __name__ == '__main__':
-    #solve(1)
-    solve(2)
+    assert(solve(1) == 2320)
+    assert(solve(2) == 2967)
+
+
+# Without frozenset:
+## time python main.py 
+## python main.py  95.10s user 1.09s system 99% cpu 1:36.24 total
+# With frozenset:
+## python main.py  55.31s user 1.35s system 99% cpu 56.710 total
