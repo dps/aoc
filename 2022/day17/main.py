@@ -46,7 +46,7 @@ def stop_rock(world, rock):
     drop = drop_rock(deepcopy(rock))
     return len(world.intersection(drop)) > 0
 
-def top_twenty(world, wmax):
+def hash_top_lines(world, wmax):
     res = ""
     for y in range(wmax, wmax-39, -1): #39 needed for input.txt, 14 enough for simple
         o = set()
@@ -90,14 +90,7 @@ def top_til_every_xspot_seen(world, wmax):
 
 def part2():
     # My hypothesis is that the system loops after some length, you just have to find when it loops
-    # that would be when the bottom half of the world is exactly equal to the top half of the world with the same next block falling
-    # and on same move count.
-    # OR there are a finite number of blocks and a finite number of moves so the height at num_blocks
-    # * num_moves will repeat?
-    # Let's find the height at num_blocks times num_moves? No, they don't neatly go into each other, so let's find how tall it is when
-    # it loops
-
-    # how about we grab move_idx, rock_idx and a bitmask of the top 20 lines and see how long until that loops?
+    # how about we grab move_idx, rock_idx and a hash of the top 20 lines and see how long until that loops?
     # that loops pretty quickly actually and the math doesn't quite work out for the simple input, so it must be harder than that.
     # >>> 1000000000000/2351
     # 425350914.5044662
@@ -130,7 +123,6 @@ def part2():
     blocks_seen = {}
 
     moves = [m for m in input[0].strip()]
-    #print(len(moves)) # 10091 for input
     move_idx = 0
     rock_idx = 0
     world = set([(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0)])
@@ -160,72 +152,28 @@ def part2():
                     print(".", end="")            
             print()
     r = -1
-    start_decr = False
-    nblock = 999
-    before_extra_wm = 0
-    almost_there = 0
     heights = [0]
     deltas = []
-    while nblock > 0:
-        state = top_twenty(world, world_max)
+    while True:
+        state = hash_top_lines(world, world_max)
         heights.append(world_max)
         deltas.append(heights[-1] - heights[-2])
 
-
-        if (start_decr):
-            nblock -= 1
-
         r += 1
-        if (r % 1000 ==0):
-            print(r, len(state))
-        if not start_decr and (move_idx, rock_idx, state) in seen_before:
-            print("SEEN BEFORE! ", r, blocks_seen[(move_idx, rock_idx, state)], world_max, wmaxes_seen[(move_idx, rock_idx, state)] )
-            print_top_of_world(world_max, world_max)
+        if (move_idx, rock_idx, state) in seen_before:
+            
+            #print("SEEN BEFORE! ", r, blocks_seen[(move_idx, rock_idx, state)], world_max, wmaxes_seen[(move_idx, rock_idx, state)] )
+            #print_top_of_world(world_max, world_max)
 
             #Between blocks_seen[(move_idx, rock_idx, state)] nBLOCKS and r we have a cycle
             cycle_blocks = r - blocks_seen[(move_idx, rock_idx, state)]
-            print("cycle blocks=", cycle_blocks)
-            #Before the next block fell at the start of this cycle, we had a tower of height
-            start_blocks = blocks_seen[(move_idx, rock_idx, state)]
-            print("start num blocks before cycle=", blocks_seen[(move_idx, rock_idx, state)])
-            print("orig tower h=", wmaxes_seen[(move_idx, rock_idx, state)])
-            # height of the cycle is
             cycle_height = world_max-wmaxes_seen[(move_idx, rock_idx, state)]
-            print("cycle height=", cycle_height)
-            # we'll also need to simulate the remaining falling on top. How many blocks?
-            print("deltas", deltas[-cycle_blocks:])
-            print("heights", heights[-cycle_blocks:]) #.  <<<-- the first of these should be the same as next line 
-            print("hs ", heights[blocks_seen[(move_idx, rock_idx, state)]], heights[-cycle_blocks])
-            # blocks after start bit
-            nblocks = 1000000000000 - blocks_seen[(move_idx, rock_idx, state)] - cycle_blocks
-            # middle part is cycles
-
-            print("height after one cycle (incl start)", heights[start_blocks+cycle_blocks])
-            after_first_cycle = heights[start_blocks+cycle_blocks]
-            remainder = (nblocks / cycle_blocks) % 1
-
-            more_blocks = round(remainder * cycle_blocks)
-            print("more blocks", more_blocks)
-            almost_there = after_first_cycle + ((nblocks//cycle_blocks) - 1 ) * cycle_height
-            print("height before final blocks:", almost_there)
-            print("wmax now", world_max)
-            before_extra_wm = world_max
-            # print(r)
-            # print(top_twenty(world, wmaxes_seen[(move_idx, rock_idx, state)]))
-            # print_top_of_world(world_max, wmaxes_seen[(move_idx, rock_idx, state)])
-            # print()
-            hh = heights[-cycle_blocks:]
-            nblock = more_blocks
-            print("height added at start of cycle by that number extras:", hh[more_blocks]-hh[0])
-
-            print("height now", world_max, "blocks_now", r)
             remain = 1000000000000 - r
             tot = world_max
-            i=0
+            i = 0
             add_cycles = remain // cycle_blocks
             tot += add_cycles * cycle_height
             remain -= add_cycles * cycle_blocks
-            print("remaining ", remain)
             while remain > 0:
                 if (remain % 10000000000) == 0:
                     print(remain)
@@ -235,12 +183,8 @@ def part2():
                 i = i % cycle_blocks
 
             print(tot)
-            for i in range(cycle_blocks):
-                print(i, world_max + sum(deltas[-cycle_blocks:][0:i]))
-            start_decr = True
+            return tot
 
-        if start_decr:
-            print("In start_decr ", r, world_max)
         
         seen_before.add((move_idx, rock_idx, state))
         wmaxes_seen[(move_idx, rock_idx, state)] = world_max
