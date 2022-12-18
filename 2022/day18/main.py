@@ -12,7 +12,7 @@ FACES = [
 ]
 
 droplet = set()
-min_x,min_y,min_z, max_x,max_y,max_z = 0,0,0,0,0,0
+min_x,min_y,min_z,max_x,max_y,max_z = 0,0,0,0,0,0
 
 def points_facing_sides(voxel):
     # a voxel has 6 sides each facing a voxel with the returned coords
@@ -53,16 +53,14 @@ def part1():
 
 def part2():
     global min_x,min_y,min_z, max_x,max_y,max_z
-    # Surface area of connected voxels
+    # Find the enclosed bubbles and ignore them!
     for line in input:
         droplet.add(tuple(ints(line)))
     
-    # find droplet bounds, scan each voxel out to bounds on each axis to see if it's inside the droplet
+    # find droplet bounds.
     min_x,min_y,min_z = min([p[0] for p in droplet]), min([p[1] for p in droplet]), min([p[2] for p in droplet])
     max_x,max_y,max_z = max([p[0] for p in droplet]), max([p[1] for p in droplet]), max([p[2] for p in droplet])
 
-    print(min_x,min_y,min_z)
-    print(max_x,max_y,max_z)
     filled_in = deepcopy(droplet)
     for x in range(min_x, max_x):
         for y in range(min_y, max_y):
