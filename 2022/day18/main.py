@@ -1,6 +1,6 @@
 from utils import *
 
-input = [i.strip() for i in open("simple.txt","r").readlines()]
+input = [i.strip() for i in open("input.txt","r").readlines()]
 
 FACES = [
     (1, 0, 0),
@@ -12,33 +12,30 @@ FACES = [
 ]
 
 droplet = set()
+min_x,min_y,min_z, max_x,max_y,max_z = 0,0,0,0,0,0
 
 def points_facing_sides(voxel):
     # a voxel has 6 sides each facing a voxel with the returned coords
     return [(voxel[0] + f[0], voxel[1] + f[1], voxel[2] + f[2]) for f in FACES]
 
-@cache
 def in_bound(x, min_x, max_x):
     return x >= min_x and x <= max_x
 
-@cache
-def enclosed(voxel, min_x,min_y,min_z, max_x,max_y,max_z):
-    # we'll need to do marching cubes... Any path to air means not enclosed
-    print("enclosed ", voxel)
+def enclosed(voxel):
+    # we'll do marching cubes... Any path to air means not enclosed
     queue = deque([voxel])
 
+    tested = set()
     while len(queue) > 0:
-        print(queue)
         vox = queue.popleft()
         for q in points_facing_sides(vox):
             if not q in droplet and in_bound(q[0], min_x, max_x) and in_bound(q[1], min_y, max_y) and in_bound(q[2], min_z, max_z):
-                queue.append(q)
+                if q not in tested:
+                    queue.append(q)
+                    tested.add(q)
             elif not in_bound(q[0], min_x, max_x) or not in_bound(q[1], min_y, max_y) or not in_bound(q[2], min_z, max_z):
-                print("enclosed: False", q)
                 return False
-    print("enclosed: march over")
     return True
-
 
 def part1():
     # Surface area of connected voxels
@@ -55,6 +52,7 @@ def part1():
     print(len(faces))
 
 def part2():
+    global min_x,min_y,min_z, max_x,max_y,max_z
     # Surface area of connected voxels
     for line in input:
         droplet.add(tuple(ints(line)))
@@ -69,7 +67,7 @@ def part2():
     for x in range(min_x, max_x):
         for y in range(min_y, max_y):
             for z in range(min_z, max_z):
-                if enclosed((x,y,z), min_x,min_y,min_z, max_x,max_y,max_z):
+                if enclosed((x,y,z)):
                     filled_in.add((x,y,z))
 
 
