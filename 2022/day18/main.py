@@ -19,30 +19,28 @@ def points_facing_sides(voxel):
     return [(voxel[0] + f[0], voxel[1] + f[1], voxel[2] + f[2]) for f in FACES]
 
 def in_bound(x, min_x, max_x):
-    return x >= min_x and x <= max_x
+    return x >= -1 and x <= max_x + 1
 
-def enclosed(voxel):
-    # we'll do marching cubes... Any path to air means not enclosed
-    queue = deque([voxel])
-
-    tested = set()
+def not_enclosed():
+    outside_droplet = set()
+    queue = deque([(0,0,0)])
     while len(queue) > 0:
         vox = queue.popleft()
         for q in points_facing_sides(vox):
-            if not q in droplet and in_bound(q[0], min_x, max_x) and in_bound(q[1], min_y, max_y) and in_bound(q[2], min_z, max_z):
-                if q not in tested:
-                    queue.append(q)
-                    tested.add(q)
-            elif not in_bound(q[0], min_x, max_x) or not in_bound(q[1], min_y, max_y) or not in_bound(q[2], min_z, max_z):
-                return False
-    return True
+            if q in outside_droplet:
+                continue
+            elif q in droplet:
+                continue
+            elif in_bound(q[0], min_x, max_x) and in_bound(q[1], min_y, max_y) and in_bound(q[2], min_z, max_z):
+                outside_droplet.add(q)
+                queue.append(q)
+    return outside_droplet
 
 def part1():
     # Surface area of connected voxels
     droplet = set()
     for line in input:
         droplet.add(tuple(ints(line)))
-    print(droplet)
     faces = []
     for voxel in droplet:
         adj = points_facing_sides(voxel)
@@ -50,6 +48,7 @@ def part1():
             if p not in droplet:
                 faces.append(adj)
     print(len(faces))
+    return len(faces)
 
 def part2():
     global min_x,min_y,min_z, max_x,max_y,max_z
@@ -61,22 +60,18 @@ def part2():
     min_x,min_y,min_z = min([p[0] for p in droplet]), min([p[1] for p in droplet]), min([p[2] for p in droplet])
     max_x,max_y,max_z = max([p[0] for p in droplet]), max([p[1] for p in droplet]), max([p[2] for p in droplet])
 
-    filled_in = deepcopy(droplet)
-    for x in range(min_x, max_x):
-        for y in range(min_y, max_y):
-            for z in range(min_z, max_z):
-                if enclosed((x,y,z)):
-                    filled_in.add((x,y,z))
-
+    # Better algorithm h/t robertying
+    outside_droplet = not_enclosed()
 
     faces = []
     for voxel in droplet:
         adj = points_facing_sides(voxel)
         for p in adj:
-            if p not in filled_in:
+            if p in outside_droplet:
                 faces.append(adj)
     print(len(faces))
+    return len(faces)
 
 if __name__ == '__main__':
-    #part1()
-    part2()
+    assert(part1() == 4580)
+    assert(part2() == 2610)
