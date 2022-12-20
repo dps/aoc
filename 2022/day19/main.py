@@ -31,7 +31,6 @@ def max_cost(num, resource_num):
     m = 0
     for v in costs:
         m = max(m, v[resource_num])
-    print("max_cost", num, resource_num, m)
     return m
 
 @cache
@@ -98,7 +97,6 @@ def solve(part=1):
         num = ints(line.split(":")[0])[0]
         robot_descs = line.split(":")[1].split(".")
         for robot in robot_descs:
-            print(robot)
             g = re.match(r"Each (\w+) robot costs ([^.]*)", robot.strip())
             if not g:
                 break
@@ -112,8 +110,6 @@ def solve(part=1):
         blueprint["n"] = int(num)
         blueprint["costs"] = (blueprint["ore"], blueprint["clay"], blueprint["obsidian"], blueprint["geode"])
         blueprints[int(num)] = blueprint
-    print(blueprints)
-
 
     tot = 0 if part == 1 else 1
     for k,blueprint in blueprints.items():
@@ -132,5 +128,5 @@ def solve(part=1):
 
 
 if __name__ == '__main__':
-    #assert(solve(1) == 1404)
+    assert(solve(1) == 1404)
     assert(solve(2) == 5880)
