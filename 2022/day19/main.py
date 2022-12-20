@@ -52,8 +52,8 @@ def maximize(num, robots, resources, mins_remaining):
             global_best = resources[3]
         return resources[3]
 
-    # if (resources[3] + robots[3] * mins_remaining + max_geodes_from_new_bots_in_remaining(mins_remaining)) < global_best:
-    #     return 0
+    if (resources[3] + robots[3] * mins_remaining + max_geodes_from_new_bots_in_remaining(mins_remaining)) < global_best:
+        return 0
     could_spend = can_build(num, resources)
 
     to_prune = []
@@ -130,5 +130,5 @@ def solve(part=1):
 
 
 if __name__ == '__main__':
-    assert(solve(1) == 1404)
+    #assert(solve(1) == 1404)
     assert(solve(2) == 5880)
