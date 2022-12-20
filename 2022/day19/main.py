@@ -90,6 +90,7 @@ def maximize(num, robots, resources, mins_remaining):
     
 
 def solve(part=1):
+    global global_best
     for i, line in enumerate(input):
         blueprint = {}
         #Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 4 ore. Each obsidian robot costs 4 ore and 8 clay. Each geode robot costs 2 ore and 15 obsidian.
@@ -116,6 +117,7 @@ def solve(part=1):
 
     tot = 0 if part == 1 else 1
     for k,blueprint in blueprints.items():
+        global_best = 0
         m = maximize(k, (1,0,0,0), (0,0,0,0), 24 if part==1 else 32)
         print("***>", k, m)
         if part == 1:
