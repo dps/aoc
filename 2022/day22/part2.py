@@ -1,12 +1,11 @@
 input = [i for i in open("input.txt", "r").readlines()]
 
-
 FACES = {
     1: 1,
     2: 2,
-    1+1j: 3,
+    1 + 1j: 3,
     2j: 4,
-    1+2j: 5,
+    1 + 2j: 5,
     3j: 6
 }
 
@@ -16,88 +15,79 @@ def face(p, face_width):
 
 
 def loop(pos, facing, face_width):
-    p = None
-    new_facing = None
+    p, new_facing = None, None
     fac = face(pos, face_width)
-    x_on_face = int(pos.real) % face_width
-    y_on_face = int(pos.imag) % face_width
+    x_on_face, y_on_face = int(
+        pos.real) % face_width, int(pos.imag) % face_width
 
     # 1 up goes to 6 coming in from left
     if fac == 1 and facing == -1j:
         y_on_new_face = x_on_face
-        p = (3 * face_width + y_on_new_face)*1j
+        p = (3 * face_width + y_on_new_face) * 1j
         new_facing = 1
     # 1 left goes to 4 coming in from left (inv)
     if fac == 1 and facing == -1:
         y_on_new_face = face_width - y_on_face - 1
-        p = (2*face_width + y_on_new_face)*1j
+        p = (2 * face_width + y_on_new_face) * 1j
         new_facing = 1
     # 2 up goes to 6 from btm
     if fac == 2 and facing == -1j:
-        p = (4*face_width - 1)*1j + x_on_face
+        p = (4 * face_width - 1) * 1j + x_on_face
         new_facing = -1j
     # 2 right -> 5 coming in from right inv
     if fac == 2 and facing == 1:
         y_on_new_face = face_width - y_on_face - 1
-        p = (2*face_width - 1) + (2 * face_width + y_on_new_face)*1j
+        p = (2 * face_width - 1) + (2 * face_width + y_on_new_face) * 1j
         new_facing = -1
     # 2 down -> 3 coming in from right
     if fac == 2 and facing == 1j:
         y_on_new_face = x_on_face
-        p = (2*face_width) - 1 + (face_width + y_on_new_face)*1j
+        p = (2 * face_width) - 1 + (face_width + y_on_new_face) * 1j
         new_facing = -1
-
     # 3 left -> 4 down from top
     if fac == 3 and facing == -1:
         x_on_new_face = y_on_face
-        p = x_on_new_face + (2*face_width) * 1j
+        p = x_on_new_face + (2 * face_width) * 1j
         new_facing = 1j
-
     # 3 right -> 2 coming up from btm
     if fac == 3 and facing == 1:
         x_on_new_face = y_on_face
-        p = 2*face_width+x_on_new_face + (face_width-1)*1j
+        p = 2 * face_width + x_on_new_face + (face_width - 1) * 1j
         new_facing = -1j
     # 4 up -> 3 from left
     if fac == 4 and facing == -1j:
         y_on_new_face = x_on_face
-        p = face_width + (face_width + y_on_new_face)*1j
+        p = face_width + (face_width + y_on_new_face) * 1j
         new_facing = 1
-
     # 4 left -> 1 from left (inv)
     if fac == 4 and facing == -1:
         y_on_new_face = face_width - y_on_face - 1
-        p = face_width + y_on_new_face*1j
+        p = face_width + y_on_new_face * 1j
         new_facing = 1
-
     # 5 right -> 2 coming in from left inv
     if fac == 5 and facing == 1:
         y_on_new_face = face_width - y_on_face - 1
-        p = (3*face_width)-1 + y_on_new_face*1j
+        p = (3 * face_width) - 1 + y_on_new_face * 1j
         new_facing = -1
-
     # 5 down -> 6 coming in right
     if fac == 5 and facing == 1j:
         y_on_new_face = x_on_face
-        p = (1*face_width)-1 + (3*face_width+y_on_new_face)*1j
+        p = (1 * face_width) - 1 + (3 * face_width + y_on_new_face) * 1j
         new_facing = -1
-
     # 6 left -> 1 coming in top
     if fac == 6 and facing == -1:
         x_on_new_face = y_on_face
         p = face_width + x_on_new_face
         new_facing = 1j
-
     # 6 right -> 5 in bottom
     if fac == 6 and facing == 1:
         x_on_new_face = y_on_face
-        p = face_width + x_on_new_face + (3*face_width - 1) * 1j
+        p = face_width + x_on_new_face + (3 * face_width - 1) * 1j
         new_facing = -1j
-
     # 6 down -> 2 coming in top
     if fac == 6 and facing == 1j:
         x_on_new_face = x_on_face
-        p = (2*face_width) + x_on_new_face
+        p = (2 * face_width) + x_on_new_face
         new_facing = 1j
 
     return (p, new_facing)
@@ -106,7 +96,7 @@ def loop(pos, facing, face_width):
 def move_gen(move):
     gen = None
     for tok in move:
-        if (not gen or type(gen) == str) and tok.isdigit():
+        if (not gen or isinstance(gen, str)) and tok.isdigit():
             if gen:
                 yield(gen)
             gen = int(tok)
@@ -151,9 +141,9 @@ def solve():
                 continue
             if ch != ' ':
                 if not origin:
-                    origin = x + y*1j
-                world.add(x + y*1j)
-                block[x + y*1j] = ch
+                    origin = x + y * 1j
+                world.add(x + y * 1j)
+                block[x + y * 1j] = ch
     pos = origin
     facing = 1
 
@@ -176,11 +166,11 @@ def solve():
         return (pos, facing)
 
     for mv in move_gen(move):
-        if type(mv) == str:
+        if isinstance(mv, str):
             facing = turn(facing, mv)
         else:
             pos, facing = advance(pos, mv, facing, 50, moved)
-    print(1000 * (pos.imag+1) + 4 * (pos.real + 1) + score[facing])
+    print(1000 * (pos.imag + 1) + 4 * (pos.real + 1) + score[facing])
 
 
 if __name__ == '__main__':
