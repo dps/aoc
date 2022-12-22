@@ -17,7 +17,6 @@ def move_gen(move):
     yield(gen)
 
 def turn(facing, dir):
-    print("turn", dir)
     if dir == "R":
         return facing * 1j
     else:
@@ -48,11 +47,7 @@ def part1():
                 if not origin:
                     origin = x + y*1j
                 world.add(x + y*1j)
-                if (ch == "%"):
-                    print(x, y)
-                    return
                 block[x + y*1j] = ch
-    print(origin, move)
     pos = origin
     facing = 1
 
@@ -89,8 +84,6 @@ def part1():
         else:
             pos = advance(pos, mv, facing)
     print(1000 * (pos.imag+1) + 4 * (pos.real + 1) + score[facing])
-
-
 
 
 if __name__ == '__main__':
