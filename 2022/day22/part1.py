@@ -63,16 +63,12 @@ def part1():
 
     def advance(pos, n, facing):
         while n > 0:
-            print("advance", n, pos, facing)
             p = pos + facing
             if p not in world:
-                # loop
                 p = loop(pos, facing)
-                print("loop", pos, facing, "->", p)
             if block[p] == '.':
                 pos = p
             else:
-                print("[" + block[p] + "]")
                 assert(block[p] == '#')
                 return pos
             n -= 1
