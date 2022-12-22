@@ -1,4 +1,4 @@
-input = [i for i in open("input.txt","r").readlines()]
+input = [i for i in open("input.txt", "r").readlines()]
 
 
 FACES = {
@@ -9,8 +9,11 @@ FACES = {
     1+2j: 5,
     3j: 6
 }
+
+
 def face(p, face_width):
     return FACES[p.real // face_width + 1j * (p.imag // face_width)]
+
 
 def loop(pos, facing, face_width):
     p = None
@@ -36,14 +39,14 @@ def loop(pos, facing, face_width):
     # 2 right -> 5 coming in from right inv
     if fac == 2 and facing == 1:
         y_on_new_face = face_width - y_on_face - 1
-        p = (2*face_width -1) + (2 * face_width + y_on_new_face)*1j
+        p = (2*face_width - 1) + (2 * face_width + y_on_new_face)*1j
         new_facing = -1
     # 2 down -> 3 coming in from right
     if fac == 2 and facing == 1j:
         y_on_new_face = x_on_face
-        p = (2*face_width) -1 + (face_width + y_on_new_face)*1j
+        p = (2*face_width) - 1 + (face_width + y_on_new_face)*1j
         new_facing = -1
-    
+
     # 3 left -> 4 down from top
     if fac == 3 and facing == -1:
         x_on_new_face = y_on_face
@@ -60,26 +63,25 @@ def loop(pos, facing, face_width):
         y_on_new_face = x_on_face
         p = face_width + (face_width + y_on_new_face)*1j
         new_facing = 1
-    
+
     # 4 left -> 1 from left (inv)
     if fac == 4 and facing == -1:
         y_on_new_face = face_width - y_on_face - 1
         p = face_width + y_on_new_face*1j
         new_facing = 1
-    
+
     # 5 right -> 2 coming in from left inv
     if fac == 5 and facing == 1:
         y_on_new_face = face_width - y_on_face - 1
         p = (3*face_width)-1 + y_on_new_face*1j
         new_facing = -1
-    
 
-    # 5 down -> 6 coming in right 
+    # 5 down -> 6 coming in right
     if fac == 5 and facing == 1j:
         y_on_new_face = x_on_face
         p = (1*face_width)-1 + (3*face_width+y_on_new_face)*1j
         new_facing = -1
-    
+
     # 6 left -> 1 coming in top
     if fac == 6 and facing == -1:
         x_on_new_face = y_on_face
@@ -89,7 +91,7 @@ def loop(pos, facing, face_width):
     # 6 right -> 5 in bottom
     if fac == 6 and facing == 1:
         x_on_new_face = y_on_face
-        p = face_width + x_on_new_face + (3*face_width -1) *1j
+        p = face_width + x_on_new_face + (3*face_width - 1) * 1j
         new_facing = -1j
 
     # 6 down -> 2 coming in top
@@ -97,8 +99,9 @@ def loop(pos, facing, face_width):
         x_on_new_face = x_on_face
         p = (2*face_width) + x_on_new_face
         new_facing = 1j
-    
+
     return (p, new_facing)
+
 
 def move_gen(move):
     gen = None
@@ -115,11 +118,13 @@ def move_gen(move):
             gen += int(tok)
     yield(gen)
 
+
 def turn(facing, dir):
     if dir == "R":
         return facing * 1j
     else:
         return facing / 1j
+
 
 score = {
     1: 0,
@@ -127,6 +132,7 @@ score = {
     -1: 2,
     -1j: 3
 }
+
 
 def solve():
     world = set()
@@ -213,7 +219,7 @@ if __name__ == '__main__':
     # assert(loop(3+4j, 1, 2) == (5+1j, -1))
     # assert(loop(3+5j, 1, 2) == (5, -1))
 
-    # # 5 down -> 6 coming in right 
+    # # 5 down -> 6 coming in right
     # assert(loop(2+5j, 1j, 2) == (1+6j, -1))
     # assert(loop(3+5j, 1j, 2) == (1+7j, -1))
 
@@ -231,7 +237,7 @@ if __name__ == '__main__':
 # FACES_EXAMPLE = {
 #     (2): 1,
 #     (0+1j): 2, (1+1j): 3, (2+1j): 4,
-#     (2+2j): 5, (3+2j): 6, 
+#     (2+2j): 5, (3+2j): 6,
 # }
 
 # def loop_example(pos, facing, face_width):
@@ -248,7 +254,7 @@ if __name__ == '__main__':
 #         new_facing = 1j
 #     # 1 left goes to 3 coming down from top facing \/
 #     if fac == 1 and facing == -1:
-#         p = (face_width + y_on_face) + (face_width * 1j) 
+#         p = (face_width + y_on_face) + (face_width * 1j)
 #         new_facing = 1j
 #     # 1 right goes to 6 coming in from right facing <
 #     if fac == 1 and facing == 1:

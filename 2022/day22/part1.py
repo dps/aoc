@@ -1,4 +1,4 @@
-input = [i for i in open("inp.txt","r").readlines()]
+input = [i for i in open("inp.txt", "r").readlines()]
 
 
 def move_gen(move):
@@ -16,11 +16,13 @@ def move_gen(move):
             gen += int(tok)
     yield(gen)
 
+
 def turn(facing, dir):
     if dir == "R":
         return facing * 1j
     else:
         return facing / 1j
+
 
 score = {
     1: 0,
@@ -28,6 +30,7 @@ score = {
     -1: 2,
     -1j: 3
 }
+
 
 def part1():
     world = set()
