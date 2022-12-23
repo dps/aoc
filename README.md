@@ -79,6 +79,8 @@ Char positions
 ## References
 https://gist.github.com/mcpower/87427528b9ba5cac6f0c679370789661
 
+https://www.youtube.com/watch?v=IIaj7MSFEcU&list=PLZhotmgEsCQNhE-X5bkcVvlyAMzcCqAEw
+
 ## My setup
 
 ```
