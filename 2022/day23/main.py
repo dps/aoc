@@ -29,19 +29,18 @@ def solve(max_rounds):
                     proposed[elf + mv[1]] += 1
                     elf_mv[elf] = elf + mv[1]
                     break
-        new_world = deepcopy(world)
-        for elf, proposed_mv in elf_mv.items():
-            if proposed[proposed_mv] == 1:
-                new_world.remove(elf)
-                new_world.add(elf_mv[elf])
-        moves.rotate(-1)
-        if (new_world == world):
+
+        if len(elf_mv.keys()) == 0:
             print("pt2 DONE at round", round+1)
             return(round+1)
-        world = new_world
+        for elf, proposed_mv in elf_mv.items():
+            if proposed[proposed_mv] == 1:
+                world.remove(elf)
+                world.add(proposed_mv)
+        moves.rotate(-1)
 
-        mix,mxx = int(min([x.real for x in world])), int(max([x.real for x in world]))
-        miy,myy = int(min([x.imag for x in world])), int(max([x.imag for x in world]))
+    mix,mxx = int(min([x.real for x in world])), int(max([x.real for x in world]))
+    miy,myy = int(min([x.imag for x in world])), int(max([x.imag for x in world]))
 
     space = 0
     for y in range(miy,myy+1):
