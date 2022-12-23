@@ -30,8 +30,8 @@ def solve(max_rounds):
                     elf_mv[elf] = elf + mv[1]
                     break
         new_world = deepcopy(world)
-        for elf in world:
-            if elf in elf_mv and proposed[elf_mv[elf]] == 1:
+        for elf, proposed_mv in elf_mv.items():
+            if proposed[proposed_mv] == 1:
                 new_world.remove(elf)
                 new_world.add(elf_mv[elf])
         moves.rotate(-1)
