@@ -5,10 +5,11 @@ MDIR8 = [p[0] + 1j*p[1] for _,p in DIR8.items()]
 
 def solve(max_rounds):
     world = set()
-    moves = deque([ ((-1j,1-1j,-1-1j), -1j, "N"),
-                    ((1j,1+1j,-1+1j), 1j, "S"),
-                    ((-1,-1+1j,-1-1j), -1, "W"),
-                    ((1,1+1j,1-1j), 1, "E")])
+    moves = deque([
+        ((-1j,1-1j,-1-1j), -1j), # N
+        ((1j,1+1j,-1+1j), 1j),   # S
+        ((-1,-1+1j,-1-1j), -1),  # W
+        ((1,1+1j,1-1j), 1)])     # E
 
     for y, row in enumerate(input):
         for x, ch in enumerate(row):
@@ -50,6 +51,6 @@ def solve(max_rounds):
     print("pt1 spaces after max_rounds", space)
     return(space)
 
-if __name__ == '__main__':
-    assert(solve(10) == 3800)   # 0.14s
-    assert(solve(1000) == 916)  # 3.95s
+if __name__ == '__main__': # 3.12s
+    assert(solve(10) == 3800)
+    assert(solve(1000) == 916)
