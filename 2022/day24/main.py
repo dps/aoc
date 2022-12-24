@@ -1,6 +1,4 @@
-from collections import deque
-from functools import cache
-import sys
+from utils import *
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
 blizzards = deque([])
@@ -35,7 +33,7 @@ def blizzards_at(mins):
 @cache
 def dfs(pos, goal, mins_elapsed):
     global global_min
-    if mins_elapsed > global_min:
+    if mins_elapsed + manhattani(pos, goal) > global_min:
         return sys.maxsize
     blizz = blizzards_at(mins_elapsed + 1)
     best = sys.maxsize
@@ -85,5 +83,5 @@ def solve():
     print("Part 2 answer:", initial_crossing + return_journey + back_again, "mins")
 
 if __name__ == '__main__':
-    # input is 122x26 # Runtime: 54.58s
+    # input is 122x26 # Runtime: 54.58s -> 40.86s [added manhattan stop]
     solve()
