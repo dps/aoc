@@ -2,6 +2,7 @@ from utils import *
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
 blizzards = deque([])
+return_blizzards = None
 max_x, max_y = 0,0
 global_min = 1000 #sys.maxsize
 
@@ -53,7 +54,7 @@ def dfs(pos, goal, mins_elapsed):
     
 
 def solve():
-    global max_x, max_y
+    global max_x, max_y, blizzards
     # Ignore the sides
     for y,row in enumerate(input):
         for x, ch in enumerate(row):
@@ -64,6 +65,12 @@ def solve():
 
     pos = (0-1j)
     goal = max_x+(max_y+1)*1j
+
+    blizzards = blizzards_at(518)
+    blizzards_at.cache_clear()
+
+    # goal = (0-1j)
+    # pos = max_x+(max_y+1)*1j
 
     # for r in range(10):
     #     blizz = blizzards_at(r)
@@ -79,8 +86,14 @@ def solve():
     #         print()
     #     print()
 
-    print("dfs", dfs(pos, goal, 0))
-    print("dfs", dfs(pos, goal, 2))
+    print("dfs", dfs(pos, goal, 1))
+    # print("dfs", dfs(pos, goal, 2))
+
+    # 255 mins to get from pos -> goal
+    # back again 263 #518
+    # 
+
+    # Return blizz = 
 
     score = 0
     print(score)
