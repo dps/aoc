@@ -1,8 +1,8 @@
-from utils import *
+from collections import deque
+from functools import cache
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
 blizzards = deque([])
-return_blizzards = None
 max_x, max_y = 0,0
 global_min = 512
 
@@ -84,5 +84,5 @@ def solve():
     print("Part 2 answer:", initial_crossing + return_journey + back_again, "mins")
 
 if __name__ == '__main__':
-    # input is 122x26
+    # input is 122x26 # Runtime: 54.58s
     solve()
