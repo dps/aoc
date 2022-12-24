@@ -3,7 +3,6 @@ input = [i.strip() for i in open("input.txt","r").readlines()]
 
 blizzards = deque([])
 max_x, max_y = 0,0
-global_min = 512
 
 def wrap(p):
     q = p
@@ -30,24 +29,23 @@ def blizzards_at(mins):
         this_min.append((blizzard[0], wrap(blizzard[1] + mv)))
     return this_min
 
-@cache
-def dfs(pos, goal, mins_elapsed):
-    global global_min
-    if mins_elapsed + manhattani(pos, goal) > global_min:
-        return sys.maxsize
-    blizz = blizzards_at(mins_elapsed + 1)
-    best = sys.maxsize
-    for move in MV.values():
-        next = pos + move
-        if next == goal:
-            if (mins_elapsed + 1) < global_min:
-                global_min = mins_elapsed + 1
-            return mins_elapsed + 1
-        if next.real < 0 or next.real > max_x or next.imag < 0 or next.imag > max_y:
-            continue
-        if not any([b[1] == next for b in blizz]):
-            best = min(best, dfs(next, goal, mins_elapsed + 1))
-    return best
+def bfs(pos, goal):
+    q = deque([(pos, 0)])
+    visited = set()
+    while len(q) > 0:
+        p = q.popleft()
+        blizz = blizzards_at(p[1] + 1)
+        for move in MV.values():
+            next = p[0] + move
+            if next == goal:
+                return p[1] + 1
+            if next != pos and (next.real < 0 or next.real > max_x or next.imag < 0 or next.imag > max_y):
+                continue
+            if not any([b[1] == next for b in blizz]):
+                if (next, p[1] + 1) not in visited:
+                    q.append((next, p[1] + 1))
+                    visited.add((next, p[1] + 1))
+    return sys.maxsize
 
 def solve():
     global max_x, max_y, blizzards, global_min
@@ -62,26 +60,22 @@ def solve():
     pos = (0-1j)
     goal = max_x+(max_y+1)*1j
 
-    initial_crossing = dfs(pos, goal, 2)
+    initial_crossing = bfs(pos, goal)
     print("Part 1 answer:", initial_crossing, "mins")
 
     blizzards = blizzards_at(initial_crossing)
     blizzards_at.cache_clear()
-    dfs.cache_clear()
-    global_min = 512
 
-    return_journey = dfs(goal, pos, 1)
-    print(return_journey)
+    return_journey = bfs(goal, pos)
 
     blizzards = blizzards_at(return_journey)
     blizzards_at.cache_clear()
-    dfs.cache_clear()
-    global_min = 512
 
-    back_again = dfs(pos, goal, 1)
+    back_again = bfs(pos, goal)
     print(back_again)
     print("Part 2 answer:", initial_crossing + return_journey + back_again, "mins")
 
 if __name__ == '__main__':
-    # input is 122x26 # Runtime: 54.58s -> 40.86s [added manhattan stop]
+    # Runtime: DFS 54.58s -> 40.86s [added manhattan stop] -> 18.09s [BFS]
+    # input is 122x26
     solve()
