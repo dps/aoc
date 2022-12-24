@@ -4,7 +4,7 @@ input = [i.strip() for i in open("input.txt","r").readlines()]
 blizzards = deque([])
 return_blizzards = None
 max_x, max_y = 0,0
-global_min = 1000 #sys.maxsize
+global_min = 512
 
 def wrap(p):
     q = p
@@ -50,11 +50,8 @@ def dfs(pos, goal, mins_elapsed):
             best = min(best, dfs(next, goal, mins_elapsed + 1))
     return best
 
-
-    
-
 def solve():
-    global max_x, max_y, blizzards
+    global max_x, max_y, blizzards, global_min
     # Ignore the sides
     for y,row in enumerate(input):
         for x, ch in enumerate(row):
@@ -66,38 +63,25 @@ def solve():
     pos = (0-1j)
     goal = max_x+(max_y+1)*1j
 
-    blizzards = blizzards_at(518)
+    initial_crossing = dfs(pos, goal, 2)
+    print("Part 1 answer:", initial_crossing, "mins")
+
+    blizzards = blizzards_at(initial_crossing)
     blizzards_at.cache_clear()
+    dfs.cache_clear()
+    global_min = 512
 
-    # goal = (0-1j)
-    # pos = max_x+(max_y+1)*1j
+    return_journey = dfs(goal, pos, 1)
+    print(return_journey)
 
-    # for r in range(10):
-    #     blizz = blizzards_at(r)
-    #     for y in range(max_y + 1):
-    #         for x in range(max_x + 1):
-    #             bz = [b for b in blizz if b[1] == x+y*1j]
-    #             if len(bz) > 1:
-    #                 print(str(len(bz))[0], end="")
-    #             elif len(bz) == 1:
-    #                 print(bz[0][0], end="")
-    #             else:
-    #                 print(".", end="")
-    #         print()
-    #     print()
+    blizzards = blizzards_at(return_journey)
+    blizzards_at.cache_clear()
+    dfs.cache_clear()
+    global_min = 512
 
-    print("dfs", dfs(pos, goal, 1))
-    # print("dfs", dfs(pos, goal, 2))
-
-    # 255 mins to get from pos -> goal
-    # back again 263 #518
-    # 
-
-    # Return blizz = 
-
-    score = 0
-    print(score)
-    return score
+    back_again = dfs(pos, goal, 1)
+    print(back_again)
+    print("Part 2 answer:", initial_crossing + return_journey + back_again, "mins")
 
 if __name__ == '__main__':
     # input is 122x26
