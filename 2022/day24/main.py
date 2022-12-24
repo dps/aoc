@@ -1,9 +1,9 @@
 from utils import *
-input = [i.strip() for i in open("simple.txt","r").readlines()]
+input = [i.strip() for i in open("input.txt","r").readlines()]
 
 blizzards = deque([])
 max_x, max_y = 0,0
-global_min = 20 #sys.maxsize
+global_min = 1000 #sys.maxsize
 
 def wrap(p):
     q = p
@@ -30,8 +30,9 @@ def blizzards_at(mins):
         this_min.append((blizzard[0], wrap(blizzard[1] + mv)))
     return this_min
 
+@cache
 def dfs(pos, goal, mins_elapsed):
-    print(pos, goal, mins_elapsed)
+    global global_min
     if mins_elapsed > global_min:
         return sys.maxsize
     blizz = blizzards_at(mins_elapsed + 1)
@@ -39,7 +40,9 @@ def dfs(pos, goal, mins_elapsed):
     for move in MV.values():
         next = pos + move
         if next == goal:
-            return 1
+            if (mins_elapsed + 1) < global_min:
+                global_min = mins_elapsed + 1
+            return mins_elapsed + 1
         if next.real < 0 or next.real > max_x or next.imag < 0 or next.imag > max_y:
             continue
         if not any([b[1] == next for b in blizz]):
@@ -76,7 +79,8 @@ def solve():
     #         print()
     #     print()
 
-    # print(dfs(pos, goal, 0))
+    print("dfs", dfs(pos, goal, 0))
+    print("dfs", dfs(pos, goal, 2))
 
     score = 0
     print(score)
