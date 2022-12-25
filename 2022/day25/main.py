@@ -8,13 +8,14 @@ input = [i.strip() for i in open("input.txt","r").readlines()]
 #     /:.`' \ 
 #       | |
 
-DMAP = {'0': 0, '1': 1, '2':2, '=':-2, '-': -1}
-SMAP = {0:'0',1:'1',2:'2',3:'=',4:'-'}
+DMAP = {'0': 0, '1':1, '2':2, '=':-2, '-': -1}
+SMAP = {0:'0', 1:'1', 2:'2', 3:'=', 4:'-'}
+
 def snafu_to_dec(snafu):
     exp = len(snafu) - 1
     acc = 0
     for dig in snafu:
-        acc += (pow(5, exp) * DMAP[dig])
+        acc += pow(5, exp) * DMAP[dig]
         exp -= 1
     return acc
 
