@@ -8,7 +8,7 @@ input = [i.strip() for i in open("input.txt","r").readlines()]
 
 flow = {}
 connect = defaultdict(lambda : [])
-tvalves = 0
+all_valves = 0
 dist = {}
 start = 999
 
@@ -37,33 +37,28 @@ def dfs(here, mins_remaining, bitmask, accumulated):
     B[bitmask] = max(B[bitmask], accumulated)
     if mins_remaining <= 1: # it takes a min to open a valve
         return
-
-    if here == start:
-        for c in connect[here]:
-            if not (1<<c) & bitmask:
-                dfs(c, mins_remaining - dist[(here,c)], bitmask, accumulated)
-    elif flow[here] > 0 and not bitmask & (1<<here):
+    acc = 0
+    if flow[here] > 0:
         # Open the valve
         mins_remaining -= 1 # It takes a min to open the valve
         acc = mins_remaining * flow[here]
         bitmask = bitmask | (1<<here)
-        if bitmask == tvalves: # If all the valves are open, stop searching.
+        if bitmask == all_valves: # If all the valves are open, stop searching.
             B[bitmask] = max(B[bitmask], accumulated + acc)
             return
-        for c in connect[here]:
-            if not (1<<c) & bitmask:
-                dfs(c, mins_remaining - dist[(here,c)], bitmask, accumulated + acc)
+
+    for c in connect[here]:
+        if not (1<<c) & bitmask:
+            dfs(c, mins_remaining - dist[(here,c)], bitmask, accumulated + acc)
 
 def solve():
-    global tvalves, start, dist, connect, B
+    global all_valves, start, dist, connect, B
 
     all_conn = {}
     for row in input:
-        # Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
+        # Each row like: "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB"
         valve = row.split(" ")[1]
         rate = int(row.split("rate=")[1].split(";")[0])
-        if rate > 0:
-            tvalves += 1
         if "lead to valves " in row:
             tunnels = row.split("lead to valves ")[1].split(", ")
         else:
@@ -81,7 +76,7 @@ def solve():
             connect[remap[n]].append(remap[o])
             dist[(remap[n],remap[o])] = d
 
-    tvalves = (1 << (len([(k,v) for k,v in flow.items() if k == "AA" or v > 0]) - 2)) - 1
+    all_valves = (1 << (len([(k,v) for k,v in flow.items() if k == "AA" or v > 0]) - 2)) - 1
 
     for k,v in remap.items():
         flow[v] = flow[k]
@@ -114,4 +109,4 @@ assert(solve() == (2320, 2967))
 # floyd-warshall instead of BFS
 ## 31.14s user 0.55s system 99% cpu 31.733 total
 # opened valves statemap !!!
-## 1.55s user 0.13s system 98% cpu 1.699 total
+## 1.48s user 0.12s system 98% cpu 1.624 total
