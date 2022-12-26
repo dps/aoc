@@ -2,6 +2,7 @@ import math
 from utils import *
 from functools import cache
 from functools import cmp_to_key
+from itertools import permutations
 
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
@@ -20,7 +21,7 @@ def floyd_warshall(graph, bidirectional=False):
             dist[(node, dest)] = 1 # use weight if weighted
             if bidirectional:
                 dist[(dest, node)] = 1
-    # for node in graph.keys():
+    # for node in graph.keys():    # use if self connections important.
     #     dist[(node, node)] = 0
     for k in graph.keys():
         for i in graph.keys():
@@ -28,38 +29,33 @@ def floyd_warshall(graph, bidirectional=False):
                 if dist[(i,j)] > dist[(i,k)] + dist[(k,j)]:
                     dist[(i,j)] = dist[(i,k)] + dist[(k,j)]
     return dist
-    
 
-def maxl(list):
-    if len(list) == 0:
-        return 0
-    return max(list)
+B = defaultdict(int)
 
 @cache
-def dfs(here, mins_remaining, bitmask, players_remaining):
-    acc = 0
+def dfs(here, mins_remaining, bitmask, accumulated):
+    B[bitmask] = max(B[bitmask], accumulated)
     if mins_remaining <= 1: # it takes a min to open a valve
-        if (players_remaining > 0):
-            players_remaining -= 1
-            return dfs(start, 26, bitmask, players_remaining)
-        return 0
+        return
 
-    ## Run past case!
-    best = maxl([dfs(c, mins_remaining-dist[(here,c)], bitmask, players_remaining) 
-                    for c in connect[here] if not (1<<c) & bitmask]) #if here == start else 0
-    ## Open valve case
-    if flow[here] > 0 and not bitmask & (1<<here):
-        acc = (mins_remaining-1) * flow[here]
+    if here == start:
+        for c in connect[here]:
+            if not (1<<c) & bitmask:
+                dfs(c, mins_remaining - dist[(here,c)], bitmask, accumulated)
+    elif flow[here] > 0 and not bitmask & (1<<here):
+        # Open the valve
         mins_remaining -= 1 # It takes a min to open the valve
-        if bitmask == tvalves:
-            return acc
-        # It takes a min to traverse the tunnel
-        best = max(best, acc + maxl([dfs(c, mins_remaining-dist[(here,c)], bitmask | (1<<here), players_remaining) for c in connect[here] if not (1<<c) & bitmask]))
-
-    return best
+        acc = mins_remaining * flow[here]
+        bitmask = bitmask | (1<<here)
+        if bitmask == tvalves: # If all the valves are open, stop searching.
+            B[bitmask] = max(B[bitmask], accumulated + acc)
+            return
+        for c in connect[here]:
+            if not (1<<c) & bitmask:
+                dfs(c, mins_remaining - dist[(here,c)], bitmask, accumulated + acc)
 
 def solve():
-    global tvalves, start, dist, connect
+    global tvalves, start, dist, connect, B
 
     all_conn = {}
     for row in input:
@@ -78,11 +74,10 @@ def solve():
     remap = {p[0]:i for i,p in enumerate(sorted([(k,v) for k,v in flow.items()],
         key=cmp_to_key(lambda x,y: y[1]-x[1])))}
     start = remap["AA"]
-
     dist_pairs = floyd_warshall(all_conn)
 
     for (n,o), d in dist_pairs.items():
-        if d != math.inf and flow[o] > 0:
+        if d != math.inf and flow[o] > 0 and (flow[n] > 0 or n == "AA"):
             connect[remap[n]].append(remap[o])
             dist[(remap[n],remap[o])] = d
 
@@ -92,10 +87,16 @@ def solve():
         flow[v] = flow[k]
         del(flow[k])
 
-    assert(dfs(start, 30, 0, 0) == 2320)
-    assert(dfs(start, 26, 0, 1) == 2967)
+    dfs(start, 30, 0, 0)
+    part1 = max(B.values())
+    print(part1)
+    B = defaultdict(int)
+    dfs(start, 26, 0, 0)
+    part2 = max([v1 + v2 for k1, v1 in B.items() for k2, v2 in B.items() if not k1 & k2])
+    print(part2)
+    return (part1, part2)
 
-solve()
+assert(solve() == (2320, 2967))
 
 
 # Progress:
@@ -112,3 +113,5 @@ solve()
 ## 34.73s user 0.48s system 99% cpu 35.222 total
 # floyd-warshall instead of BFS
 ## 31.14s user 0.55s system 99% cpu 31.733 total
+# opened valves statemap !!!
+## 1.55s user 0.13s system 98% cpu 1.699 total
