@@ -86,7 +86,7 @@ def solve():
     print(part1)
     B = defaultdict(int)
     dfs(start, 26, 0, 0)
-    part2 = max([v1 + v2 for k1, v1 in B.items() for k2, v2 in B.items() if not k1 & k2])
+    part2 = max([v1 + v2 for bitmask1, v1 in B.items() for bitmask2, v2 in B.items() if not bitmask1 & bitmask2])
     print(part2)
     return (part1, part2)
 
