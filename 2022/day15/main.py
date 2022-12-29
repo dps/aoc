@@ -40,6 +40,7 @@ def part1():
                 break
 
     print(i)
+    return i
 
 def paint_around(p, dist, c, stop):
     res = []
@@ -95,12 +96,12 @@ def part2():
                 break
     
     res = [x for x in res if x.real <= max_dim and x.real >= 0 and x.imag <= max_dim and x.imag >= 0]
-    print(res)
     print(int(4000000 * res[0].real + res[0].imag))
+    return int(4000000 * res[0].real + res[0].imag)
 
 
 
 
 if __name__ == '__main__':
-    part1()
-    #part2()
+    assert(part1() == 5525990)
+    assert(part2() == 11756174628223)
