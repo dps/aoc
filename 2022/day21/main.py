@@ -1,3 +1,6 @@
+import re
+from copy import deepcopy
+
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
 state = {}
