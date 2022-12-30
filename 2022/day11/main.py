@@ -13,20 +13,20 @@ def solve(part, rounds):
         if line.startswith("Monkey"):
             monkey = ints(line)[0]
         else:
-            match line.strip().split(" ")[0]:
-                case "Starting":
-                    m[monkey]["starting"] = ints(line)
-                    m[monkey]["inspected"] = 0
-                case "Operation:":
-                    m[monkey]["op"] = line.split("new = old")[1].strip()
-                case "Test:":
-                    m[monkey]["div"] = ints(line)[0]
-                    divisors *= m[monkey]["div"]
-                case "If":
-                    if line.strip().split(" ")[1] == "true:":
-                      m[monkey]["true"] = ints(line)[0]
-                    else:
-                      m[monkey]["false"] = ints(line)[0]
+            cmd = line.strip().split(" ")[0]
+            if cmd == "Starting":
+                m[monkey]["starting"] = ints(line)
+                m[monkey]["inspected"] = 0
+            elif cmd == "Operation:":
+                m[monkey]["op"] = line.split("new = old")[1].strip()
+            elif cmd == "Test:":
+                m[monkey]["div"] = ints(line)[0]
+                divisors *= m[monkey]["div"]
+            elif cmd == "If":
+                if line.strip().split(" ")[1] == "true:":
+                    m[monkey]["true"] = ints(line)[0]
+                else:
+                    m[monkey]["false"] = ints(line)[0]
     for _ in range(rounds):
         for monk in range(monkey + 1):
             M = m[monk]
@@ -43,7 +43,7 @@ def solve(part, rounds):
                     throw_to = M["true"]
                 else:
                     throw_to = M["false"]
-                items = deepcopy(m[throw_to]["starting"])
+                items = m[throw_to]["starting"][:]
                 items.append(l)
                 m[throw_to]["starting"] = items
             M["starting"] = []
