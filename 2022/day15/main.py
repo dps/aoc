@@ -1,4 +1,5 @@
 from utils import *
+from functools import cache
 import sys
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
@@ -74,13 +75,18 @@ def part2():
         w[b]=int(0)
 
     checked = set()
+    intersect = []
     for s1,r1 in w.items():
         for s2, r2 in w.items():
             if not (s1.real+s2.real,s2.imag+s1.imag) in checked:
                 if manhattan(s1, s2) == r1 + r2 + 2:
-                    paint_around(s1, int(r1 + 1), candidates, max_dim)
+                    ps = set()
+                    paint_around(s1, int(r1 + 1), ps, max_dim)
+                    intersect.append(ps)
                     checked.add((s1.real+s2.real,s2.imag+s1.imag))
                     break
+
+    candidates = reduce(lambda a,x: x if not a else a & x, intersect, None)
 
     for candidate in candidates:
         keep = True
