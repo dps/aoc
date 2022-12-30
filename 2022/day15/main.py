@@ -73,33 +73,29 @@ def part2():
         w[s]=int(mh)
         w[b]=int(0)
 
-        paint_around(s, int(mh + 1), candidates, max_dim)
+    checked = set()
+    for s1,r1 in w.items():
+        for s2, r2 in w.items():
+            if not (s1.real+s2.real,s2.imag+s1.imag) in checked:
+                if manhattan(s1, s2) == r1 + r2 + 2:
+                    paint_around(s1, int(r1 + 1), candidates, max_dim)
+                    checked.add((s1.real+s2.real,s2.imag+s1.imag))
+                    break
 
-    res = deepcopy(candidates)
-    iter = 0
     for candidate in candidates:
-        iter += 1
-        if iter % 1000000 == 0:
-            # input.txt completes in ~1 min... Which means there must be a more
-            # efficient algorithm. Wrote this to make sure it wasn't a waste to
-            # let it finish.
-            print("progress>>>", (iter/len(candidates))*100)
+        keep = True
         if candidate in w:
-            res.remove(candidate)
+            keep = False
             continue
         for p,s in w.items():
             if s == 0:
                 continue
             if manhattan(candidate, p) <= s:
-                if candidate in res:
-                    res.remove(candidate)
+                keep = False
                 break
-    
-    res = [x for x in res if x.real <= max_dim and x.real >= 0 and x.imag <= max_dim and x.imag >= 0]
-    print(int(4000000 * res[0].real + res[0].imag))
-    return int(4000000 * res[0].real + res[0].imag)
-
-
+        if keep:
+            print(int(4000000 * candidate.real + candidate.imag))
+            return(int(4000000 * candidate.real + candidate.imag))
 
 
 if __name__ == '__main__':
