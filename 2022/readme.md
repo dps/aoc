@@ -1,0 +1,27 @@
+| day  | Runtime (s)|
+|------|------------|
+| day1 | 0.022 total|
+| day2 | 0.024 total|
+| day3 | 0.031 total| 
+| day4 | 0.028 total| 
+| day5 | 0.030 total|
+| day6 | 0.023 total|
+| day7 | 0.035 total| 
+| day8 | 0.074 total|
+| day9 | 0.112 total|
+| day10 | 0.022 total|
+| day11 | 3.591 total|
+| day12 | 1.199 total|
+| day13 | 0.070 total|
+| day14 | 0.127 total|
+| day15 | 2.449 total|
+| day16 | 1.604 total|
+| day17 | 0.467 total|
+| day18 | 0.081 total|
+| day19 | 0.955 total|
+| day20 | 0.659 total|
+| day21 | 0.154 total|
+| day22 | 0.077 total|
+| day23 | 3.499 total|
+| day24 | 1.207 total|
+| day25 | 0.020 total|
