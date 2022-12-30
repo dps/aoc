@@ -31,6 +31,18 @@ def manhattani(p, q):
 def manhattan(p, q):
     return abs(p[0] - q[0]) + abs(p[1] - q[1])
 
+def wrap(p, max_x, max_y, min_x=0, min_y=0):
+    q = p
+    if p.real > max_x:
+        q = min_x + q.imag * 1j
+    if p.real < min_x:
+        q = max_x + q.imag * 1j
+    if p.imag > max_y:
+        q = q.real + min_y * 1j
+    if p.imag < min_y:
+        q = q.real + 1j*max_y
+    return q
+
 def cartesian(p, q):
     return math.sqrt(abs(p[0] - q[0])*abs(p[0] - q[0]) + abs(p[1] - q[1]) * abs(p[1] - q[1]))
 

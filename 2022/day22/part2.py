@@ -125,12 +125,8 @@ score = {
 
 
 def solve():
-    world = set()
-    block = {}
-    moved = {}
-
-    move = None
-    origin = None
+    world, block = set(), {}
+    move, origin, facing = None, None, 1
 
     for y, row in enumerate(input):
         if row[0].isdigit():
@@ -145,23 +141,19 @@ def solve():
                 world.add(x + y * 1j)
                 block[x + y * 1j] = ch
     pos = origin
-    facing = 1
 
-    def advance(pos, n, facing, face_width, moved):
+    def advance(pos, n, facing, face_width):
         while n > 0:
             new_facing = facing
             p = pos + facing
             if p not in world:
-                # loop
                 p, new_facing = loop(pos, facing, face_width)
             if block[p] == '.':
                 pos = p
                 facing = new_facing
             else:
                 assert(block[p] == '#')
-                moved[pos] = "*"
                 return (pos, facing)
-            moved[pos] = "*"
             n -= 1
         return (pos, facing)
 
@@ -169,7 +161,7 @@ def solve():
         if isinstance(mv, str):
             facing = turn(facing, mv)
         else:
-            pos, facing = advance(pos, mv, facing, 50, moved)
+            pos, facing = advance(pos, mv, facing, 50)
     print(1000 * (pos.imag + 1) + 4 * (pos.real + 1) + score[facing])
 
 

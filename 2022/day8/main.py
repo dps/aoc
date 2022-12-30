@@ -39,11 +39,10 @@ def part1():
         h = -1
         while cur >= 0:
             if int(g[row][cur-1]) > h:
-                print("adding ", (row, cur-1), g[row][cur-1], h)
                 h = int(g[row][cur-1])
                 score.add((row, cur-1))
             cur -= 1
-    print(score)
+    print(len(score))
 
 
 def cs(g, x, y):
@@ -88,9 +87,6 @@ def cs(g, x, y):
     cs.append(c)
     return reduce(operator.mul, cs, 1)
 
-
-
-
 def part2():
     g = grid_from_strs(input)
     max_scene = 0
@@ -103,5 +99,5 @@ def part2():
 
 
 if __name__ == '__main__':
-    #part1()
+    part1()
     part2()

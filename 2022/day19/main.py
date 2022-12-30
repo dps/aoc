@@ -1,9 +1,8 @@
 from utils import *
 from math import ceil
-input = [i.strip() for i in open("input.txt","r").readlines()]
 
 recipes = []
-for i, line in enumerate(input):
+for i, line in enumerate(open("input.txt", "r").readlines()):
     costs = ints(line)
     bots = [(costs[1],0,0,0), (costs[2],0,0,0), (costs[3], costs[4],0,0), (costs[5], 0, costs[6],0)]
     max_ore, max_clay, max_obsidian = max([c[0] for c in bots]), max([c[1] for c in bots]), max([c[2] for c in bots])

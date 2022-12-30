@@ -1,6 +1,18 @@
 from utils import *
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
+def find_shortest_path(graph, start, end):
+    dist = {start: [start]}
+    q = deque([start])
+    while len(q):
+        at = q.popleft()
+        for next in graph[at]:
+            if next not in dist:
+                #dist[next] = [dist[at], next]
+                dist[next] = dist[at] + [next]
+                q.append(next)
+    return dist.get(end)
+
 def delta(here, there):
     return (ord(there if there not in "SE" else {"S":"a","E":"z"}[there])
             -
