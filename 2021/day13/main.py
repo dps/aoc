@@ -30,7 +30,7 @@ def solve():
     mx, my = int(max([p.real for p in world])), int(max([p.imag for p in world]))
     for y in range(my+1):
         for x in range(mx+1):
-            print("#" if x+1j*y in world else " ", end="")
+            print("🟧" if x+1j*y in world else "⬛️", end="")
         print()
 
 solve()
