@@ -1,4 +1,4 @@
-| day  | Runtime (s)|
+| Day  | Runtime (s)|
 |------|------------|
 | day1 | 0.022 total|
 | day2 | 0.024 total|
