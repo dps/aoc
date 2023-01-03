@@ -217,7 +217,15 @@ def grid_ints_from_strs(lines, spl=''):
             line = line.split(spl)
         for x, ch in enumerate(line):
             g[y][x] = int(ch)
-    return grid
+    return g, w, h
+
+def grid_neighbors(p, width, height=None):
+    height = width if not height else height
+    for d in DIR.values():
+        q = (p[0] + d[0], p[1] + d[1])
+        if q[0] < 0 or q[1] < 0 or q[0] >= width or q[1] >= height:
+            continue
+        yield(q)
 
 def find_shortest_path(graph, start, end):
     dist = {start: [start]}
