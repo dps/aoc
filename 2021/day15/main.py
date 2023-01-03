@@ -11,10 +11,7 @@ def solve(part=1):
     for y in range(ldim):
         for x in range(ldim):
             p = (x, y)
-            neighbors = []
-            for q in grid_neighbors(p, ldim):
-                neighbors.append((grid_at(q[0], q[1]), q))
-            graph[p] = neighbors
+            graph[p] = [(grid_at(q[0], q[1]), q) for q in grid_neighbors(p, ldim)]
     start = (0,0)
     end = (ldim-1, ldim-1)
     return(dijkstra(graph, start, end)[0])
