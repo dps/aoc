@@ -26,21 +26,23 @@ def eq(a,b): return 1 if a == b else 0
 
 TYPE_ID_TO_OPERATOR = {0: "_sum", 1: "product", 2: "_min", 3: "_max", 4: "", 5: "gt", 6: "lt", 7: "eq"}
 
+ver = 0
+
 def parse(bitstream, max_p=math.inf):
+    global ver
     parsed = 0
     try:
         while parsed < max_p:
             version = nbit(3, bitstream)
-            yield "version", version
+            ver += version
             type_id = nbit(3, bitstream)
             parsed += 1
             if type_id == 4:
                 more = nbit(1, bitstream)
                 acc = nbit(4, bitstream)
                 while more:
-                    acc = acc << 4
                     more = nbit(1, bitstream)
-                    acc |= nbit(4, bitstream)
+                    acc = (acc << 4) | nbit(4, bitstream)
                 yield str(acc) + ","
             else:
                 yield TYPE_ID_TO_OPERATOR[type_id]
@@ -57,15 +59,9 @@ def parse(bitstream, max_p=math.inf):
                 yield "),"
     except StopIteration:
         pass
-    
 
-def part1():
-    packet = bitstream(input[0])
-    return sum([x[1] for x in parse(packet) if x[0] == "version"])
+def solve():
+    expression = "".join([x for x in parse(bitstream(input[0]))]).replace(",)", ")")[:-1]
+    return(ver, eval(expression))
 
-def part2():
-    expression = "".join([x for x in parse(bitstream(input[0])) if type(x) == str]).replace(",)", ")")[:-1]
-    return(eval(expression))
-
-print(part1())
-print(part2())
+print(solve())
