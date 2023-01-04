@@ -16,11 +16,7 @@ def nbit(n, bitstream):
         acc = acc << 1 | next(bitstream)
     return acc
 
-def product(*args):
-    acc = 1
-    for a in args:
-        acc *= a
-    return acc
+def product(*args): return reduce(operator.mul, args, 1)
 def _min(*args): return min(args)
 def _max(*args): return max(args)
 def _sum(*args): return sum(args)
