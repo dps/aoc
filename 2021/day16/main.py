@@ -21,14 +21,14 @@ def product(*args):
     for a in args:
         acc *= a
     return acc
-def mmin(*args): return min(args)
-def mmax(*args): return max(args)
-def msum(*args): return sum(args)
+def _min(*args): return min(args)
+def _max(*args): return max(args)
+def _sum(*args): return sum(args)
 def gt(a,b): return 1 if a > b else 0
 def lt(a,b): return 1 if a < b else 0
 def eq(a,b): return 1 if a == b else 0
 
-TYPE_ID_TO_OPERATOR = {0: "msum", 1: "product", 2: "mmin", 3: "mmax", 4: "", 5: "gt", 6: "lt", 7: "eq"}
+TYPE_ID_TO_OPERATOR = {0: "_sum", 1: "product", 2: "_min", 3: "_max", 4: "", 5: "gt", 6: "lt", 7: "eq"}
 
 def parse(bitstream, max_p=math.inf):
     parsed = 0
