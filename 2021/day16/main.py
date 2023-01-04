@@ -10,16 +10,11 @@ def bitstream(packet):
         yield((dig >> 1) & 1)
         yield((dig) & 1)
 
-def take(n, bitstream):
+def nbit(n, bitstream):
     acc = 0
     for _ in range(n):
         acc = acc << 1 | next(bitstream)
     return acc
-
-def sub_bitstream(length, bitstream):
-    for _ in range(length):
-        yield next(bitstream)
-    return
 
 def product(*args):
     acc = 1
@@ -39,33 +34,31 @@ def parse(bitstream, max_p=math.inf):
     parsed = 0
     try:
         while parsed < max_p:
-            version = take(3, bitstream)
+            version = nbit(3, bitstream)
             yield "version", version
-            type_id = take(3, bitstream)
+            type_id = nbit(3, bitstream)
             parsed += 1
             if type_id == 4:
-                more = take(1, bitstream)
-                acc = take(4, bitstream)
+                more = nbit(1, bitstream)
+                acc = nbit(4, bitstream)
                 while more:
                     acc = acc << 4
-                    more = take(1, bitstream)
-                    acc |= take(4, bitstream)
-                yield "@", str(acc) + ","
+                    more = nbit(1, bitstream)
+                    acc |= nbit(4, bitstream)
+                yield str(acc) + ","
             else:
-                yield "@", TYPE_ID_TO_OPERATOR[type_id]
-                len_type = take(1, bitstream)
+                yield TYPE_ID_TO_OPERATOR[type_id]
+                len_type = nbit(1, bitstream)
+                yield "("
                 if len_type == 0:
-                    total_len = take(15, bitstream)
-                    yield ("@", "(")
-                    for tok in parse(sub_bitstream(total_len, bitstream)):
+                    total_len = nbit(15, bitstream)
+                    for tok in parse(itertools.islice(bitstream, total_len)):
                         yield tok
-                    yield ("@", "),")
                 else:
-                    num_sub_packets = take(11, bitstream)
-                    yield ("@", "(")
+                    num_sub_packets = nbit(11, bitstream)
                     for tok in parse(bitstream, max_p=num_sub_packets):
                         yield tok
-                    yield ("@", "),")
+                yield "),"
     except StopIteration:
         pass
     
@@ -75,7 +68,7 @@ def part1():
     return sum([x[1] for x in parse(packet) if x[0] == "version"])
 
 def part2():
-    expression = "".join([x[1] for x in parse(bitstream(input[0])) if x[0] == "@"]).replace(",)", ")")[:-1]
+    expression = "".join([x for x in parse(bitstream(input[0])) if type(x) == str]).replace(",)", ")")[:-1]
     return(eval(expression))
 
 print(part1())
