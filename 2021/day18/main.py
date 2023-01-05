@@ -51,7 +51,7 @@ def explode(sn):
         l,r = sn[0:explode_at],(sn[explode_at:])[sn[explode_at:].index("]")+1:]
         l = incr_preceeding_num(l, exploded[0])
         r = incr_following_num(r, exploded[1])
-        return(l+"0"+r)
+        return(l + "0" + r)
     else:
         return sn
 
@@ -62,8 +62,9 @@ def split(sn):
             n += ch
         else:
             if n != "":
-                if (int(n) > 9):
-                    return(sn[0:l+1]+ str([int(int(n)//2), int(math.ceil(int(n)/2))])+ sn[i:])
+                num = int(n)
+                if (num > 9):
+                    return(sn[0:l+1]+ str([int(num//2), int(math.ceil(num/2))])+ sn[i:])
                 n = ""
             else:
                 l = i
@@ -73,7 +74,9 @@ def split(sn):
 def snailfish_add(a, b):
     prev = [a, b]
     while True:
-        a = eval(explode(str(prev).replace(" ","")))
+        # TODO all these evals should now not be needed as everything is
+        # being done in string space.
+        a = eval(explode(str(prev)))
         if a == prev:
             a = eval(split(str(a)))
         if a == prev:
@@ -107,5 +110,5 @@ def part2():
     print(m) 
 
 
-#part1()
+part1()
 part2()
