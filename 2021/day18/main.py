@@ -2,113 +2,82 @@ from utils import *
 
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
-def incr_preceeding_num(lstr, inc_by):
-    l = lstr
-    found,o,p = False,-1,len(l)
-    n = ""
-    for i in range(len(l)-1, -1, -1):
-        if found and not l[i].isdigit():
-            o = i
-            break
-        elif l[i].isdigit():
-            if not found:
-                p = i
-            found = True
-            n = l[i] + n
-    if found:
-        return lstr[0:o+1] + str(int(n)+inc_by) + lstr[p+1:]
-    return lstr
-
-def incr_following_num(rstr, inc_by):
-    r = rstr
-    found,o,p,n = False,-1,-1,""
-    for i in range(len(r)):
-        if found and not r[i].isdigit():
-            p = i
-            break
-        elif r[i].isdigit():
-            if not found:
-                o = i
-            found = True
-            n += r[i]
-    if found:
-        return rstr[0:o] + str(int(n)+inc_by) + rstr[p:]
-    return rstr
-         
-def explode(sn):
-    depth, explode_at = 0, -1
-    for i, ch in enumerate(sn):
-        if ch == '[':
-            if depth == 4:
-                explode_at = i
-                break
-            depth += 1
-        elif ch == ']':
-            depth -= 1
-    if explode_at > 0:
-        fwd = sn[explode_at:].index("]") + 1
-        exploded = eval(sn[explode_at:explode_at+fwd])
-        l,r = sn[0:explode_at],(sn[explode_at:])[sn[explode_at:].index("]")+1:]
-        l = incr_preceeding_num(l, exploded[0])
-        r = incr_following_num(r, exploded[1])
-        return(l + "0" + r)
-    else:
-        return sn
-
-def split(sn):
-    l,n = 0, ""
-    for i, ch in enumerate(sn):
-        if ch.isdigit():
-            n += ch
+def explode(n):
+    exploded = False
+    p,acc = [], -1
+    for i in n:
+        if exploded and acc == -1:
+            acc = i[1]
+            continue
+        if i[0] == 5 and not exploded:
+            if len(p) > 0:
+                p[-1] = (p[-1][0], p[-1][1] + i[1])
+            p.append((i[0]-1, 0))
+            exploded = True
         else:
-            if n != "":
-                num = int(n)
-                if (num > 9):
-                    return(sn[0:l+1]+ str([int(num//2), int(math.ceil(num/2))])+ sn[i:])
-                n = ""
+            if acc > 0:
+                p.append((i[0], i[1]+acc))
+                acc = 0
             else:
-                l = i
-    return sn
+                p.append(i)
+    return exploded, p
 
-
-def snailfish_add(a, b):
-    prev = [a, b]
-    while True:
-        # TODO all these evals should now not be needed as everything is
-        # being done in string space.
-        a = eval(explode(str(prev)))
-        if a == prev:
-            a = eval(split(str(a)))
-        if a == prev:
-            return a
-        prev = a
+def split(n):
+    split = False
+    p = []
+    for i in n:
+        if not split and i[1] > 9:
+            split = True
+            p.append((i[0] + 1, i[1]//2))
+            p.append((i[0] + 1, int(math.ceil(i[1]/2))))
+        else:
+            p.append(i)
+    return split, p
 
 def magnitude(sn):
-    l,r = sn[0], sn[1]
-    if type(l) == int and type(r) == int:
-        return 3*l + 2*r
-    if type(l) == list and type(r) == int:
-        return 3 * magnitude(l) + 2*r
-    if type(l) == int and type(r) == list:
-        return 3 * l + 2* magnitude(r)
-    if type(l) == list and type(r) == list:
-        return 3 * magnitude(l) + 2* magnitude(r)
+    max_d = max(i[0] for i in sn)
+    for depth in range(max_d, 0, -1):
+        q, l = [], None
+        for d,r in sn:
+            if d != depth: q.append((d,r))
+            elif l != None:
+                q.append((depth-1, 3*l + 2*r))
+                l = None
+            else: l = r
+        sn = q
+    return(q[0][1])
+
+def parse_sn(sn):
+    n,d = [],0
+    for ch in sn:
+        if ch == "[":
+            d+=1
+        if ch == "]":
+            d-=1
+        if ch.isdigit():
+            n.append((d,int(ch)))
+    return n 
+
+def add(a,b):
+    n = [(x[0]+1, x[1]) for x in a] + [(x[0]+1, x[1]) for x in b]
+    changed = True
+    while changed:
+        changed, n = explode(n)
+        if changed:
+            continue
+        changed, n = split(n)
+    return n
 
 def part1():
-    acc = eval(input[0])
-    for line in input[1:]:
-        v = eval(line)
-        acc = snailfish_add(acc, v)
-    print(magnitude(acc))
+    print(magnitude(reduce(add, [parse_sn(x) for x in input])))
 
 def part2():
-    inp = [eval(i) for i in input]
+    inp = [parse_sn(i) for i in input]
     m = 0
     for a,b in itertools.combinations(inp, 2):
-        m = max(m, magnitude(snailfish_add(a, b)))
-        m = max(m, magnitude(snailfish_add(b, a)))
-    print(m) 
-
+        m = max(m, magnitude(add(a, b)))
+        m = max(m, magnitude(add(b, a)))
+    print(m)
 
 part1()
 part2()
