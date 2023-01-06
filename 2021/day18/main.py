@@ -4,32 +4,29 @@ input = [i.strip() for i in open("input.txt","r").readlines()]
 
 def explode(n):
     exploded = False
-    p,acc = [], -1
+    p, acc = [], -1
     for i in n:
         if exploded and acc == -1:
             acc = i[1]
-            continue
-        if i[0] == 5 and not exploded:
+        elif i[0] == 5 and not exploded:
             if len(p) > 0:
                 p[-1] = (p[-1][0], p[-1][1] + i[1])
             p.append((i[0]-1, 0))
             exploded = True
         else:
             if acc > 0:
-                p.append((i[0], i[1]+acc))
+                p.append((i[0], i[1] + acc))
                 acc = 0
             else:
                 p.append(i)
     return exploded, p
 
 def split(n):
-    split = False
-    p = []
+    split, p = False, []
     for i in n:
         if not split and i[1] > 9:
             split = True
-            p.append((i[0] + 1, i[1]//2))
-            p.append((i[0] + 1, int(math.ceil(i[1]/2))))
+            p.extend([(i[0] + 1, i[1]//2), (i[0] + 1, int(math.ceil(i[1]/2)))])
         else:
             p.append(i)
     return split, p
@@ -51,11 +48,11 @@ def parse_sn(sn):
     n,d = [],0
     for ch in sn:
         if ch == "[":
-            d+=1
+            d += 1
         if ch == "]":
-            d-=1
+            d -= 1
         if ch.isdigit():
-            n.append((d,int(ch)))
+            n.append((d, int(ch)))
     return n 
 
 def add(a,b):
