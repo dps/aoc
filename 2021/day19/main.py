@@ -28,7 +28,7 @@ sinter = [[(0, 9), ((-884, -676, -820), (-862, -696, 357), (-719, -647, -908), (
 overlaps = [(0, 9), (0, 10), (0, 29), (1, 2), (1, 11), (1, 28), (1, 33), (2, 22), (2, 26), (3, 8), (3, 9), (3, 11), (3, 28), (3, 29), (4, 8), (4, 28), (5, 14), (5, 23), (6, 30), (6, 34), (6, 35), (7, 13), (7, 19), (8, 12), (8, 15), (9, 21), (12, 29), (13, 30), (13, 32), (13, 36), (14, 22), (15, 18), (16, 20), (16, 36), (17, 24), (17, 37), (19, 23), (19, 30), (19, 34), (20, 27), (22, 23), (22, 30), (22, 32), (22, 33), (23, 24), (24, 33), (25, 28), (25, 30), (25, 33), (26, 28), (26, 29), (26, 30), (26, 36), (27, 35), (28, 31), (33, 37)]
 
 
-def merge_points_into_left_coord_space(pair, lpoints, rpoints):
+def merge_points_into_left_coord_space(pair, lpoints, rpoints, scanners_in_r):
     #overlap[0] => (l,r)
     #overlap[1] => [lpoints that overlap]
     #overlap[2] => [rpoints that overlap]
@@ -108,10 +108,12 @@ def merge_points_into_left_coord_space(pair, lpoints, rpoints):
     for point in r_points:
         l_points.add(r_to_l(point))
     print(pair, tmp - len(l_points), "OVERLAPPING")
-    return l_points
+
+    scanners_in_l = [(0,0,0), r_in_l] + [r_to_l(s) for s in scanners_in_r]
+    return l_points, scanners_in_l
 
 
-def part1():
+def solve():
     global scanners, sinter
     total = 0
     data = open("input.txt","r").read().split("\n\n")
@@ -191,18 +193,27 @@ def part1():
     paths = sorted(paths, reverse=True)
     print(paths)
 
+    all_scanners = set()
+
     sintermap = {s[0]:(s[1],s[2]) for s in sinter}
     sintermap.update({(s[0][1],s[0][0]):(s[2],s[1]) for s in sinter})
     for path in paths:
+        scanners_in_r = []
         for l,r in zip(path[1][1:], path[1]):
             #l,r = p[1][0],p[1][1]
-            merged = merge_points_into_left_coord_space((l,r), sintermap[(l,r)][0], sintermap[(l,r)][1])
+            merged, scanners_in_r = merge_points_into_left_coord_space((l,r), sintermap[(l,r)][0], sintermap[(l,r)][1], scanners_in_r)
             scanners[l] = merged
+        all_scanners.update(scanners_in_r)
 
-    print(len(scanners[0]))
+    print("Part 1 answer:", len(scanners[0]))
+    max_d = 0
+    for a in all_scanners:
+        for b in all_scanners:
+            max_d = max(max_d, manhattan3(a,b))
+    print("Part 2 answer:", max_d)
         
 
-part1()
+solve()
 exit(0)
 # o = """-618,-824,-621
 # -537,-823,-458
