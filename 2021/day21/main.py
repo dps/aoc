@@ -8,7 +8,7 @@ die_rolls = 0
 def roll():
     global die_rolls
     die_rolls += 1
-    return((die_rolls-1) % 100) + 1
+    return ((die_rolls-1) % 100) + 1
 
 def part1():
     scores = [0, 0]
@@ -25,19 +25,12 @@ def part1():
     
     print(scores[0 if playing == 1 else 1] * die_rolls)
 
-p1_winning_states = []
-p2_winning_states = []
 @cache
 def dfs(scores, positions, to_play, depth):
-    if to_play != -1:
-        if scores[0] >= 21:
-            p1_winning_states.append(scores)
-            return 1
-        if scores[1] >= 21:
-            p2_winning_states.append(scores)
-            return 1j
-    if to_play == -1:
-        to_play = 0
+    if scores[0] >= 21:
+        return 1
+    if scores[1] >= 21:
+        return 1j
     s = 0
     for roll, universes in [(3,1),(4,3),(5,6),(6,7),(7,6),(8,3),(9,1)]:
         if to_play == 0:
@@ -51,8 +44,8 @@ def dfs(scores, positions, to_play, depth):
 
 
 def part2():
-    s = dfs((0,0),(p1_start,p2_start), -1, 0)
-    print(max(s.real, s.imag))
+    s = dfs((0,0),(p1_start,p2_start), 0, 0)
+    print(int(max(s.real, s.imag)))
 
 part1()
 part2()
