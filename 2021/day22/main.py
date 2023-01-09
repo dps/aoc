@@ -8,7 +8,7 @@ def part1():
     for line in input:
         action = line.split(" ")[0]
         ranges = ints(line)
-        if ranges[0] < -500:
+        if ranges[0] > 500:
             break
         procedure.append((action, ranges))
 
@@ -65,53 +65,5 @@ def part2():
             region_counts[range] += count
 
     print(sum(volume(range) * dir for range, dir in region_counts.items()))
-
-
-
-
-
-    
-
-
-
-# @dataclass
-# class Box:
-#     num: int
-#     ranges: list
-#     state: bool
-#     intersects: list
-
-# def part2():
-#     mins = (0,0,0)
-#     maxes = (0,0,0)
-#     boxes = {}
-#     procedure = []
-#     for i, line in enumerate(input):
-#         action = line.split(" ")[0]
-#         ranges = ints(line)
-#         # if ranges[0] < -50:
-#         #     break
-#         mins = (min(mins[0], ranges[0]), min(mins[1], ranges[2]), min(mins[2], ranges[4]))
-#         maxes = (max(maxes[0], ranges[1]), max(maxes[1], ranges[3]), max(maxes[2], ranges[5]))
-#         volume = abs(ranges[5]-ranges[4])*abs(ranges[3]-ranges[2])*abs(ranges[1]-ranges[0])
-#         procedure.append((volume, action, ranges, i))
-#     print("***", len(procedure))
-#     all_b = sorted(procedure, reverse=True)
-#     print(all_b)
-#     for box in all_b:
-#         this_box = Box(num=box[3], ranges=box[2], state=False, intersects=[])
-#         for ob in boxes.values():
-#             isect = box_intersection(this_box.ranges, ob.ranges)
-#             if isect != None:
-#                 ob.intersects.append((this_box, isect))
-#                 this_box.intersects.append((ob, isect))
-#         boxes[box[3]] = this_box
-#     for box in boxes.values():
-#         print(len(box.intersects))
-
-
-
-
-
-#part1() #590784
+part1()
 part2()
