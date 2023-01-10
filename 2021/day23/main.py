@@ -2,45 +2,8 @@ import heapq
 import math
 from functools import partial
 
-TARGET = {0:'A', 1:'B', 2:'C', 3:'D'}
-RTARGET = {'A':0,'B':1,'C':2,'D':3}
+TARGET = {'A':0,'B':1,'C':2,'D':3}
 COST = {'A':1, 'B':10, 'C':100, 'D':1000}
-
-def write_my_code(): # This writes the code for clear_from_room_to_spot
-    data = [0, 1, "0", 2, "1", 3, "2",4, "3",5 ,6]
-    for room in "0123":
-        left = []
-        right = []
-
-        found = False
-        for x in data:
-            if x == room:
-                found = True
-            if type(x) == int:
-                if not found:
-                    left.append(x)
-                else:
-                    right.append(x)
-        left.reverse()
-        for spot in range(7):
-            v = ""
-            if spot in left:
-                for z in left:
-                    if len(v) > 0: v += " and "
-                    v += "not z[" + str(z) + "]"
-                    if z == spot:
-                        break
-                print("if r ==", room, "and s ==", spot, ": return " + v)
-            if spot in right:
-                for z in right:
-                    if len(v) > 0: v += " and "
-                    v += "not z[" + str(z) + "]"
-                    if z == spot:
-                        break
-
-                print("if r ==", room, "and s ==", spot, ": return " + v)
-
-#write_my_code()
 
 def clear_from_room_to_spot(r, s, z):
     if r == 0 and s == 0 : return not z[1] and not z[0], 3
@@ -151,7 +114,7 @@ def next_states(room_size, s):
     for spot in range(7):
         if s[4][spot] != '':
             in_spot = s[4][spot]
-            target_room = RTARGET[in_spot]
+            target_room = TARGET[in_spot]
             # "and that room contains no amphipods which do not also have that room as their own destination."
             has_space = len(s[target_room]) < room_size and all([a == in_spot for a in s[target_room]])
             if has_space:
@@ -168,19 +131,54 @@ def next_states(room_size, s):
     return next_states if len(next_states) else ()
 
 def part1():
-    global start_state
-    global end_state
+    global start_state, end_state
     start_state = (('B', 'C'), ('B', 'A'), ('D', 'A'), ('D','C'), ('', '', '', '', '', '', ''))
     end_state = (('A','A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('', '', '', '', '', '', ''))
     print(dynamic_dijkstra(partial(next_states, 2), start_state, end_state)[0])
 
 def part2():
-    global start_state
-    global end_state
+    global start_state, end_state
     end_state = (('A','A','A','A'), ('B', 'B', 'B', 'B'), ('C', 'C', 'C', 'C'), ('D', 'D', 'D', 'D'), ('', '', '', '', '', '', ''))
     start_state = (('B', 'D', 'D', 'C'), ('B', 'C', 'B', 'A'), ('D', 'B', 'A', 'A'), ('D', 'A', 'C', 'C'), ('', '', '', '', '', '', ''))
     print(dynamic_dijkstra(partial(next_states, 4), start_state, end_state)[0])
 
-part1()
-part2()
+part1() # 10607, dijkstra - 1.49s
+part2() # 59071, dijkstra - 1.3s
 
+#### "Appendix"
+
+def write_my_code(): # This writes the code for clear_from_room_to_spot
+    data = [0, 1, "0", 2, "1", 3, "2", 4, "3", 5 ,6]
+    for room in "0123":
+        left = []
+        right = []
+
+        found = False
+        for x in data:
+            if x == room:
+                found = True
+            if type(x) == int:
+                if not found:
+                    left.append(x)
+                else:
+                    right.append(x)
+        left.reverse()
+        for spot in range(7):
+            v = ""
+            if spot in left:
+                for z in left:
+                    if len(v) > 0: v += " and "
+                    v += "not z[" + str(z) + "]"
+                    if z == spot:
+                        break
+                print("if r ==", room, "and s ==", spot, ": return " + v)
+            if spot in right:
+                for z in right:
+                    if len(v) > 0: v += " and "
+                    v += "not z[" + str(z) + "]"
+                    if z == spot:
+                        break
+
+                print("if r ==", room, "and s ==", spot, ": return " + v)
+
+#write_my_code()
