@@ -1,3 +1,5 @@
+| Day  | Runtime (s)|
+|------|------------|
 | day1 | 0.034 total |
 | day2 | 0.017 total |
 | day3 | 0.165 total |
