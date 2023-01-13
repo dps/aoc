@@ -12,7 +12,7 @@ def fingerprints_two(num):
         fps.add(manhattan3(c[0], c[1]))
     return fps
 
-def align(b, cnum):
+def aligno(b, cnum):
     base = scanners[b]
     c = scanners[cnum]
     signs = [[-1, -1, -1], [-1, -1, 1], [-1, 1, -1], [-1, 1, 1], [1, -1, -1], [1, -1, 1], [1, 1, -1], [1, 1, 1]]
@@ -28,8 +28,39 @@ def align(b, cnum):
                     xlat = (p[0]-o[0], p[1]- o[1], p[2] - o[2])
                     translated = {(q[0]-xlat[0], q[1]-xlat[1], q[2]-xlat[2]) for q in cc}
                     if len(base & translated) >= 12:
-                        return translated, xlat
+                        return "***", xlat, sign, axis
     return None, None
+
+def align(b, cnum):
+    base = scanners[b]
+    c = scanners[cnum]
+    axes = [0,1,2]
+
+    xlats = []
+    translated_axes = []
+
+    for axis in [0,1,2]:
+        escape = False
+        for rot, caxis in itertools.product([1,-1], axes):
+            if escape: break
+            oo = [p[axis] for p in base]
+            cc = [rot * p[caxis] for p in c]
+            for o,p in product(oo, cc):
+                xlat = p-o
+                translated = [q - xlat for q in cc]
+                # Annoyingly we can't just do set intersection as there are some dup
+                # values on the same axis when we go one axis at a time.
+                a, b = Counter(oo), Counter(translated)
+                intersection_len = sum([min(a[i], b[i]) for i in (set(oo) & set(translated))])
+                if intersection_len >= 12:
+                    xlats.append(xlat)
+                    translated_axes.append(translated)
+                    axes.remove(caxis)
+                    escape = True
+                    break
+
+    translated = list(zip(translated_axes[0], translated_axes[1], translated_axes[2]))
+    return set(translated), tuple(xlats)
 
 def solve():
     data = open("input.txt","r").read().split("\n\n")
