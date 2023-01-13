@@ -22,6 +22,6 @@
 | day20 | 1.640 total |
 | day21 | 0.139 total |
 | day22 | 0.588 total |
-| day23 | 2.382 total |
+| day23 | 1.596 total |
 | day24 | 0.017 total |
 | day25 | 0.379 total |
