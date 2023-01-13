@@ -14,7 +14,7 @@
 | day12 | 0.667 total |
 | day13 | 0.029 total |
 | day14 | 0.036 total |
-| day15 | 1.265 total |
+| day15 | 0.785 total |
 | day16 | 0.031 total |
 | day17 | 0.077 total |
 | day18 | 0.145 total |
@@ -22,6 +22,6 @@
 | day20 | 1.640 total |
 | day21 | 0.139 total |
 | day22 | 0.588 total |
-| day23 | 1.596 total |
+| day23 | 1.515 total |
 | day24 | 0.017 total |
 | day25 | 0.379 total |
