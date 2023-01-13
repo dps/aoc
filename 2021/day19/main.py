@@ -3,6 +3,7 @@ from itertools import *
 
 scanners = []
 
+@cache
 def fingerprints_two(num):
     global scanners
     scanner = scanners[num]
@@ -11,7 +12,6 @@ def fingerprints_two(num):
         fps.add(manhattan3(c[0], c[1]))
     return fps
 
-@cache
 def align(b, cnum):
     base = scanners[b]
     c = scanners[cnum]
@@ -51,18 +51,15 @@ def solve():
             graph[pair[0]].append(pair[1])
             graph[pair[1]].append(pair[0])
 
-
     world = set()
     next = [ 0 ]
     aligned = set()
     locs = set()
     while len(next):
         t = next.pop()
-        to_align = graph[t]
+        to_align = [x for x in graph[t] if x not in aligned]
         for process in to_align:
-            if process in aligned: continue
             translated, scanner_loc = align(t, process)
-            assert(translated != None)
             locs.add(scanner_loc)
             world.update(translated)
             scanners[process] = translated #scanners[process] data is now in scanner[0] space
