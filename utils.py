@@ -113,11 +113,11 @@ def a_star(graph, start, end, heuristic):
     distances[start] = 0
     previous = {vertex: None for vertex in graph}
     queue = []
-    heapq.heappush(queue, (0, start))
+    heapq.heappush(queue, (0, 0, start))
     
     # Loop until the queue is empty
     while queue:
-        current_distance, current_vertex = heapq.heappop(queue)
+        _, current_distance, current_vertex = heapq.heappop(queue)
         
         # End search if we have reached the end
         if current_vertex == end:
@@ -130,7 +130,7 @@ def a_star(graph, start, end, heuristic):
                 distances[neighbor] = distance
                 previous[neighbor] = current_vertex
                 priority = distance + heuristic(neighbor, end)
-                heapq.heappush(queue, (priority, neighbor))
+                heapq.heappush(queue, (priority, distance, neighbor))
     
     # Build the path
     path = []
@@ -155,11 +155,11 @@ def dynamic_a_star(next_fn, start, end, heuristic):
     distances[start] = 0
     previous = defaultdict(lambda: None)
     queue = []
-    heapq.heappush(queue, (0, start))
+    heapq.heappush(queue, (0, 0, start))
     
     # Loop until the queue is empty
     while queue:
-        current_distance, current_vertex = heapq.heappop(queue)
+        _, current_distance, current_vertex = heapq.heappop(queue)
         
         # End search if we have reached the end
         if current_vertex == end:
@@ -172,7 +172,7 @@ def dynamic_a_star(next_fn, start, end, heuristic):
                 distances[neighbor] = distance
                 previous[neighbor] = current_vertex
                 priority = distance + heuristic(neighbor, end)
-                heapq.heappush(queue, (priority, neighbor))
+                heapq.heappush(queue, (priority, distance, neighbor))
     
     # Build the path
     path = []
