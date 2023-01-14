@@ -1,25 +1,13 @@
 input = [i.strip() for i in open("input.txt","r").readlines()]
 
-def part1():
-    score = 0
+def solve(ilen=4):
     last = []
-    for ch in input[0]:
-        score = score + 1
+    for i, ch in enumerate(input[0]):
         last.append(ch)
-        if len(set(last[-4:])) == 4:
+        if len(set(last[-ilen:])) == ilen:
             break
-    print(score)
-
-def part2():
-    score = 0
-    last = []
-    for ch in input[0]:
-        score = score + 1
-        last.append(ch)
-        if len(set(last[-14:])) == 14:
-            break
-    print(score)
+    print(i + 1)
 
 if __name__ == '__main__':
-    part1()
-    part2()
+    solve(4)
+    solve(14)
