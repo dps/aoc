@@ -223,8 +223,9 @@ Given `p` is a point `(x,y)` in a grid of `width` x `height`, generates the up t
 #### `wrap(p, max_x, max_y, min_x=0, min_y=0)`
 Wraps an imaginary coordinate `x + y*1j` back into a grid of size `max_x, max_y` etc. Does no modular arithmetic - i.e. `max+2 => 0`
 
-
-#### print_grid(g, spacing=0, markfn=lambda r,c,ch:""):
+## Visualizations
+_Useful for debugging_
+#### `print_grid(g, spacing=0, markfn=lambda r,c,ch:"")`
 Given `g` is a grid - a 2D array as above, print the grid. Optionally add spacing (shorter values get padded so print out is tidy). Optionally use `markfn` to apply a _mark_ to certain elements (e.g. to show a path through a grid or similar)
 ```python
 >>> grid, _, _ = grid_from_strs(["123","456","789"])
@@ -233,7 +234,7 @@ Given `g` is a grid - a 2D array as above, print the grid. Optionally add spacin
 4* 5  6* 
 7  8* 9 
 ```
-#### print_world(world)
+#### `print_world(world)`
 Given `world` is a set of imaginary numbers representing points in a 2D plane of form `x+y*1j`, prints the set as a matrix of orange (present) and black (absent) squares.
 ```python
 >>> print_world(world)
