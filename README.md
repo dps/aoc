@@ -201,10 +201,12 @@ Given `lines` is a list of strs, each one representing a row in a grid, returns 
 
 ### `grid_neighbors(p, width, height=None)`, `grid_8_neighbors(p, width, height=None)`
 Given `p` is a point `(x,y)` in a grid of `width` x `height`, generates the up to four/eight neighbors of `p` that also lie within the grid. Clips at the edges of the grid, which is why this is useful!
-```
-848
-4p4
-848
+```R
+8  4  8
+ \ | /
+4--p--4
+ / | \
+8  4  8
 ```
 
 *Note - `x` `y` not `row`, `col`... Matters for non-square grids*
