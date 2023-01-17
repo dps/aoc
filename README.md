@@ -237,6 +237,7 @@ Given `g` is a grid - a 2D array as above, print the grid. Optionally add spacin
 #### `print_world(world)`
 Given `world` is a set of imaginary numbers representing points in a 2D plane of form `x+y*1j`, prints the set as a matrix of orange (present) and black (absent) squares.
 ```python
+>>> world = {(triangle(y)+y*1j) for y in range(5)}
 >>> print_world(world)
 🟧⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️
 ⬛️🟧⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️
