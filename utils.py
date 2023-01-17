@@ -98,8 +98,6 @@ def dynamic_dijkstra(neighbors, start, end):
 
     return math.inf, None
 
-import heapq
-
 def a_star(graph, start, end, heuristic):
     """
     graph is a dict of vertex: [(weight, neighbor), ...] 
@@ -140,7 +138,6 @@ def a_star(graph, start, end, heuristic):
         current_vertex = previous[current_vertex]
     
     return (distances[end], path[::-1])
-
 
 def dynamic_a_star(next_fn, start, end, heuristic):
     """
@@ -189,20 +186,17 @@ def dynamic_a_star(next_fn, start, end, heuristic):
 # Most of these have two versions - one for complex number represention and one for tuple
 # representation.
 
-DIR = {'E': (1,0), 'W':(-1,0), 'N':(0,-1), 'S':(0,1) }
-#DIR = {'R': (1,0), 'L':(-1,0), 'U':(0,-1), 'D':(0,1) }
-#DIR = {'>': (1,0), '<':(-1,0), '^':(0,-1), 'v':(0,1) }
-DIR8 = {'NE': (1, -1),
-        'NW': (-1, -1),
-        'SE': (1, 1),
-        'SW': (-1, 1),
-        'E': (1,0),
-        'W':(-1,0),
-        'N':(0,-1),
-        'S':(0,1)}
+COMPASS = {'E': (1,0), 'W':(-1,0), 'N':(0,-1), 'S':(0,1) }
+COMPASS8 = {'NE': (1, -1), 'NW': (-1, -1), 'SE': (1, 1), 'SW': (-1, 1), 'E': (1,0), 'W':(-1,0), 'N':(0,-1), 'S':(0,1)}
 
-CDIR8 = [p[0] + 1j*p[1] for _,p in DIR8.items()]
-CDIR = [p[0] + 1j*p[1] for _,p in DIR.items()]
+RLUD = {'R': (1,0), 'L':(-1,0), 'U':(0,-1), 'D':(0,1) }
+ARROWS = {'>': (1,0), '<':(-1,0), '^':(0,-1), 'v':(0,1) }
+
+DIR = [(1,0),(-1,0), (0,1), (0,-1)]
+DIR8 = [d[1] for d in COMPASS8.items()]
+
+CDIR8 = [p[0] + 1j*p[1] for p in DIR8]
+CDIR = [p[0] + 1j*p[1] for p in DIR]
 
 def manhattani(p, q):
     return abs(p.real - q.real) + abs(p.imag - q.imag)
@@ -359,7 +353,7 @@ def grid_ints_from_strs(lines, spl=''):
 
 def grid_neighbors(p, width, height=None):
     height = width if not height else height
-    for d in DIR.values():
+    for d in DIR:
         q = (p[0] + d[0], p[1] + d[1])
         if q[0] < 0 or q[1] < 0 or q[0] >= width or q[1] >= height:
             continue
@@ -367,7 +361,7 @@ def grid_neighbors(p, width, height=None):
 
 def grid_8_neighbors(p, width, height=None):
     height = width if not height else height
-    for d in DIR8.values():
+    for d in DIR8:
         q = (p[0] + d[0], p[1] + d[1])
         if q[0] < 0 or q[1] < 0 or q[0] >= width or q[1] >= height:
             continue
@@ -385,3 +379,23 @@ def print_world(world):
     for y in range(miy, my+1):
         print("".join(["🟧" if x+1j*y in world else "⬛️" for x in range(mix,mx+1)]))
 
+if __name__ == "__main__":
+    assert(set(grid_neighbors((0,0), 4)) == set([(1,0), (0,1)]))
+    assert(set(grid_neighbors((3,3), 4)) == set([(2,3), (3,2)]))
+    assert(set(grid_8_neighbors((0,0), 4)) == set([(1,0), (0,1), (1,1)]))
+
+    graph = {'A':['B','C'],'B':['D'],'C':['B'],'D':['F'], 'E':['F', 'A'], 'F':[]}
+    assert(floyd_warshall(graph)[('E','B')] == 2)
+    neighbors = lambda ch:[(ord(ch), chr(ord('A') + ((ord(ch) - ord('A') + 1) % 26)))]
+    assert(dynamic_dijkstra(neighbors, 'C', 'B')[0] == 1949)
+
+    grid, dim, _ = grid_ints_from_strs(["0000","9913", "9199", "5432"])
+    graph = {(x,y): 
+                [(int(grid[n[1]][n[0]]),n) for n in grid_neighbors((x,y), dim)]
+             for x,y in itertools.product(range(dim), range(dim))}
+    start, end = (0,0), (dim-1, dim-1)
+    assert(a_star(graph, start, end, lambda x,y:manhattan(x,y))) #[0] == 14)
+    print("utils OK")
+    # An arbitrary non-trivial weight space
+    neighbors = lambda e: [(triangle(p[0])+p[1]*p[1], p) for p in grid_neighbors(e, 100)]
+    assert(dynamic_a_star(neighbors, (0,0), (99,99), manhattan)[0] == 902975)
