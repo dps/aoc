@@ -113,8 +113,7 @@ Returns the Manhattan distance between points in `(x,y)` tuple and imaginary num
 Wraps an imaginary coordinate `x + y*1j` back into a grid of size `max_x, max_y` etc. Does no modular arithmetic - i.e. `max+2 => 0`
 
 
-# sequence like 1,3,6,10,15
-### Numeric
+## Numeric
 
 #### `triangle(n)`
 Returns the `n`th triangular number - a sequence like `1,3,6,10,15`
