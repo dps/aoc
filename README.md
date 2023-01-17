@@ -1,9 +1,11 @@
 # aoc
 
+https://blog.singleton.io/posts/2023-01-14-advent-of-code/
+
 ## Utils
 
 #### A bunch of useful imports
-```
+```python
 import itertools
 import math
 import operator
@@ -27,18 +29,30 @@ e.g.
 ```python
 >>> graph = {'A':['B','C'],'B':['D'],'C':['B'],'D':['F'], 'E':['F', 'A'], 'F':[]}
 >>> dict(floyd_warshall(graph))
-{('A', 'B'): 1, ('A', 'C'): 1, ('B', 'D'): 1, ('C', 'B'): 1, ('D', 'F'): 1, ('E', 'F'): 1, ('E', 'A'): 1, ('A', 'A'): inf, ('A', 'D'): 2, ('A', 'E'): inf, ('A', 'F'): 3, ('B', 'A'): inf, ('B', 'B'): inf, ('B', 'C'): inf, ('B', 'E'): inf, ('B', 'F'): 2, ('C', 'A'): inf, ('C', 'C'): inf, ('C', 'D'): 2, ('C', 'E'): inf, ('C', 'F'): 3, ('D', 'A'): inf, ('D', 'B'): inf, ('D', 'C'): inf, ('D', 'D'): inf, ('D', 'E'): inf, ('E', 'B'): 2, ('E', 'C'): 2, ('E', 'D'): 3, ('E', 'E'): inf, ('F', 'A'): inf, ('F', 'B'): inf, ('F', 'C'): inf, ('F', 'D'): inf, ('F', 'E'): inf, ('F', 'F'): inf}
+{('A', 'B'): 1, ('A', 'C'): 1, ... , ('F', 'E'): inf, ('F', 'F'): inf}
 >>> floyd_warshall(graph)[('E','B')]
 2
 ```
 
 #### `find_shortest_path(graph, start, end)`
-Given the graph `dict` of format `{vertex: [edges]}` find the shortest path from node start to node end. Does a breadth first search. Returns length of the path.
-
+Given the graph `dict` of format `{vertex: [edges]}` find the shortest path from node start to node end. Does a breadth first search. Returns the path as a list or `None`
+```python
+>>> find_shortest_path(graph, 'A', 'F')
+['A', 'B', 'D', 'F']
+```
 
 #### `dijkstra(graph, start, end)`
 Given a graph `dict` of format `{vertex: [(weight, neighbor), ...] }` finds the shortest path using Dijkstra's algorithm. Returns tuple `(sum(path weights), [path])`
-
+```python
+>>> grid, dim, _ = grid_ints_from_strs(["0000","9913", "9199", "5432"])
+>>> graph = {(x,y): 
+...             [(int(grid[n[1]][n[0]]),n) for n in grid_neighbors((x,y), dim)]
+...           for x,y in itertools.product(range(dim), range(dim))}
+>>> 
+>>> start, end = (0,0), (dim-1, dim-1)
+>>> dijkstra(graph, start, end)
+(14, [(0, 0), (1, 0), (2, 0), (3, 0), (3, 1), (3, 2), (3, 3)])
+```
 
 #### `dynamic_dijkstra(neighbors, start, end)`
 Given `neighbors` is a function which takes a node and returns a list of `(weight, neighbor)` pairs or `()` if no neighbors exist, finds the shortest path from `start` to `end` using Dijkstra's algorithm and returns `(sum(shortest path weights), [path])`
@@ -84,19 +98,25 @@ Most of these have two versions - one for complex number represention and one fo
 `{'E': (1,0), 'W':(-1,0), 'N':(0,-1), 'S':(0,1) }`
 
 #### `COMPASS8`
-`{'NE': (1, -1), 'NW': (-1, -1), 'SE': (1, 1), 'SW': (-1, 1), 'E': (1,0), 'W':(-1,0), 'N':(0,-1), 'S':(0,1)}`
+```python
+{'NE': (1, -1), 'NW': (-1, -1), 'SE': (1, 1), 'SW': (-1, 1), 'E': (1,0), 'W':(-1,0), 'N':(0,-1), 'S':(0,1)}
+```
 
 #### `RLUD` "Right, Left, Up, Down"
-`{'R': (1,0), 'L':(-1,0), 'U':(0,-1), 'D':(0,1) }`
-#### `ARROWS`
-`{'>': (1,0), '<':(-1,0), '^':(0,-1), 'v':(0,1) }`
-
-#### DIR
-`[(1,0),(-1,0), (0,1), (0,-1)]`
-#### DIR8
-`[d[1] for d in COMPASS8.items()]`
 ```python
->>> DIR8
+{'R': (1,0), 'L':(-1,0), 'U':(0,-1), 'D':(0,1) }
+```
+#### `ARROWS`
+```python
+{'>': (1,0), '<':(-1,0), '^':(0,-1), 'v':(0,1) }
+```
+
+#### `DIR`
+```python
+[(1,0),(-1,0), (0,1), (0,-1)]
+```
+#### `DIR8`
+```python
 [(1, -1), (-1, -1), (1, 1), (-1, 1), (1, 0), (-1, 0), (0, -1), (0, 1)]
 ```
 #### `CDIR8`
@@ -104,13 +124,12 @@ Most of these have two versions - one for complex number represention and one fo
 #### `CDIR`
 `[p[0] + 1j*p[1] for p in DIR]`
 
+## Distance stuff
 #### `manhattan` and `manhattani(p, q)`
 Returns the Manhattan distance between points in `(x,y)` tuple and imaginary number format respectively. `manhattan3(p, q)` for 3D (tuple only for obvious reasons).
 #### `cartesian(p, q)`
 `p` and `q` are `(x, y)` tuples. Returns the cartesian distance between `p` and `q` using Pythagoras' theorem. 
 
-#### `wrap(p, max_x, max_y, min_x=0, min_y=0)`
-Wraps an imaginary coordinate `x + y*1j` back into a grid of size `max_x, max_y` etc. Does no modular arithmetic - i.e. `max+2 => 0`
 
 
 ## Numeric
@@ -198,6 +217,9 @@ Given `p` is a point `(x,y)` in a grid of `width` x `height`, generates the up t
 >>> list(grid_8_neighbors((1,1),400))
 [(2, 0), (0, 0), (2, 2), (0, 2), (2, 1), (0, 1), (1, 0), (1, 2)]
 ```
+
+#### `wrap(p, max_x, max_y, min_x=0, min_y=0)`
+Wraps an imaginary coordinate `x + y*1j` back into a grid of size `max_x, max_y` etc. Does no modular arithmetic - i.e. `max+2 => 0`
 
 
 #### print_grid(g, spacing=0, markfn=lambda r,c,ch:""):
