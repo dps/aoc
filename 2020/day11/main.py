@@ -1,6 +1,6 @@
 from utils import *
 
-input = [i.strip() for i in open("test.txt","r").readlines()]
+input = [i.strip() for i in open("input.txt","r").readlines()]
 
 def part1():
     g,w,h = grid_from_strs(input)
@@ -53,10 +53,14 @@ def part2():
                     continue
                 adj = 0
                 for c in DIR8:
-                    if (x+c[0], y+c[1]) in occupied:
-                        adj += 1
+                    for i in range(1, w):
+                        if (x+i*c[0], y+i*c[1]) in occupied:
+                            adj += 1
+                            break
+                        elif (x+i*c[0], y+i*c[1]) in seats:
+                            break
                 if (x,y) in occupied:
-                    if adj < 4:
+                    if adj < 5:
                         new_occupied.add((x,y))
                 else:
                     if adj == 0:
