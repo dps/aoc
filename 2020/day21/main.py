@@ -27,7 +27,6 @@ def solve():
 
     print(sum([ingredient_count[g] for g in greds]))
 
-    print(a_g)
     mapped = {}
     ordered = []
     while len(a_g.keys()) > 0:
@@ -40,7 +39,6 @@ def solve():
                 del(a_g[a])
                 break
 
-    print(mapped)
     print(",".join([v for k,v in sorted(ordered)]))
 
 
