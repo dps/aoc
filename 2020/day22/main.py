@@ -25,7 +25,7 @@ def part1():
     aoc(sum([l * r for (l,r) in zip(range(1, len(winner)+1), reversed(winner))]))
 
 def state(o,t):
-    return ",".join([str(i) for i in o]) + "|" + ",".join([str(i) for i in t])
+    return tuple(o),tuple(t)
 
 def recurse(o,t):
     states = set()
