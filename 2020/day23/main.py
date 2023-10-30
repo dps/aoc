@@ -59,7 +59,7 @@ def part2(moves=10000000):
     cups = cups + list(range(max_l + 1,1000001))
     min_l, max_l = min(cups), max(cups)
 
-    dmap = {}
+    dmap = {} # O(1) lookup for any val.
 
     head = None
     one = None
