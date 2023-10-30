@@ -11,23 +11,25 @@ def solve(moves=10000000, part2=True):
         cups = cups + list(range(max_l + 1,1000001))
     min_l, max_l = min(cups), max(cups)
 
-    dmap = {} # O(1) lookup for any val.
+    #dmap = {} # O(1) lookup for any val.
 
-    head = None
-    one = None
-    prev = None
-    for v in cups:
-        n = dll(v, prev, None)
-        if not prev:
-            head = n
-        else:
-            prev.set_nxt(n)
-        prev = n
-        if v == 1:
-            one = n
-        dmap[v] = n
-    head.set_prv(prev) # Connect the ends
-    prev.set_nxt(head)
+    # head = None
+    # one = None
+    # prev = None
+    # for v in cups:
+    #     n = Dll(v, prev, None)
+    #     if not prev:
+    #         head = n
+    #     else:
+    #         prev.set_nxt(n)
+    #     prev = n
+    #     if v == 1:
+    #         one = n
+    #     dmap[v] = n
+    # head.set_prv(prev) # Connect the ends
+    # prev.set_nxt(head)
+
+    head, dmap, one = Dll.parse(cups, 1)
 
     while moves > 0:
         first = head.val()

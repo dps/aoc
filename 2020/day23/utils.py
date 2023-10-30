@@ -404,7 +404,27 @@ def print_world(world):
     for y in range(miy, my+1):
         print("".join(["🟧" if x+1j*y in world else "⬛️" for x in range(mix,mx+1)]))
 
-class dll(object):
+class Dll(object):
+
+    def parse(src, special_val=None, circular=True):
+        vmap = {}
+        head = None
+        special = None
+        prev = None
+        for v in src:
+            n = Dll(v, prev, None)
+            if not prev:
+                head = n
+            else:
+                prev.set_nxt(n)
+            prev = n
+            if v == special_val:
+                special = n
+            vmap[v] = n
+        if circular:
+            head.set_prv(prev) # Connect the ends
+            prev.set_nxt(head)
+        return head, vmap, special 
 
     def __init__(self, val, prv, nxt):
         self._val = val
