@@ -404,6 +404,29 @@ def print_world(world):
     for y in range(miy, my+1):
         print("".join(["🟧" if x+1j*y in world else "⬛️" for x in range(mix,mx+1)]))
 
+class dll(object):
+
+    def __init__(self, val, prv, nxt):
+        self._val = val
+        self._prv = prv
+        self._nxt = nxt
+
+    def set_nxt(self, n):
+        self._nxt = n
+
+    def set_prv(self, n):
+        self._prv = n
+
+    def nxt(self):
+        return self._nxt
+
+    def prv(self):
+        return self._prv
+
+    def val(self):
+        return self._val
+
+
 if __name__ == "__main__":
     assert(set(grid_neighbors((0,0), 4)) == set([(1,0), (0,1)]))
     assert(set(grid_neighbors((3,3), 4)) == set([(2,3), (3,2)]))
