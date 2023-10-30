@@ -53,9 +53,6 @@ class dll(object):
     def val(self):
         return self._val
 
-def state(cups):
-    return ",".join([str(c) for c in cups])
-
 def part2(moves=10000000):
     cups = [int(ch) for ch in input]
     max_l = max(cups)
