@@ -7,9 +7,24 @@ import heapq
 from collections import Counter, defaultdict, deque
 from copy import deepcopy
 from functools import cache, reduce
-
+from itertools import combinations, permutations, product
+import subprocess
 
 sys.setrecursionlimit(100000)
+
+def aoc(data):
+    print(data)
+    subprocess.run("pbcopy", text=True, input=str(data))
+
+def bundles(inp):
+    r = []
+    for line in inp:
+        if line == '':
+            yield(r)
+            r = []
+        else:
+            r.append(line)
+    yield(r)
 
 def maxl(list):
     if len(list) == 0:
@@ -228,12 +243,22 @@ def cartesian(p, q):
 def triangle(n):
     return int((n/2)*(n+1))
 
+# def flatten(list_of_lists):
+#     if len(list_of_lists) == 0:
+#         return list_of_lists
+#     if isinstance(list_of_lists[0], list):
+#         return flatten(list_of_lists[0]) + flatten(list_of_lists[1:])
+#     return list_of_lists[:1] + flatten(list_of_lists[1:])
+
 def flatten(list_of_lists):
     if len(list_of_lists) == 0:
-        return list_of_lists
+        return list(list_of_lists)
+    if isinstance(list_of_lists[0], tuple):
+        return flatten(list_of_lists[0]) + flatten(list_of_lists[1:])
     if isinstance(list_of_lists[0], list):
         return flatten(list_of_lists[0]) + flatten(list_of_lists[1:])
-    return list_of_lists[:1] + flatten(list_of_lists[1:])
+    return list(list_of_lists[:1]) + list(flatten(list_of_lists[1:]))
+
 
 def sign(a):
     if a == 0:
@@ -320,16 +345,16 @@ class Grid(object):
         return self._grid
 
     def right_wrap(self, x, steps=1):
-        return (x + steps) #% self._width
+        return (x + steps) % self._width
 
     def left_wrap(self, x, steps=1):
-        return (x - steps) #% self._width
+        return (x - steps) % self._width
 
     def up_wrap(self, y, steps=1):
-        return (y - steps) #% self._height
+        return (y - steps) % self._height
 
     def down_wrap(self, y, steps=1):
-        return (y + steps) #% self._height
+        return (y + steps) % self._height
 
 def grid_from_strs(lines, mapfn=lambda x:x, spl=''):
     l = lines[0].strip()
@@ -346,7 +371,7 @@ def grid_from_strs(lines, mapfn=lambda x:x, spl=''):
             line = line.split(spl)
         for x, ch in enumerate(line):
             g[y][x] = mapfn(ch)
-    return g, w, h
+    return grid, w, h
 
 def grid_ints_from_strs(lines, spl=''):
     return grid_from_strs(lines, mapfn=int, spl=spl)
@@ -378,6 +403,82 @@ def print_world(world):
     mx, my = int(max([p.real for p in world])), int(max([p.imag for p in world]))
     for y in range(miy, my+1):
         print("".join(["🟧" if x+1j*y in world else "⬛️" for x in range(mix,mx+1)]))
+
+class Dll(object):
+
+    def parse(src, special_val=None, circular=True):
+        vmap = {}
+        head = None
+        special = None
+        prev = None
+        for v in src:
+            n = Dll(v, prev, None)
+            if not prev:
+                head = n
+            else:
+                prev.set_nxt(n)
+            prev = n
+            if v == special_val:
+                special = n
+            vmap[v] = n
+        if circular:
+            head.set_prv(prev) # Connect the ends
+            prev.set_nxt(head)
+        return head, vmap, special 
+
+    def __init__(self, val, prv, nxt):
+        self._val = val
+        self._prv = prv
+        self._nxt = nxt
+
+    def set_nxt(self, n):
+        self._nxt = n
+
+    def set_prv(self, n):
+        self._prv = n
+
+    def nxt(self):
+        return self._nxt
+
+    def prv(self):
+        return self._prv
+
+    def val(self):
+        return self._val
+
+class Sll(object):
+
+    def parse(src, special_val=None, circular=True):
+        vmap = {}
+        head = None
+        special = None
+        prev = None
+        for v in src:
+            n = Dll(v, prev, None)
+            if not prev:
+                head = n
+            else:
+                prev.set_nxt(n)
+            prev = n
+            if v == special_val:
+                special = n
+            vmap[v] = n
+        if circular:
+            prev.set_nxt(head)
+        return head, vmap, special 
+
+    def __init__(self, val, nxt):
+        self._val = val
+        self._nxt = nxt
+
+    def set_nxt(self, n):
+        self._nxt = n
+
+    def nxt(self):
+        return self._nxt
+
+    def val(self):
+        return self._val
 
 if __name__ == "__main__":
     assert(set(grid_neighbors((0,0), 4)) == set([(1,0), (0,1)]))
