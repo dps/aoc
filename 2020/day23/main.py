@@ -29,7 +29,7 @@ def solve(moves=10000000, part2=True):
     # head.set_prv(prev) # Connect the ends
     # prev.set_nxt(head)
 
-    head, dmap, one = Dll.parse(cups, 1)
+    head, dmap, one = Sll.parse(cups, 1)
 
     while moves > 0:
         first = head.val()
@@ -39,7 +39,6 @@ def solve(moves=10000000, part2=True):
         
         # splice out taken
         head.set_nxt(c.nxt())
-        c.nxt().set_prv(head)
 
         in_hand = {a.val(), b.val(), c.val()}
 
@@ -55,10 +54,8 @@ def solve(moves=10000000, part2=True):
         found = dmap[look_for]
         tmp = found.nxt()
         found.set_nxt(a)
-        a.set_prv(found)
 
         c.set_nxt(tmp)
-        tmp.set_prv(c)
         moves -= 1
         head = head.nxt()
 

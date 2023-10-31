@@ -446,6 +446,39 @@ class Dll(object):
     def val(self):
         return self._val
 
+class Sll(object):
+
+    def parse(src, special_val=None, circular=True):
+        vmap = {}
+        head = None
+        special = None
+        prev = None
+        for v in src:
+            n = Dll(v, prev, None)
+            if not prev:
+                head = n
+            else:
+                prev.set_nxt(n)
+            prev = n
+            if v == special_val:
+                special = n
+            vmap[v] = n
+        if circular:
+            prev.set_nxt(head)
+        return head, vmap, special 
+
+    def __init__(self, val, nxt):
+        self._val = val
+        self._nxt = nxt
+
+    def set_nxt(self, n):
+        self._nxt = n
+
+    def nxt(self):
+        return self._nxt
+
+    def val(self):
+        return self._val
 
 if __name__ == "__main__":
     assert(set(grid_neighbors((0,0), 4)) == set([(1,0), (0,1)]))
