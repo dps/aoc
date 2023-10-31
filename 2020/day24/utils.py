@@ -213,6 +213,9 @@ DIR8 = [d[1] for d in COMPASS8.items()]
 CDIR8 = [p[0] + 1j*p[1] for p in DIR8]
 CDIR = [p[0] + 1j*p[1] for p in DIR]
 
+HEX_DIR = {'e': (1,0), 'w': (-1, 0), 'se': (0,1), 'sw': (-1,1), 'ne': (1,-1), 'nw': (0,-1)}
+HEX_NEIGHBORS = [(1,0),(-1,0),(0,1),(-1,1),(1,-1),(0,-1)]
+
 def manhattani(p, q):
     return abs(p.real - q.real) + abs(p.imag - q.imag)
 
