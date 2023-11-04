@@ -13,6 +13,18 @@ import cmath
 
 sys.setrecursionlimit(100000)
 
+def bin_search_fn(lower, upper, test):
+    # Example: Find value where probe(x) is < 1T and probe(x+1) is > 1T
+    # bin_search_fn(p_i, i, lambda x:probe(x) - 1000000000000)
+    while upper - lower > 1:
+        mid = (lower + upper) // 2
+        p = test(mid)
+        if p < 0:
+            lower = mid
+        else:
+            upper = mid
+    return lower
+
 base_string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 @cache
 def to_base(number, base):

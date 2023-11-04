@@ -66,17 +66,6 @@ def probe(probeamt):
 def part1():
     aoc(probe(1))
 
-def bin_search(lower, upper):
-    while upper - lower > 1:
-        mid = (lower + upper) // 2
-        p = probe(mid)
-        if p < 1000000000000:
-            lower = mid
-        else:
-            upper = mid
-    return lower
-        
-
 def part2():
     p_i = 0
     i = 1
@@ -87,7 +76,7 @@ def part2():
         needed = probe(i)
 
     #binary search between p_i and i
-    aoc(bin_search(p_i, i))
+    aoc(bin_search_fn(p_i, i, lambda x:probe(x) - 1000000000000))
 
 part1()
 part2()
