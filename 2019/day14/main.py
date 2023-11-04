@@ -13,33 +13,24 @@ def probe(probeamt):
             a = r.strip().split(' ')[1]
             rs.append((n,a))
         n,a = int(output.strip().split(' ')[0]), output.strip().split(' ')[1]
-        rs = sorted(rs, reverse=True)
         reactions.append((rs, (n,a)))
         back_graph[a] = (n, rs)
 
     needed = defaultdict(int)
     needed['FUEL'] = probeamt
     surplus = defaultdict(int)
-    order = deque(['FUEL'])
     while list(needed.keys()) != ['ORE']:
-        choose = order.popleft() #(set(needed.keys()) - {'ORE'}).pop()
-        if choose == 'ORE':
-            order.append(choose)
-            continue
-        #print("chose", choose)
+        choose = (set(needed.keys()) - {'ORE'}).pop()
         amt = needed[choose]
         del(needed[choose])
 
         if surplus[choose] > 0:
             if surplus[choose] >= amt:
-                #print("FULL SURPLUS NO NEED TO RUN REACTION", surplus[choose], amt)
                 surplus[choose] -= amt
                 continue
             else:
-                #print("Surplus ", surplus[choose])
                 amt -= surplus[choose]
                 surplus[choose] = 0
-
 
         react_produces, react = back_graph[choose]
         times = 1
@@ -50,17 +41,9 @@ def probe(probeamt):
         remain = (times * react_produces) - amt
         surplus[choose] += remain
 
-        #print("need to run reaction", choose, back_graph[choose], times, "times", remain)
         for reagent in react:
-            if needed[reagent[1]] != 0:
-                #print("REMOVING ", reagent[1], "surplus is ", surplus[reagent[1]])
-                order.remove(reagent[1])
-            order.append(reagent[1])
-            before = needed[reagent[1]]
             needed[reagent[1]] += times * reagent[0]
-            #print("consume", reagent[1],  before, 'plus', times * reagent[0])
-        #print(needed)
-    #print(needed)
+
     return(needed['ORE'])
 
 def part1():
