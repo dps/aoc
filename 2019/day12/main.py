@@ -61,8 +61,8 @@ def part2():
                     moons[r][a+3] -= 1
 
             for m in range(len(moons)):
-                moons[m][0],moons[m][1],moons[m][2] = moons[m][0] + moons[m][3], moons[m][1] + moons[m][4], moons[m][2] + moons[m][5]
-    
+                moons[m][axis] = moons[m][axis] + moons[m][axis + 3]
+
     aoc(math.lcm(*repeats))
 
 part1()
