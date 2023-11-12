@@ -16,41 +16,6 @@ def part1():
             c = computer(deepcopy(allmem), 0, 0, [x,y])
             acc += next(c)
     aoc(acc)
-test = """#.......................................
-.#......................................
-..##....................................
-...###..................................
-....###.................................
-.....####...............................
-......#####.............................
-......######............................
-.......#######..........................
-........########........................
-.........#########......................
-..........#########.....................
-...........##########...................
-...........############.................
-............############................
-.............#############..............
-..............##############............
-...............###############..........
-................###############.........
-................#################.......
-.................########OOOOOOOOOO.....
-..................#######OOOOOOOOOO#....
-...................######OOOOOOOOOO###..
-....................#####OOOOOOOOOO#####.
-.....................####OOOOOOOOOO#####.
-.....................####OOOOOOOOOO#####.
-......................###OOOOOOOOOO#####.
-.......................##OOOOOOOOOO#####.
-........................#OOOOOOOOOO#####.
-.........................OOOOOOOOOO#####.
-..........................##############.
-..........................##############.
-...........................#############.
-............................############.
-.............................###########."""
 
 def part2():
     program = [int(x) for x in input[0].split(",")]    
@@ -58,28 +23,17 @@ def part2():
     for i, v in enumerate(program):
         allmem[i] = v
 
-
-    # for x in range(0,900):
-    #     for y in range(0, 1000):
-    #         c = computer(deepcopy(allmem), 0, 0, [x,y])
-    #         acc += next(c)
-
     def check(x,y):
         return next(computer(deepcopy(allmem), 0, 0, [x,y]))
-    # def check(x,y):
-    #     ch = test.split('\n')[y][x]
-    #     if ch == '.':
-    #         return 0
-    #     else:
-    #         return 1
-    #     return next(computer(deepcopy(allmem), 0, 0, [x,y]))
 
     world = set()
     sqsize = 100
     cur_row = 16
-    prev_bounds = (11,13)
-    # cur_row = 4
-    # prev_bounds = (3,5)
+    # Pick a line far enough out to skip the empty sections, and find its bounds.
+    bnds = [check(x,cur_row-1) for x in range(20)]
+    line = list(zip(bnds,[0]+bnds))
+    prev_bounds = (line.index((1,0)),line.index((0,1))-1)
+
     bounds = {}
     overflow = None
     while True:
@@ -95,7 +49,6 @@ def part2():
         world.add(right_bound+1j*cur_row)
         prev_bounds = bounds[cur_row]
         if overflow == None and (cur_row - (sqsize - 1)) in bounds and left_bound >= bounds[cur_row - (sqsize - 1)][0] and left_bound <= bounds[cur_row - (sqsize - 1)][1] and (left_bound+(sqsize-1)) <= bounds[cur_row - (sqsize-1)][1]:
-            print("FOUND", cur_row, left_bound,"x", cur_row - (sqsize -1))
             for x in range(left_bound, left_bound+sqsize):
                 for y in range(cur_row-(sqsize-1),cur_row+1):
                     world.add(x+1j*y)
