@@ -48,18 +48,14 @@ def part2():
         world.add(left_bound+1j*cur_row)
         world.add(right_bound+1j*cur_row)
         prev_bounds = bounds[cur_row]
-        if overflow == None and (cur_row - (sqsize - 1)) in bounds and left_bound >= bounds[cur_row - (sqsize - 1)][0] and left_bound <= bounds[cur_row - (sqsize - 1)][1] and (left_bound+(sqsize-1)) <= bounds[cur_row - (sqsize-1)][1]:
-            for x in range(left_bound, left_bound+sqsize):
-                for y in range(cur_row-(sqsize-1),cur_row+1):
-                    world.add(x+1j*y)
-            aoc(10000 * left_bound + (cur_row - (sqsize - 1)))
-            overflow = sqsize//10
-        cur_row += 1
-        if type(overflow) == type(1):
-            overflow -= 1
-            if overflow < 0:
-                break
-    #print_world(world)
 
-#part1()
+        if (overflow == None and (cur_row - (sqsize - 1)) in bounds and
+            left_bound >= bounds[cur_row - (sqsize - 1)][0] and
+            left_bound <= bounds[cur_row - (sqsize - 1)][1] and
+            (left_bound+(sqsize-1)) <= bounds[cur_row - (sqsize-1)][1]):
+            aoc(10000 * left_bound + (cur_row - (sqsize - 1)))
+            break
+        cur_row += 1
+
+part1()
 part2()
