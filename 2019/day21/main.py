@@ -40,12 +40,10 @@ def part2():
         allmem[i] = v
 
     P = [
-        "NOT J J",
-        "AND E J", # J = E
+        "OR E J", # J = E
         "AND I J", # J = E&&I
         "OR H J",  # J = (E&&I) || H
-        "NOT T T",
-        "AND B T", # T = B
+        "OR B T", # T = B
         "AND C T", # T = B&&C
         "NOT T T", # T = !(B&&C)
         "AND T J", # J = (!(B&C) && (H || (E&&I)))
