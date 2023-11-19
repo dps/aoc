@@ -9,14 +9,54 @@ from copy import deepcopy
 from functools import cache, reduce
 from itertools import combinations, permutations, product
 import subprocess
+import cmath
 
 sys.setrecursionlimit(100000)
+
+def data(filename="input", strip=True):
+    """
+    `[i.strip() if strip else i for i in open(filename,"r").readlines()]`
+    """
+    return [i.strip() if strip else i for i in open(filename,"r").readlines()]
+
+def bin_search_fn(lower, upper, test):
+    """
+    Example: Find value where probe(x) is < 1T and probe(x+1) is >= 1T
+    bin_search_fn(p_i, i, lambda x:probe(x) - 1000000000000)
+    """
+    while upper - lower > 1:
+        mid = (lower + upper) // 2
+        p = test(mid)
+        if p < 0:
+            lower = mid
+        else:
+            upper = mid
+    return lower
+
+base_string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+@cache
+def to_base(number, base):
+    result = ""
+    while number:
+        result += base_string[number % base]
+        number //= base
+    return result[::-1] or "0"
 
 def aoc(data):
     print(data)
     subprocess.run("pbcopy", text=True, input=str(data))
 
 def bundles(inp):
+    """
+    Generator to turn input array from file with multi-line sequences divided by
+    blank lines into something you can loop over.
+    e.g.
+    ```
+    input = [i.strip() for i in open("input.txt","r").readlines()]
+
+    max([sum(map(int, line)) for line in bundles(inp)])
+    ```
+    """
     r = []
     for line in inp:
         if line == '':
@@ -31,11 +71,31 @@ def maxl(list):
         return 0
     return max(list)
 
+def angle_from_vertical(c):
+    """
+    ```           |    _c
+               |Θ.-'
+     origin -> .'
+    ```
+    c is a complex number with (CAREFUL!) y ^ up vertical as +1j direction
+    opposite from how you usually read grids, but intuitive for trig.
+    returns angle clockwise from vertical in degrees. Will return 315 not -45
+    for close anticlockwise.
+    """
+    angle_from_horizontal = cmath.phase(c)
+    angle_from_horizontal_degrees = math.degrees(angle_from_horizontal)
+    angle_from_vertical_degrees = 90 - angle_from_horizontal_degrees
+    if angle_from_vertical_degrees < 0:
+        angle_from_vertical_degrees += 360
+    return angle_from_vertical_degrees
+
 ## Graph stuff
 
 def floyd_warshall(graph, bidirectional=False):
-    # Given a graph dict of format {vertex: [edges]}
-    # returns the shortest path between every pair of nodes in the graph.
+    """
+    Given a graph dict of format {vertex: [edges]}
+    returns the shortest path between every pair of nodes in the graph.
+    """
     dist = defaultdict(lambda : math.inf)
     for node, edges in graph.items():
         for dest in edges:
@@ -52,6 +112,11 @@ def floyd_warshall(graph, bidirectional=False):
     return dist
 
 def find_shortest_path(graph, start, end):
+    """
+    Given a graph dict of format {vertex: [edges]}
+    returns the shortest path between start and end. It's literally the whole route
+    so to find its length do len(find_shortest_path)
+    """
     dist = {start: [start]}
     q = deque([start])
     while len(q):
@@ -61,6 +126,23 @@ def find_shortest_path(graph, start, end):
                 dist[next] = dist[at] + [next]
                 q.append(next)
     return dist.get(end)
+
+def dynamic_find_shortest_path(neighbors, start, end):
+    """
+    Given a graph defined by function `neighbors`
+    returns the shortest path between start and end. It's literally the whole route
+    so to find its length do len(find_shortest_path)
+    """
+    dist = {start: [start]}
+    q = deque([start])
+    while len(q):
+        at = q.popleft()
+        for next in neighbors(at):
+            if next not in dist:
+                dist[next] = dist[at] + [next]
+                q.append(next)
+    return dist.get(end)
+
 
 def dijkstra(graph, start, end):
     """
@@ -206,6 +288,8 @@ COMPASS8 = {'NE': (1, -1), 'NW': (-1, -1), 'SE': (1, 1), 'SW': (-1, 1), 'E': (1,
 
 RLUD = {'R': (1,0), 'L':(-1,0), 'U':(0,-1), 'D':(0,1) }
 ARROWS = {'>': (1,0), '<':(-1,0), '^':(0,-1), 'v':(0,1) }
+CRLUD = {'R': 1, 'L':-1, 'U':-1j, 'D':1j }
+CARROWS = {'>': 1, '<':-1, '^':-1j, 'v':1j }
 
 DIR = [(1,0),(-1,0), (0,1), (0,-1)]
 DIR8 = [d[1] for d in COMPASS8.items()]
@@ -223,6 +307,52 @@ def manhattan3(p, q):
     return abs(p[0] - q[0]) + abs(p[1] - q[1]) + + abs(p[2] - q[2])
 
 
+# THERE ARE TWO TYPES OF HEX GRID - those with north/south
+# and those with east/west
+#          _____         _____         _____
+#         /     \       /     \       /     \
+#   _____/ -2,-1 \_____/  0,-1 \_____/  2,-1 \_____
+#  /     \       /     \       /     \       /     \
+# / -3,-1 \_____/ -1,-1 \_____/  1,-1 \_____/  3,-1 \
+# \       /     \       /     \       /     \       /
+#  \_____/ -2,0  \_____/  0,0  \_____/  2,0  \_____/
+#  /     \       /     \  ***  /     \       /     \
+# / -3,0  \_____/ -1,0  \_____/  1,0  \_____/  3,0  \
+# \       /     \       /     \       /     \       /
+#  \_____/ -2,1  \_____/  0,1  \_____/  2,1  \_____/
+#  /     \       /     \       /     \       /     \
+# / -3,1  \_____/ -1,1  \_____/  1,1  \_____/  3,1  \
+# \       /     \       /     \       /     \       /
+#  \_____/       \_____/       \_____/       \_____/
+HEX_DIR_ALT_EVEN_X = {'n': (0,-1), 's': (0,1), 'ne':(1,-1), 'se': (1,0), 'nw': (-1,-1), 'sw': (-1,0)}
+HEX_DIR_ALT_ODD_X = {'n': (0,-1), 's': (0,1), 'ne':(1,0), 'se': (1,1), 'nw': (-1,0), 'sw': (-1,1)}
+def hex_dir_alt(p, dir):
+    x,_ = p[0],p[1]
+    if x % 2 == 0:
+        return HEX_DIR_ALT_EVEN_X[dir]
+    else:
+        return HEX_DIR_ALT_ODD_X[dir]
+
+#    /\   /\   /\
+#   /  \ /  \ /  \
+#  |    |0,-1|1,-1|
+#  |    |    |    |
+#   \  / \  / \  / \
+#    \/   \/   \/   \
+#    |-1,0| 0,0| 1,0|
+#    |    | ** |    |
+#   / \  / \  / \  /
+#  /   \/   \/   \/
+# |    |-1,1| 0,1|
+# |    |    |    |
+#  \  / \  / \  / \
+#   \/   \/   \/   \
+
+
+HEX_DIR = {'e': (1,0), 'w': (-1, 0), 'se': (0,1), 'sw': (-1,1), 'ne': (1,-1), 'nw': (0,-1)}
+HEX_NEIGHBORS = [(1,0),(-1,0),(0,1),(-1,1),(1,-1),(0,-1)]
+
+
 def wrap(p, max_x, max_y, min_x=0, min_y=0):
     q = p
     if p.real > max_x:
@@ -238,6 +368,8 @@ def wrap(p, max_x, max_y, min_x=0, min_y=0):
 def cartesian(p, q):
     return math.sqrt(abs(p[0] - q[0])*abs(p[0] - q[0]) + abs(p[1] - q[1]) * abs(p[1] - q[1]))
 
+def cartesiani(p, q):
+    return math.sqrt(abs(p.real - q.real)*abs(p.real - q.real) + abs(p.imag - q.imag) * abs(p.imag - q.imag))
 
 # sequence like 1,3,6,10,15
 def triangle(n):
@@ -333,11 +465,11 @@ class Grid(object):
         return  self.set_cursor(self.right_wrap(self._cursor[0], right),
                         self.down_wrap(self._cursor[1], down))
 
-    def could_move(self, right, down, dbg=False):
+    def could_move(self, right, down):
         return  self.could_cursor(self.right_wrap(self._cursor[0], right),
                         self.down_wrap(self._cursor[1], down))
 
-    def peek_move(self, right, down, dbg=False):
+    def peek_move(self, right, down):
         ch = self._grid[self.down_wrap(self._cursor[1], down)][self.right_wrap(self._cursor[0], right)]
         return ch
 
@@ -371,7 +503,7 @@ def grid_from_strs(lines, mapfn=lambda x:x, spl=''):
             line = line.split(spl)
         for x, ch in enumerate(line):
             g[y][x] = mapfn(ch)
-    return grid, w, h
+    return g, w, h
 
 def grid_ints_from_strs(lines, spl=''):
     return grid_from_strs(lines, mapfn=int, spl=spl)
@@ -384,6 +516,12 @@ def grid_neighbors(p, width, height=None):
             continue
         yield(q)
 
+def grid_wrap_neighbors(p, width, height=None):
+    height = width if not height else height
+    for d in DIR:
+        q = (p[0] + d[0]) % width, (p[1] + d[1]) % height
+        yield(q)
+
 def grid_8_neighbors(p, width, height=None):
     height = width if not height else height
     for d in DIR8:
@@ -391,6 +529,13 @@ def grid_8_neighbors(p, width, height=None):
         if q[0] < 0 or q[1] < 0 or q[0] >= width or q[1] >= height:
             continue
         yield(q)
+
+def grid_wrap_8_neighbors(p, width, height=None):
+    height = width if not height else height
+    for d in DIR8:
+        q = (p[0] + d[0]) % width, (p[1] + d[1]) % height
+        yield(q)
+
 
 def print_grid(g, spacing=0, markfn=lambda r,c,ch:""):
     for r, row in enumerate(g):
@@ -402,7 +547,21 @@ def print_world(world):
     mix, miy = int(min([p.real for p in world])), int(min([p.imag for p in world]))
     mx, my = int(max([p.real for p in world])), int(max([p.imag for p in world]))
     for y in range(miy, my+1):
-        print("".join(["🟧" if x+1j*y in world else "⬛️" for x in range(mix,mx+1)]))
+        print("".join(["#" if x+1j*y in world else "." for x in range(mix,mx+1)]))
+
+def print_dict_world(world):
+    mix = int(min([k[0] for k in world.keys()]))
+    miy = int(min([k[1] for k in world.keys()]))
+    mx = int(max([k[0] for k in world.keys()]))
+    my = int(max([k[1] for k in world.keys()]))
+
+    for y in range(miy, my+1):
+        for x in range(mix, mx+1):
+            if (x,y) in world:
+                print(world[(x,y)][0], end='')
+            else:
+                print(" ", end='')
+        print()
 
 class Dll(object):
 
@@ -480,6 +639,30 @@ class Sll(object):
     def val(self):
         return self._val
 
+def toposort(leaves, graph):
+    """
+    Returns list of leaves topologically sorted according to graph
+    ```
+    leaves: set of leaves
+    graph: dict of vertex => dependencies
+
+    graph={'A':['B', 'C'], 'C': ['D']}
+    print(toposort({'A','B','C','D'}, graph))
+    ['D', 'C', 'B', 'A']
+    ```
+    """
+    # Kahn's algorithm
+    res = []
+    s = leaves
+    while len(s) > 0:
+        n = s.pop()
+        res.append(n)
+        for dep_k,dep_v in [(k,v) for k,v in graph.items() if n in v]:
+            dep_v.remove(n)
+            if len(dep_v) == 0:
+                s.add(dep_k)
+    return res
+
 if __name__ == "__main__":
     assert(set(grid_neighbors((0,0), 4)) == set([(1,0), (0,1)]))
     assert(set(grid_neighbors((3,3), 4)) == set([(2,3), (3,2)]))
@@ -496,7 +679,39 @@ if __name__ == "__main__":
              for x,y in itertools.product(range(dim), range(dim))}
     start, end = (0,0), (dim-1, dim-1)
     assert(a_star(graph, start, end, lambda x,y:manhattan(x,y))) #[0] == 14)
-    print("utils OK")
+    
     # An arbitrary non-trivial weight space
     neighbors = lambda e: [(triangle(p[0])+p[1]*p[1], p) for p in grid_neighbors(e, 100)]
     assert(dynamic_a_star(neighbors, (0,0), (99,99), manhattan)[0] == 902975)
+
+    print(list(grid_wrap_8_neighbors((0,0), 8, 8)))
+
+    print(angle_from_vertical(-1+1j))
+
+    xx = sum([x for x,_ in [HEX_DIR[c] for c in ['ne','se','sw','w','ne']]])
+    yy = sum([y for _,y in [HEX_DIR[c] for c in ['ne','se','sw','w','ne']]])
+    assert((xx, yy) == (0,0))
+
+    seq = ['ne','se','sw','w','nw','nw','e','se']
+    xx = sum([x for x,_ in [HEX_DIR[c] for c in seq]])
+    yy = sum([y for _,y in [HEX_DIR[c] for c in seq]])
+    assert((xx, yy) == (0,0))
+
+
+    xx,yy = 0,0
+    seq = ['ne','s','sw','nw','nw','ne','se']
+    for s in seq:
+        dx,dy = hex_dir_alt((xx,yy), s)
+        xx += dx
+        yy += dy
+
+    assert((xx, yy) == (0,0))
+
+    print(bin_search_fn(0,1000000000000000, lambda x: x - 987665454321))
+    print(to_base(999,5))
+
+    inp = ['12','13','14','','4','99','','1234']
+    assert(max([sum(map(int, line)) for line in bundles(inp)]) == 1234)
+    
+    graph={'A':['B', 'C'], 'C': ['D']}
+    print(toposort({'A','B','C','D'}, graph))
