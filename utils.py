@@ -126,6 +126,13 @@ def to_base(number, base):
         number //= base
     return result[::-1] or "0"
 
+@cache
+def from_base(s, base):
+    number = 0
+    for char in s:
+        value = base_string.index(char)
+        number = number * base + value
+    return number
 
 def aoc(data):
     print(data)
@@ -146,7 +153,7 @@ def bundles(inp):
     r = []
     for line in inp:
         if line == "":
-            yield (r)
+            yield r
             r = []
         else:
             r.append(line)
@@ -484,7 +491,7 @@ HEX_DIR = {
 HEX_NEIGHBORS = [(1, 0), (-1, 0), (0, 1), (-1, 1), (1, -1), (0, -1)]
 
 
-def wrap(p, max_x, max_y, min_x=0, min_y=0):
+def wrapi(p, max_x, max_y, min_x=0, min_y=0):
     q = p
     if p.real > max_x:
         q = min_x + q.imag * 1j
@@ -495,6 +502,11 @@ def wrap(p, max_x, max_y, min_x=0, min_y=0):
     if p.imag < min_y:
         q = q.real + 1j * max_y
     return q
+
+def wrap(p, max_x, max_y, min_x=0, min_y=0):
+    q = p[0] + 1j*p[1]
+    q = wrapi(q, max_x, max_y, min_x, min_y)
+    return int(q.real), int(q.imag)
 
 
 def cartesian(p, q):
@@ -843,8 +855,7 @@ def toposort(leaves, graph):
                 s.add(dep_k)
     return res
 
-
-if __name__ == "__main__":
+def test():
     assert set(grid_neighbors((0, 0), 4)) == set([(1, 0), (0, 1)])
     assert set(grid_neighbors((3, 3), 4)) == set([(2, 3), (3, 2)])
     assert set(grid_8_neighbors((0, 0), 4)) == set([(1, 0), (0, 1), (1, 1)])
@@ -905,3 +916,45 @@ if __name__ == "__main__":
 
     graph = {"A": ["B", "C"], "C": ["D"]}
     print(toposort({"A", "B", "C", "D"}, graph))
+
+TEMPLATE = """
+from utils import *
+
+#input = [int(i.strip()) for i in open("input","r").readlines()]
+input = [i.strip() for i in open("input","r").readlines()]
+
+def part1():
+    tot, prod = 0, 1
+    max_sum = max([sum(map(int, lines)) for lines in bundles(input)])
+    
+    for line in input:
+        pass
+        
+    aoc(max_sum)
+
+part1()
+#part2()
+"""
+
+def make_template():
+    import argparse
+    import os
+    import shutil
+    parser = argparse.ArgumentParser(
+                    prog='utils',
+                    description='AoC utils for dps',
+                    epilog='May the elves be with you')
+    parser.add_argument('day_num')
+    args = parser.parse_args()
+    print(args.day_num)
+    directory = f"day{str(args.day_num).zfill(2)}"
+    os.mkdir(f"day{str(args.day_num).zfill(2)}")
+    os.chdir(directory)
+    shutil.copyfile("../../utils.py", "utils.py")
+    t = open("main.py","w")
+    t.write(TEMPLATE)
+    t.close()
+    print(f"Now run aoc --year 2023 --day {args.day_num}")
+
+if __name__ == "__main__":
+    make_template()
