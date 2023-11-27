@@ -955,6 +955,7 @@ def make_template():
     t.write(TEMPLATE)
     t.close()
     print(f"Now run aoc --year 2023 --day {args.day_num}")
+    print("watchexec -- \"clear;pypy3 main.py\"")
 
 if __name__ == "__main__":
     make_template()
