@@ -3,28 +3,15 @@ from utils import *
 
 input = [i.strip() for i in open("input","r").readlines()]
 
-def react(inp):
-    chain = list(inp)
-
+def react(chain):
+    chain = list(chain)
     newchain = []
-
-    while len(newchain) != len(chain):
-        if newchain != []:
-            chain = newchain
-            newchain = []
-        skip = 0
-        for l,r in zip(chain, chain[1:]):
-            if skip > 0:
-                skip -= 1
-                continue
-            if l != r and l.lower() == r.lower():
-                skip += 1
-            else:
-                newchain.append(l)
-        if not skip:
-            newchain.append(chain[-1])
-
-    return len(chain)
+    for ch in chain:
+        if newchain and ch == newchain[-1].swapcase():
+            newchain.pop()
+        else:
+            newchain.append(ch)
+    return len("".join(newchain))
 
 def part1():
     aoc(react(input[0]))
