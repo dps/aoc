@@ -6,7 +6,9 @@ input = [i.strip() for i in open("input","r").readlines()]
 
 def part1():
     points = []
-    world = defaultdict(int)
+    counts = defaultdict(int)
+    infinities = set()
+
     mx,my = 0,0
     for line in input:
         x,y = map(int, line.split(","))
@@ -18,22 +20,13 @@ def part1():
             closest = sorted([(manhattani(xx+1j*yy, p),i) for i,p in enumerate(points)], key=itemgetter(0))
             if closest[0][0] == closest[1][0]:
                 continue
-            world[xx+1j*yy] = closest[0][1]
-    
-    infinities = set()
-    for xx in range(-1, mx+2):
-        infinities.add(world[xx+1j*-1])
-        infinities.add(world[xx+1j*(my+1)])
-    for yy in range(-1, mx+2):
-        infinities.add(world[-1+1j*yy])
-        infinities.add(world[(mx+1)+1j*yy])
+            counts[closest[0][1]] += 1
+            if xx == -1 or xx == mx+1 or yy == -1 or yy == my+1:
+                infinities.add(closest[0][1])
 
-    cc = Counter()
-    for v in world.values():
-        if v not in infinities:
-            cc[v] += 1
-
-    aoc(cc.most_common()[0])
+    for i in infinities:
+        del(counts[i])
+    aoc(max(counts.items(), key=itemgetter(1))[1])
 
 
 def part2():
@@ -54,5 +47,5 @@ def part2():
     aoc(len(world))
 
 
-#part1()
+part1()
 part2()
