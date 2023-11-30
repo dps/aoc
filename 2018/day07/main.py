@@ -1,48 +1,9 @@
 
 from utils import *
 
-#input = [int(i.strip()) for i in open("input","r").readlines()]
 input = [i.strip() for i in open("input","r").readlines()]
 
 # Step P must be finished before step F can begin.
-
-def toposort(leaves, graph):
-    """
-    Returns list of leaves topologically sorted according to graph
-    ```
-    leaves: set of leaves
-    graph: dict of vertex => dependencies
-
-    graph={'A':['B', 'C'], 'C': ['D']}
-    print(toposort({'A','B','C','D'}, graph))
-    ['D', 'C', 'B', 'A']
-    ```
-    """
-    # Kahn's algorithm
-    res = []
-    s = leaves
-    while len(s) > 0:
-        n = sorted(list(s))[0]
-        s.remove(n)
-        res.append(n)
-        for dep_k, dep_v in [(k, v) for k, v in graph.items() if n in v]:
-            dep_v.remove(n)
-            if len(dep_v) == 0:
-                s.add(dep_k)
-    return res
-
-def part1():
-    lefts = set()
-    rights = set()
-    order = defaultdict(list)
-    for line in input:
-        l,r = line.split(" must be")[0][-1], line.split(" can begin")[0][-1]
-        lefts.add(l)
-        rights.add(r)
-        order[r].append(l)
-
-    print("".join(toposort(lefts - rights, order)))
-        
 
 def ntoposort(leaves, graph, nworkers=4):
     res = []
