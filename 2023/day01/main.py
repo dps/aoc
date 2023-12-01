@@ -1,7 +1,7 @@
 
 from utils import *
+import string
 
-#input = [int(i.strip()) for i in open("input","r").readlines()]
 input = [i.strip() for i in open("input","r").readlines()]
 
 def digs(s):
@@ -18,33 +18,22 @@ def part1():
     aoc(tot)
 
 def part2():
-    tot = 0
-    
+    tot = 0    
     # gah they can overlap!
     #Like this: oneight
     
-    dig = {"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9, "zero":0}
+    dig = {ch: i for i,ch in enumerate(string.digits)}
+    dig.update({"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9, "zero":0})
+
     for line in input:
-        l = ""
-        r = ""
-        ls = []
-        rs = []
         for i in range(len(line)):
-            l += line[i]
-            r = line[len(line)-1-i] + r
-            if len(nums(l)) > 0:
-                ls.append(nums(l)[0])
-            if len(nums(r)) > 0:
-                rs.append(nums(r)[0])
-            if ls and rs:
+            if nums(line[0:i]):
+                l = dig[nums(line[0:i])[0]]
                 break
-            
-        l = ls[0]
-        r = rs[0]
-        if l in dig.keys():
-            l = dig[l]
-        if r in dig.keys():
-            r = dig[r]
+        for i in range(len(line)-1, -1, -1):
+            if nums(line[i:]):
+                r = dig[nums(line[i:])[0]]
+                break        
         tot += int(str(l) + str(r))
         
     aoc(tot)
