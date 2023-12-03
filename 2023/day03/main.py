@@ -3,113 +3,48 @@ from utils import *
 
 input = [i.strip() for i in open("input","r").readlines()]
 
-def part1():
-    tot = 0    
-    symbols = set()
-    pnums = []
+def solve():
+    symbols, symbolposes, pnums = set(), set(), []
+    partial_num, p_num_pos = '', []
+
+    def push_num():
+        nonlocal pnums, partial_num, p_num_pos
+        if partial_num != '':
+            pnums.append((partial_num, p_num_pos))
+        partial_num, p_num_pos = '', []
+
     for y, line in enumerate(input):
-        partial_num = ''
-        p_num_pos = []
-        for x, ch in enumerate(line):
+        for x, ch in enumerate(line + "."):
             if ch.isdigit():
                 partial_num += ch
                 p_num_pos.append(x + 1j*y)
-            elif ch != '.':
+            else:
+                push_num()
+
+            if not ch.isdigit() and ch != '.':
                 symbols.add(x + 1j*y)
-                if partial_num != '':
-                    pnums.append((partial_num, p_num_pos))
-                    partial_num = ''
-                    p_num_pos = []
-            else:
-                if partial_num != '':
-                    pnums.append((partial_num, p_num_pos))
-                    partial_num = ''
-                    p_num_pos = []
-        if partial_num != '':
-            pnums.append((partial_num, p_num_pos))
-            partial_num = ''
-            p_num_pos = []
+                symbolposes.add((ch, x + 1j*y))
 
-    
-    for nstr, poses in pnums:
-        print(nstr, poses)
-        b = False
-        for p in poses:
-            if b:
-                break
-            for d in CDIR8:
-                if p+d in symbols:
-                    tot += int(nstr)
-                    b=True
-                    break
-
-    aoc(tot)
-
-def part2():
     tot = 0
-    #max_sum = max([sum(map(int, lines)) for lines in bundles(input)])
-    
-    symbols = set()
-    nums = {}
-    pnums = []
-    for y, line in enumerate(input):
-        partial_num = ''
-        p_num_pos = []
-        for x, ch in enumerate(line):
-            if ch.isdigit():
-                partial_num += ch
-                p_num_pos.append(x + 1j*y)
-            elif ch != '.':
-                symbols.add((ch, x + 1j*y))
-                if partial_num != '':
-                    pnums.append((partial_num, p_num_pos))
-                    partial_num = ''
-                    p_num_pos = []
-            else:
-                if partial_num != '':
-                    pnums.append((partial_num, p_num_pos))
-                    partial_num = ''
-                    p_num_pos = []
-        if partial_num != '':
-            pnums.append((partial_num, p_num_pos))
-            partial_num = ''
-            p_num_pos = []
+    for nstr, poses in pnums:
+        for p,d in product(poses, CDIR8):
+            if p+d in symbols:
+                tot += int(nstr)
+                break
 
-    
-    # for nstr, poses in pnums:
-    #     print(nstr, poses)
-    #     b = False
-    #     for p in poses:
-    #         if b:
-    #             break
-    #         for d in CDIR8:
-    #             if p+d in symbols:
-    #                 tot += int(nstr)
-    #                 b=True
-    #                 break
+    print("part1:", tot)
 
-    for t,p in symbols:
-        if t != "*":
-            continue
-        c = 0
-        ss = []
-
+    tot = 0
+    for ch,p in [s for s in symbolposes if s[0] == "*"]:
+        c, ss = 0, []
         for pn in pnums:
-            b=False
-            for pnn in pn[1]:
-                if b:
+            for pnn, d in product(pn[1], CDIR8):
+                if pnn+d == p:
+                    c += 1
+                    ss.append(int(pn[0]))
                     break
-                for d in CDIR8:
-                    if pnn+d == p:
-                        c += 1
-                        ss.append(int(pn[0]))
-                        b = True
-                        break
-        print(c, tot, ss)
-        if c ==2:
+        if c == 2:
             tot += ss[0] * ss[1]
+    print("part2:", tot)
 
-    aoc(tot)
-
-part2()
-#part2()
+solve()
