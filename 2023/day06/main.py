@@ -1,11 +1,10 @@
 
 from utils import *
 
-#input = [int(i.strip()) for i in open("input","r").readlines()]
 input = [i.strip() for i in open("input","r").readlines()]
 
-def part1():
-    prod = 1
+def solve():
+    pt1,pt2 = 1,0
     times = ints(input[0])
     distances = ints(input[1])
     td = list(zip(times, distances))
@@ -15,22 +14,13 @@ def part1():
         for i in range(1,time-1):
             if (time-i)*i > record:
                 c += 1
-        prod *= c        
-    aoc(prod)
+        pt1 *= c
 
-def part2():
-    prod = 1
-    times = ints(input[0].replace(" ",""))
-    distances = ints(input[1].replace(" ",""))
-    td = list(zip(times, distances))
+    time = ints(input[0].replace(" ",""))[0]
+    record = ints(input[1].replace(" ",""))[0]
+    for i in range(1,time-1):
+        if (time-i)*i > record:
+            pt2 += 1
+    print(pt1,pt2)
 
-    for time,record in td:
-        c = 0
-        for i in range(1,time-1):
-            if (time-i)*i > record:
-                c += 1
-        prod *= c        
-    aoc(prod)
-
-part1()
-part2()
+solve()
