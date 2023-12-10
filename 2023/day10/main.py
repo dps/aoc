@@ -49,8 +49,6 @@ def part1():
 
     bfs, visited = deque(initial_dirs), initial_set
 
-    maxes = defaultdict(int)
-
     while bfs:
         pos, depth, start_dir = bfs.popleft()
         for d in neighbors(pos):
