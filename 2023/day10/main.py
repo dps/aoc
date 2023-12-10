@@ -3,7 +3,7 @@ from utils import *
 D = [i.strip() for i in open("input", "r").readlines()]
 
 
-def part1():
+def trace_pipe():
     global D
     start = None
     G, w, h = grid_from_strs(D)
@@ -46,7 +46,7 @@ def part1():
                 visited.add(d)
 
 
-g, w, h, on_loop, result = part1()
+g, w, h, on_loop, result = trace_pipe()
 print("Part 1: ", result)
 
 # Remove all the junk from the map
