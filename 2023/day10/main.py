@@ -5,12 +5,9 @@ D = [i.strip() for i in open("input","r").readlines()]
 
 def part1():
     global D
-    tot = 0
-
-    on_loop = set()
-    
+    on_loop, start = set(), None
     G,w,h = grid_from_strs(D)
-    start = None
+
     for r in range(h):
         for c in range(w):
             if G[r][c] == 'S':
@@ -22,7 +19,6 @@ def part1():
             q = (p[0] + d[0], p[1] + d[1])
             if q[0] < 0 or q[1] < 0 or q[0] >= width or q[1] >= height:
                 continue
-            #outsides = [(p[0]+x[0], p[1]+x[1]) for x in d[2]]
             yield q
 
     NEIGHBORS = {
