@@ -13,30 +13,20 @@ def part1():
             if G[r][c] == "S":
                 start = (c, r)
 
-    def grid_neighbors(p, width, height=None, dir=[(1, 0), (-1, 0), (0, 1), (0, -1)]):
-        height = width if not height else height
-        for d in dir:
-            q = (p[0] + d[0], p[1] + d[1])
-            if q[0] < 0 or q[1] < 0 or q[0] >= width or q[1] >= height:
-                continue
-            yield q
-
     NEIGHBORS = {
-        "S": [(0, 1)],  # [(1, 0), (-1, 0), (0, 1), (0, -1)], #yes
-        "-": [(1, 0), (-1, 0)],  # yes
-        "L": [(0, -1), (1, 0)],  # yes
-        "J": [(-1, 0), (0, -1)],  # yes
-        "7": [(-1, 0), (0, 1)],  # yes
-        "F": [(0, 1), (1, 0)],  # yes
-        "|": [(0, -1), (0, 1)],  # yes
-        ".": [],  # yes
+        "S": [(0, 1)],
+        "-": [(1, 0), (-1, 0)],
+        "L": [(0, -1), (1, 0)],
+        "J": [(-1, 0), (0, -1)],
+        "7": [(-1, 0), (0, 1)],
+        "F": [(0, 1), (1, 0)],
+        "|": [(0, -1), (0, 1)],
     }
 
     def neighbors(p):
         ch = G[p[1]][p[0]]
-        dd = NEIGHBORS[ch]
-        for d in grid_neighbors(p, w, h, dd):
-            yield d
+        for d in NEIGHBORS[ch]:
+            yield (p[0] + d[0], p[1] + d[1])
 
     bfs, visited = deque([(start, 0)]), {start}
 
