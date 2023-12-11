@@ -7,10 +7,8 @@ def solve(part=1):
     global D
 
     g, w, h, _ = grid_from_strs(D)
-    expand_rows = sorted([y for y in range(h) if all((c == "." for c in g[y]))])
-    expand_cols = sorted(
-        [x for x in range(w) if all((g[y][x] == "." for y in range(h)))]
-    )
+    expand_rows = [y for y in range(h) if all((c == "." for c in g[y]))]
+    expand_cols = [x for x in range(w) if all((g[y][x] == "." for y in range(h)))]
 
     def new_pos(x, y):
         return (
