@@ -6,6 +6,7 @@ D = [i.strip() for i in open("input","r").readlines()]
 
 def reflect(grid,w,h):
     c, r = None, None
+    results = []
     for col in range(1,w):
         reflect = True
         for i in range(1, w):
@@ -20,7 +21,7 @@ def reflect(grid,w,h):
             if reflect == False:
                 break
         if reflect:
-            return col
+            results.append(col)
 
     for row in range(1,h):
         reflect = True
@@ -36,7 +37,8 @@ def reflect(grid,w,h):
             if reflect == False:
                 break
         if reflect:
-            return 100 * row
+            results.append(100 * row)
+    return results
     
 
 
@@ -51,5 +53,36 @@ def part1():
         
     aoc(tot)
 
-part1()
-#part2()
+def part2():
+    global D
+    tot = 0
+    
+    for grid in bundles(D):
+        g,w,h,_ = grid_from_strs(grid)
+
+        orig = set(reflect(g,w,h))
+        print(orig)
+
+        escape = False
+        for r in range(h):
+            for c in range(w):
+                print(r,c)
+                t = g[r][c]
+                print(t)
+                g[r][c] = "#" if t == "." else "."
+                print(g)
+                test = set(reflect(g,w,h))
+                test = test - orig
+                print("test", test)
+                if len(test) == 1:
+                    tot += test.pop()
+                    escape = True
+                    break
+                g[r][c] = t
+            if escape:
+                break
+        
+    aoc(tot)
+
+#part1()
+part2() # 29388 too low
