@@ -1,15 +1,9 @@
 
 from utils import *
 
-#input = [int(i.strip()) for i in open("input","r").readlines()]
 D = [i.strip() for i in open("input","r").readlines()]
 
-def part1():
-    global D
-    tot = 0
-    #max_sum = max([sum(map(int, lines)) for lines in bundles(D)])
-    
-    g,w,h,_ = grid_from_strs(D)
+def roll_north(g,w,h):
     new_grid = deepcopy(g)
     for j in range(h):
         for i in range(w):
@@ -19,18 +13,38 @@ def part1():
                     jj -= 1
                 new_grid[j][i] = "."
                 new_grid[jj][i] = "O"
-            #print_grid(new_grid)
-            #print(" ---  ")
+    return new_grid
 
-    #print_grid(new_grid)
-    for j in range(h):
-        for i in range(w):
-            if new_grid[j][i] == "O":
-                tot += (h-j)
-                
+def rotate_clock(g):
+    return [list(x) for x in list(zip(*g[::-1]))]
 
-        
-    aoc(tot)
+def score(g,w,h):
+    return sum((h-j) for i in range(w) for j in range(h) if g[j][i] == "O")
 
-part1()
-#part2()
+g,w,h,_ = grid_from_strs(D)
+print("Part 1:", score(roll_north(g, w, h),w,h))
+
+seen, reverse_seen = {}, {}
+start, mod = None, None
+
+for i in range(1000000000):
+    for _ in range(4):
+        g = roll_north(g,w,h)
+        g = rotate_clock(g)
+    
+    fs = "".join(["".join(x) for x in g])
+    if fs in seen:
+        print("loop> ", seen[fs], i - seen[fs])
+        start = seen[fs]
+        mod = i - start
+        break
+    seen[fs] = i
+    reverse_seen[i] = g
+
+    # test is loop at 2 == 9, so every 7  2 + [((1000000000-2)%7)]
+    # input is loop at 175 == 184
+    # after 175 we loop every nine
+    # we need the value at 175 + [(1000000000-175) % 9] - 1
+
+g = reverse_seen[start + ((1000000000 - start) % mod) - 1]
+print("Part 2:", score(g, w, h))
