@@ -1,34 +1,34 @@
 
 from utils import *
 
-#input = [int(i.strip()) for i in open("input","r").readlines()]
 D = [i.strip() for i in open("input","r").readlines()]
-
-# Determine the ASCII code for the current character of the string.
-# Increase the current value by the ASCII code you just determined.
-# Set the current value to itself multiplied by 17.
-# Set the current value to the remainder of dividing itself by 256.
 
 def hashfn(str):
     r = 0
     for ch in str:
-        o = ord(ch)
-        r += o
-        r *= 17
-        r %= 256
+        r = ((r + ord(ch)) * 17) % 256
     return r
 
+print("Part 1", sum(hashfn(v) for v in D[0].split(",")))
 
-def part1():
-    global D
-    tot = 0
-    #max_sum = max([sum(map(int, lines)) for lines in bundles(D)])
-    
-    vals = D[0].split(",")
-    for v in vals:
-        tot += hashfn(v)
-        
-    aoc(tot)
+boxes = defaultdict(list)
+lenses = defaultdict(int)
+for instr in D[0].split(","):
+    box, label = hashfn(words(instr)[0]), words(instr)[0]
+    op = ("remove", None) if instr[-1] == "-" else ("set", int(instr.split("=")[1]))
 
-part1()
-#part2()
+    if op[0] == "set":
+        if label in boxes[box]:
+            lenses[str(box) + "," + str(label)] = op[1]
+        else:
+            boxes[box].append(label)
+            lenses[str(box) + "," + str(label)] = op[1]
+    elif op[0] == "remove":
+        if label in boxes[box]:
+            boxes[box].remove(label)
+
+tot = 0
+for box, ll in boxes.items():
+    for slot,label in enumerate(ll, 1):
+        tot += (box+1) * slot * lenses[str(box) + "," + str(label)]
+print("Part 2", tot)
