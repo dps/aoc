@@ -8,7 +8,16 @@ g, w, h, _ = grid_from_strs(D)
 
 def trybeam(ix, iy, idx, idy):
     beams = deque([(ix, iy, idx, idy)])
-
+    GO = {
+        ("\\", 1, 0): (0, 1),
+        ("\\", -1, 0): (0, -1),
+        ("\\", 0, 1): (1, 0),
+        ("\\", 0, -1): (-1, 0),
+        ("/", 1, 0): (0, -1),
+        ("/", -1, 0): (0, 1),
+        ("/", 0, 1): (-1, 0),
+        ("/", 0, -1): (1, 0),
+    }
     states = set()
     energize = set()
     while len(beams):
@@ -21,51 +30,24 @@ def trybeam(ix, iy, idx, idy):
             states.add((x, y, dx, dy))
             m = g[y][x]
             if m == ".":
-                x += dx
-                y += dy
-                beams.append((x, y, dx, dy))
-            elif m == "\\":
-                if dx == 1 and dy == 0:
-                    dx, dy = 0, 1
-                elif dx == -1 and dy == 0:
-                    dx, dy = 0, -1
-                elif dx == 0 and dy == 1:
-                    dx, dy = 1, 0
-                elif dx == 0 and dy == -1:
-                    dx, dy = -1, 0
-                x += dx
-                y += dy
-                beams.append((x, y, dx, dy))
-            elif m == "/":
-                if dx == 1 and dy == 0:
-                    dx, dy = 0, -1
-                elif dx == -1 and dy == 0:
-                    dx, dy = 0, 1
-                elif dx == 0 and dy == 1:
-                    dx, dy = -1, 0
-                elif dx == 0 and dy == -1:
-                    dx, dy = 1, 0
-                x += dx
-                y += dy
-                beams.append((x, y, dx, dy))
+                beams.append((x + dx, y + dy, dx, dy))
             elif m == "|":
                 if abs(dy) == 1 and abs(dx) == 0:
-                    x += dx
-                    y += dy
-                    beams.append((x, y, dx, dy))
+                    beams.append((x + dx, y + dy, dx, dy))
                 else:
                     assert abs(dx) == 1
                     beams.append((x, y + 1, 0, 1))
                     beams.append((x, y - 1, 0, -1))
             elif m == "-":
                 if abs(dx) == 1 and abs(dy) == 0:
-                    x += dx
-                    y += dy
-                    beams.append((x, y, dx, dy))
+                    beams.append((x + dx, y + dy, dx, dy))
                 else:
                     assert abs(dy) == 1
                     beams.append((x + 1, y, 1, 0))
                     beams.append((x - 1, y, -1, 0))
+            else:
+                dx, dy = GO[(m, dx, dy)]
+                beams.append((x + dx, y + dy, dx, dy))
 
     return len(energize)
 
