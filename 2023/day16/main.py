@@ -35,14 +35,12 @@ def trybeam(ix, iy, idx, idy):
                 if abs(dy) == 1 and abs(dx) == 0:
                     beams.append((x + dx, y + dy, dx, dy))
                 else:
-                    assert abs(dx) == 1
                     beams.append((x, y + 1, 0, 1))
                     beams.append((x, y - 1, 0, -1))
             elif m == "-":
                 if abs(dx) == 1 and abs(dy) == 0:
                     beams.append((x + dx, y + dy, dx, dy))
                 else:
-                    assert abs(dy) == 1
                     beams.append((x + 1, y, 1, 0))
                     beams.append((x - 1, y, -1, 0))
             else:
