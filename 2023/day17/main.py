@@ -7,11 +7,6 @@ end = ((w - 1), (h - 1))
 
 
 def dynamic_dijkstra(neighbors, start, end):
-    """
-    neighbors is a function which takes current node and returns a list of (weight, neighbor)
-    pairs or () if no neighbors exist.
-    returns (sum(path weights), path)
-    """
     q, seen, mins = [(0, start, [])], set(), {start: 0}
     while q:
         (cost, v, path) = heapq.heappop(q)
