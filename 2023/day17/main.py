@@ -1,11 +1,10 @@
 from utils import *
 
-D = [i.strip() for i in open("input","r").readlines()]
+D = [i.strip() for i in open("input", "r").readlines()]
 
-g,w,h,_ = grid_ints_from_strs(D)
+g, w, h, _ = grid_ints_from_strs(D)
+end = ((w - 1), (h - 1))
 
-maxw = max(max([i for i in line]) for line in g)
-end = ((w-1),(h-1))
 
 def dynamic_dijkstra(neighbors, start, end):
     """
@@ -33,69 +32,25 @@ def dynamic_dijkstra(neighbors, start, end):
 
     return math.inf, None
 
-def in_bounds(p, d):
-    global w,h
-    x,y = p[0]+d[0], p[1] + d[1]
-    return 0 <= x < w and 0 <= y < h
 
-def cost(p, d):
-    global g
-    x,y = p[0]+d[0], p[1] + d[1]
-    return g[y][x]
+def cw(d): return {(1, 0): (0, 1), (0, 1): (-1, 0), (-1, 0): (0, -1), (0, -1): (1, 0)}[d]
+def ccw(d): return {(1, 0): (0, -1), (0, 1): (1, 0), (-1, 0): (0, 1), (0, -1): (-1, 0)}[d]
 
-def cw(d):
-    return {(1,0):(0,1), (0,1): (-1,0), (-1,0):(0,-1), (0,-1):(1,0)}[d]
-def ccw(d):
-    return {(1,0):(0,-1), (0,1): (1,0), (-1,0):(0,1), (0,-1):(-1,0)}[d]
+def in_bounds(p, d): return 0 <= p[0] + d[0] < w and 0 <= p[1] + d[1] < h
+def cost(p, d): return g[p[1] + d[1]][p[0] + d[0]]
 
-
-def neighbors(state):
-    global g, end, maxw
-    if state == ("start", 0):
-        for p,d in [((0,0),(1,0)),((0,0),(0,1))]:
-            cc = 0
-            for l in range(1,4):
-                if in_bounds(p, (l*d[0], l*d[1])):
-                    cc += cost(p, (l*d[0], l*d[1]))
-                    yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), cw(d)))
-                    yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), ccw(d)))
-                else:
-                    break
-    else:
-        p,d = state
+def neighbors(state, part=1):
+    for p, d in [((0, 0), (1, 0)), ((0, 0), (0, 1))] if state == ("start") else [state]:
         cc = 0
-        for l in range(1,4):
-            if in_bounds(p, (l*d[0], l*d[1])):
-                cc += cost(p, (l*d[0], l*d[1]))
-                yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), cw(d)))
-                yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), ccw(d)))
+        for l in range(1, 4 if part == 1 else 11):
+            if in_bounds(p, (l * d[0], l * d[1])):
+                cc += cost(p, (l * d[0], l * d[1]))
+                if part == 1 or l >= 4:
+                    yield (cc, ((p[0] + l * d[0], p[1] + l * d[1]), cw(d)))
+                    yield (cc, ((p[0] + l * d[0], p[1] + l * d[1]), ccw(d)))
             else:
                 break
 
-def neighbors2(state):
-    global g, end, maxw
-    if state == ("start", 0):
-        for p,d in [((0,0),(1,0)),((0,0),(0,1))]:
-            cc = 0
-            for l in range(1,11):
-                if in_bounds(p, (l*d[0], l*d[1])):
-                    cc += cost(p, (l*d[0], l*d[1]))
-                    if l >= 4:
-                        yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), cw(d)))
-                        yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), ccw(d)))
-                else:
-                    break
-    else:
-        p,d = state
-        cc = 0
-        for l in range(1,11):
-            if in_bounds(p, (l*d[0], l*d[1])):
-                cc += cost(p, (l*d[0], l*d[1]))
-                if l >= 4:
-                    yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), cw(d)))
-                    yield (cc, ((p[0]+l*d[0], p[1]+l*d[1]), ccw(d)))
-            else:
-                break
-
-print(dynamic_dijkstra(neighbors, ("start", 0), end)[0])
-print(dynamic_dijkstra(neighbors2, ("start", 0), end)[0])
+# pypy3 main.py  1.16s user 0.02s system 99% cpu 1.187 total
+print("Part 1", dynamic_dijkstra(neighbors, ("start"), end)[0])
+print("Part 2", dynamic_dijkstra(lambda s: neighbors(s, part=2), ("start"), end)[0])
