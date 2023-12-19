@@ -23,10 +23,7 @@ R = ((1,4000),(1,4000),(1,4000),(1,4000))
 def replace_range(pos, new_r, orig):
     return [orig[i] if i != pos else new_r for i in range(4)]
 
-# jxc{m>787:hk,a>3653:sk,a<3299:A,R}
-
 def dfs(ranges, node):
-    print("dfs", node, ranges)
     if node == "A":
         return reduce(operator.mul, [(j-i)+1 for i,j in ranges])
     if node == "R":
@@ -53,7 +50,7 @@ def dfs(ranges, node):
             tot += dfs(new_ranges, rule)
     return tot
 
-print(dfs(R,"in"))
+print("Part 2", dfs(R,"in"))
 
                     
 
