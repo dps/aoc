@@ -3,33 +3,65 @@ from utils import *
 
 D = [i.strip() for i in open("input","r").readlines()]
 
-# px{a<2006:qkq,m>2090:A,rfg}
-# pv{a>1716:R,A}
-# lnx{m>1548:A,A}
-# rfg{s<537:gd,x>2440:R,A}
-# qs{s>3448:A,lnx}
-# qkq{x<1416:A,crn}
-# crn{x>2662:A,R}
-# in{s<1351:px,qqz}
-# qqz{s>2770:qs,m<1801:hdj,R}
-# gd{a>3333:R,R}
-# hdj{m>838:A,pv}
-
-# {x=787,m=2655,a=1222,s=2876}
-# {x=1679,m=44,a=2067,s=496}
-# {x=2036,m=264,a=79,s=2244}
-# {x=2461,m=1339,a=466,s=291}
-# {x=2127,m=1623,a=2188,s=1013}
 tot = 0
 #max_sum = max([sum(map(int, lines)) for lines in bundles(D)])
 
 workflows, parts = bundles(D)
 
-wf = {}
+
+wf={}
 for f in workflows:
     name = f.split("{")[0]
     steps = f.split("{")[1].split("}")[0].split(",")
     wf[name] = steps
+
+# xmas
+def pos(ch):
+    return "xmas".index(ch)
+R = ((1,4000),(1,4000),(1,4000),(1,4000))
+
+def replace_range(pos, new_r, orig):
+    return [orig[i] if i != pos else new_r for i in range(4)]
+
+# jxc{m>787:hk,a>3653:sk,a<3299:A,R}
+
+def dfs(ranges, node):
+    print("dfs", node, ranges)
+    if node == "A":
+        return reduce(operator.mul, [(j-i)+1 for i,j in ranges])
+    if node == "R":
+        return 0
+    tot = 0
+    rules = wf[node]
+    new_ranges = deepcopy(ranges)
+    for rule in rules:
+        if ":" in rule:
+            ss = "<" if "<" in rule else ">"
+            cmp, dest = rule.split(":")
+            var, val = cmp.split(ss)
+            rp = pos(var)
+            rr = new_ranges[rp]
+            val = int(val)
+            if val >= rr[0] and val <= rr[1]:
+                if ss == ">":
+                    tot += dfs(replace_range(rp, (val+1,rr[1]), new_ranges), dest)
+                    new_ranges = replace_range(rp, (rr[0],val), new_ranges)
+                if ss == "<":
+                    tot += dfs(replace_range(rp, (rr[0],val-1), new_ranges), dest)
+                    new_ranges = replace_range(rp, (val,rr[1]), new_ranges)
+        else:
+            tot += dfs(new_ranges, rule)
+    return tot
+
+print(dfs(R,"in"))
+
+                    
+
+
+
+
+
+sys.exit(0)
 
 for p in parts:
     print(p)
