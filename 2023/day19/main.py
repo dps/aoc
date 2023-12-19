@@ -15,6 +15,37 @@ for f in workflows:
     steps = f.split("{")[1].split("}")[0].split(",")
     wf[name] = steps
 
+# Part 1
+for p in parts:
+    xmas = {}
+    for l,v in [x.split("=") for x in p[1:-1].split(",")]:
+        xmas[l] = int(v)
+
+    done = False
+    state = "in"
+    while not done:
+        flow = wf[state]
+        for step in flow:
+            if ":" in step:
+                opr = operator.lt if "<" in step else operator.gt
+                ss = "<" if "<" in step else ">"
+                cmp, next = step.split(":")
+                var, val = cmp.split(ss)
+                if opr(xmas[var], int(val)):
+                    state = next
+                    break
+            else:
+                state = step
+
+        if state == "A" or state == "R":
+            done = True
+        if state == "A":
+            tot += sum(xmas.values())
+
+print("Part 1", tot)
+
+# Part 2
+
 # xmas
 def pos(ch):
     return "xmas".index(ch)
