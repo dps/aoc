@@ -33,8 +33,8 @@ def tally(src, val, dest):
     else:
         lows += 1
 
-loops = {i:[] for i in inputs[inputs["rx"][0]]}
 critical_inputs = inputs[inputs["rx"][0]]
+loops = {i:[] for i in critical_inputs}
 step = 0
 while True:  
     Q.append(("broadcaster", False, None))
@@ -45,9 +45,6 @@ while True:
             loops[n].append(step)
         if all([len(l) > 1 for _,l in loops.items()]):
             print("Part 2", math.lcm(*[l[1] - l[0] for l in loops.values()]))
-            sys.exit(0)
-        if n == "rx" and signal == False:
-            print("+++", step)
             sys.exit(0)
         action = types[n]
         if action == "broadcast":
