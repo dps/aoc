@@ -17,30 +17,31 @@ def poly(x):
 goal = 26501365
 s = goal % w
 
-def grid_neighbors(p):
+def grid_neighbors(p, width, height, part=1):
     for d in DIR:
         q = (p[0] + d[0], p[1] + d[1])
+        if part==1 and (q[0] < 0 or q[1] < 0 or q[0] >= width or q[1] >= height):
+            continue
         yield (q)
 
-reachable = defaultdict(set)
-blocked = defaultdict(set)
-things = defaultdict(lambda :defaultdict(int))
-Q, visited = deque([(start, 0)]), set()
-while Q:
-    p,steps = Q.popleft()
-    if steps == (s+2*w) + 1:
-        break
-    reachable[steps].add(p)
-    for n in grid_neighbors(p):
-        if g[n[1]%h][n[0]%w] != "#":
-            if (n,steps+1) not in visited:
-                Q.append((n, steps+1))
-                visited.add((n, steps+1))
-        else:
-            blocked[steps+1].add(n)
+def compute_reachable(part=1):
+    reachable = defaultdict(set)
+    Q, visited = deque([(start, 0)]), set()
+    while Q:
+        p,steps = Q.popleft()
+        if steps == (65 if part==1 else ((s+2*w) + 1)):
+            break
+        reachable[steps].add(p)
+        for n in grid_neighbors(p, w, h, part):
+            if g[n[1]%h][n[0]%w] != "#":
+                if (n,steps+1) not in visited:
+                    Q.append((n, steps+1))
+                    visited.add((n, steps+1))
+    return reachable
 
+print("Part 1", len(compute_reachable()[64]))
+reachable = compute_reachable(part=2)
 P = len(reachable[s]), len(reachable[s+w]), len(reachable[s+2*w])
-print(P)
 
 # f(0) = points[0], f(1) = points[1], f(2) = points[2]
 # f = ax^2 + bx + c
@@ -57,4 +58,4 @@ def quadratic(n):
     c = P[0]
     return a*(n*n) + b*n + c
 
-print(quadratic(goal//w))
+print("Part 2", quadratic(goal//w))
