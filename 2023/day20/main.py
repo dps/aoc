@@ -3,11 +3,12 @@ from utils import *
 
 D = [i.strip() for i in open("input","r").readlines()]
 
-dests = defaultdict(list)
-types = defaultdict(str)
-states = {}
-inv_states = defaultdict(lambda : defaultdict(bool))
-inputs = defaultdict(list)
+# The graph
+dests, inputs, types = defaultdict(list), defaultdict(list), defaultdict(str)
+
+# State tracking
+states, inv_states = {}, defaultdict(lambda : defaultdict(bool))
+
 for line in D:
     name,ds = line.split(" -> ")
     if name.startswith("%") or name.startswith("&"):
@@ -22,51 +23,42 @@ for line in D:
         inputs[d].append(name)
         inv_states[d][name] = False
 
-Q = deque([])
+Q, lows, highs = deque([]), 0, 0
 
-lows,highs = 0,0
-
-def tally(src, val, dest):
-    global lows, highs
-    if val:
-        highs += 1
-    else:
-        lows += 1
+def transmit(dests, val, src):
+    global Q, lows, highs
+    for dest in dests:
+        Q.append((dest, val, src))
+        if val:
+            highs += 1
+        else:
+            lows += 1
 
 critical_inputs = inputs[inputs["rx"][0]]
 loops = {i:[] for i in critical_inputs}
 step = 0
-while True:  
-    Q.append(("broadcaster", False, None))
-    lows += 1
+while True:
+    transmit(["broadcaster"], False, "button")
     while Q:
         n,signal,from_ = Q.popleft()
         if n in critical_inputs and signal == False:
             loops[n].append(step)
-        if all([len(l) > 1 for _,l in loops.items()]):
+        if all([len(s) > 1 for _,s in loops.items()]):
             print("Part 2", math.lcm(*[l[1] - l[0] for l in loops.values()]))
             sys.exit(0)
         action = types[n]
         if action == "broadcast":
-            for d in dests[n]:
-                Q.append((d, signal, n))
-                tally(n, signal, d)
+            transmit(dests[n],signal,n)
         if action == "%":
             if not signal:
                 states[n] = not states[n]
-                for d in dests[n]:
-                    Q.append((d,states[n],n))
-                    tally(n, states[n], d)
+                transmit(dests[n],states[n],n)
         if action == "&":
             inv_states[n][from_] = signal
             if all([v == True for v in inv_states[n].values()]):
-                for d in dests[n]:
-                    Q.append((d,False,n))
-                    tally(n, False, d)
+                transmit(dests[n], False, n)
             else:
-                for d in dests[n]:
-                    Q.append((d,True,n))
-                    tally(n, True, d)
+                transmit(dests[n], True, n)
     if step == 999:
         print("Part 1", lows*highs)
     step += 1
