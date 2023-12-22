@@ -31,7 +31,7 @@ elevated = sorted(elevated, key=lambda l: itemgetter(2)(l[0]))
 def drop_bricks(elevated):
     new_bricks = []
     world=set()
-    dp = set()
+    dropped = set()
     for i, brick in enumerate(elevated):
         while True:
             b = brick[0]
@@ -46,8 +46,8 @@ def drop_bricks(elevated):
                 break
             else:
                 brick = tuple((k[0], k[1], k[2]-1) for k in brick)
-                dp.add(i)
-    return new_bricks, len(dp)
+                dropped.add(i)
+    return new_bricks, len(dropped)
 
 # Let them all settle once.
 new_bricks, _ = drop_bricks(elevated)
