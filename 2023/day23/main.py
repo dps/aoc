@@ -20,6 +20,33 @@ def grid_neighbors(p):
         r.append(q)
     return r
 
+mm = 0
+def p1(p, l, visited):
+    global mm,g,end
+    if p == end:
+        mm = max(l, mm)
+    else:
+        d = None
+        if g[p[1]][p[0]] == ">":
+            d = (1,0)
+        elif g[p[1]][p[0]] == "<":
+            d = (-1,0)
+        elif g[p[1]][p[0]] == "^":
+            d = (0,-1)
+        elif g[p[1]][p[0]] == "v":
+            d = (0, 1)
+        if d:
+            if (p[0]+d[0],p[1]+d[1]) not in visited:
+                p1((p[0]+d[0],p[1]+d[1]), l+1, visited | {p})
+        else:
+            for n in grid_neighbors(p):
+                if n not in visited:
+                    p1(n,l+1, visited | {p})
+
+p1(start, 0, set())
+print("Part 1", mm)
+
+
 def find_all_intersections():
     res = []
     for x in range(w):
@@ -68,4 +95,4 @@ def dfs(p, l, edges_taken,verts_visited,dbg):
 
 
 dfs(start,0,set(),set([start]),[(start,0)])
-print(mm) # 6322
+print("Part 2", mm) # 6322, 21.47s w/pypy3
