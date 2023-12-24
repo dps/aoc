@@ -82,17 +82,22 @@ def find_edges_from_isect_to_isect(isects):
 
 graph = find_edges_from_isect_to_isect(isect)
 
-mm = 0
-def dfs(p, l, edges_taken,verts_visited,dbg):
-    global end,mm
+# Moving the visited stuff out of the dfs signature saves ~6 secs
+mm, edges_taken, verts_visited = 0, set([start]), set()
+def dfs(p, l):
+    global end,mm,edges_taken, verts_visited
     if p == end:
         mm = max(l, mm)
     else:
         nxt = graph[p]
         for n,ll,name in nxt:
             if name not in edges_taken and n not in verts_visited:
-                dfs(n, l+ll, edges_taken | {name}, verts_visited | {n}, dbg + [(n,ll)])
+                edges_taken.add(name)
+                verts_visited.add(n)
+                dfs(n, l+ll)
+                edges_taken.remove(name)
+                verts_visited.remove(n)
 
 
-dfs(start,0,set(),set([start]),[(start,0)])
-print("Part 2", mm) # 6322, 21.47s w/pypy3
+dfs(start,0) # 6322, 15.68s w/pypy3
+print("Part 2", mm)
