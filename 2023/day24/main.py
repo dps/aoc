@@ -56,7 +56,7 @@ for i,s in enumerate(stones[:3]):
     eqns.append(sym.Eq(sz + nn * dz, s[2] + nn * s[5]))
     vars.append(nn)
 
-result = sym.solve_poly_system(eqns, *vars)[0]
+result = sym.solve(eqns, *vars)[0]
 print("Part 2", result[0]+result[1]+result[2])
 
 
