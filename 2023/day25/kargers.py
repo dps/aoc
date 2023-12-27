@@ -13,6 +13,7 @@ for line in D:
         vertices[e].add(from_)
 
 while True:
+    # Implementation based on https://en.wikipedia.org/wiki/Karger%27s_algorithm
     # V maps node name to a list of nodes connected via edges (incl. repeats!) and a set
     # of the original nodes which have been merged in to n.
     V = {n: (list(v), set([n])) for n,v in vertices.items()}
