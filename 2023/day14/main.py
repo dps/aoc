@@ -4,7 +4,7 @@ from utils import *
 D = [i.strip() for i in open("input","r").readlines()]
 
 def roll_north(g,w,h):
-    new_grid = deepcopy(g)
+    new_grid = copy(g)
     for j in range(h):
         for i in range(w):
             if g[j][i] == "O":
@@ -34,7 +34,6 @@ for i in range(1000000000):
     
     fs = "".join(["".join(x) for x in g])
     if fs in seen:
-        print("loop> ", seen[fs], i - seen[fs])
         start = seen[fs]
         mod = i - start
         break

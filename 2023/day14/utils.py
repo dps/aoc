@@ -84,7 +84,7 @@ import re
 import sys
 import heapq
 from collections import Counter, defaultdict, deque
-from copy import deepcopy
+from copy import copy, deepcopy
 from functools import cache, reduce
 from itertools import combinations, permutations, product
 import subprocess
@@ -407,6 +407,9 @@ DIR8 = [d[1] for d in COMPASS8.items()]
 
 CDIR8 = [p[0] + 1j * p[1] for p in DIR8]
 CDIR = [p[0] + 1j * p[1] for p in DIR]
+
+def rotate_clock(g):
+    return [list(x) for x in list(zip(*g[::-1]))]
 
 
 def manhattani(p, q):
