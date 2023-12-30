@@ -47,8 +47,8 @@ def find_all_intersections(part1=False):
     return res
 
 
-def find_edges_from_isect_to_isect(isects, part1=False):
-    graph = defaultdict(lambda: defaultdict(tuple))
+def find_edges_from_isect_to_isect(isects, start, end, part1=False):
+    graph = {}
     for i in isects:
         o, p = i, i
         dests = []
@@ -68,29 +68,36 @@ def find_edges_from_isect_to_isect(isects, part1=False):
                 vv.add(p)
             if found:
                 dests.append((p[0], p[1], l))  # graph is origin -> (dest, len)
-        graph[o[0]][o[1]] = dests
-    return graph
+        graph[(o[0],o[1])] = dests
+    # Remap the whole graph to power of two integer node names so we
+    # can mark visited really quickly.
+    gg = {}
+    map_ = {}
+    for i,k in enumerate(graph.keys()):
+        map_[k] = pow(2,i)
+    for k,v in graph.items():
+        gg[map_[k]] = [(map_[(x[0],x[1])],x[2]) for x in v]
+    return gg,map_[start],map_[end]
 
 
 for part1 in [True, False]:
     isect = set(find_all_intersections(part1)) | {start, end}
-    graph = find_edges_from_isect_to_isect(isect, part1)
+    graph,start_,end_ = find_edges_from_isect_to_isect(isect, start, end, part1)
 
     mm = 0
-    # Unpacking the tuple and defaultdict to x,y speeds this up >2x
-    visited = [[False for _ in range(h)] for _ in range(w)]
+    visited = 0
 
-    def dfs(x, y, l):
+    def dfs(n, l):
         global mm, visited
-        if visited[y][x]:
+        if visited & n:
             return
-        visited[y][x] = True
-        if y == h - 1:
+        visited |= n
+        if n == end_:
             mm = max(l, mm)
         else:
-            for xx, yy, ll in graph[x][y]:
-                dfs(xx, yy, l + ll)
-        visited[y][x] = False
+            for nn, ll in graph[n]:
+                dfs(nn, l + ll)
+        visited ^= n
 
-    dfs(start[0], start[1], 0)
+    dfs(start_, 0)
     print("Part", "1" if part1 else "2", mm)
