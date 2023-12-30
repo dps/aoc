@@ -28,9 +28,6 @@ def compute_reachable():
         reachable[steps] += 1
         for d in DIR:
             q = (p[0] + d[0], p[1] + d[1])
-            # if q in ever_visited:
-            #     continue
-            # ever_visited.add(q)
             if g[(p[1]+d[1]) % h][(p[0]+d[0]) % w] != "#":
                 if q not in visited[steps+1]:
                     Q.append((q, steps + 1))
