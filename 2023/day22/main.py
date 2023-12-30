@@ -54,7 +54,7 @@ new_bricks, _ = drop_bricks(elevated)
 
 p1, p2 = 0, 0
 for i in range(len(new_bricks)):
-    nb = deepcopy(new_bricks)
+    nb = copy(new_bricks)
     nb.pop(i)
     _, dropped_count = drop_bricks(nb)
     if dropped_count == 0:
