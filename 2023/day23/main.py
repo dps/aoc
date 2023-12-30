@@ -39,7 +39,7 @@ def find_all_intersections(part1=False):
     return res
 
 def find_edges_from_isect_to_isect(isects, part1=False):
-    graph = {}
+    graph = defaultdict(lambda: defaultdict(tuple))
     for i in isects:
         o,p = i,i
         dests = []
@@ -58,8 +58,8 @@ def find_edges_from_isect_to_isect(isects, part1=False):
                 p = nxt[0]
                 vv.add(p)
             if found:
-                dests.append((p,l)) # graph is origin -> (dest, len)
-        graph[o] = dests
+                dests.append((p[0],p[1],l)) # graph is origin -> (dest, len)
+        graph[o[0]][o[1]] = dests
     return graph
 
 for part1 in [True, False]:
@@ -70,18 +70,17 @@ for part1 in [True, False]:
     #Unpacking the tuple and defaultdict to x,y speeds this up 2x
     #visited = defaultdict(bool)
     visited = [[False for _ in range(h)] for _ in range(w)]
-    def dfs(p, l):
+    def dfs(x, y, l):
         global mm,visited
-        x,y = p
         if visited[y][x]:
             return
         visited[y][x] = True
         if y == h-1:
             mm = max(l, mm)
         else:
-            for n,ll in graph[p]:
-                dfs(n, l+ll)
+            for xx,yy, ll in graph[x][y]:
+                dfs(xx, yy, l+ll)
         visited[y][x] = False
 
-    dfs(start,0)
+    dfs(start[0],start[1],0)
     print("Part", "1" if part1 else "2", mm)
