@@ -1,7 +1,8 @@
+# This is the more complicated version which minimizes runtime by sharding across
+# cores. simple.py contains the pre-sharded version.
 from utils import *
 
 D = [i.strip() for i in open("input", "r").readlines()]
-tot = 0
 
 g, w, h, _ = grid_from_strs(D)
 start = (1, 0)
@@ -79,14 +80,44 @@ def find_edges_from_isect_to_isect(isects, start, end, part1=False):
         gg[map_[k]] = [(map_[(x[0],x[1])],x[2]) for x in v]
     return gg,map_[start],map_[end]
 
+def partition():
+    parts = []
+    for part1 in [True, False]:
+        part = []
+        isect = set(find_all_intersections(part1)) | {start, end}
+        graph,start_,end_ = find_edges_from_isect_to_isect(isect, start, end, part1)
 
-for part1 in [True, False]:
-    isect = set(find_all_intersections(part1)) | {start, end}
-    graph,start_,end_ = find_edges_from_isect_to_isect(isect, start, end, part1)
+        mm = 0
+        visited = 0
 
+        Q = []
+        def unroll_to_depth4(n, l, d):
+            global mm, visited
+            if d > 4:
+                return
+            if visited & n:
+                return
+            visited |= n
+            if n == end_:
+                mm = max(l, mm)
+            else:
+                for nn, ll in graph[n]:
+                    if d == 4:
+                        Q.append((d, nn, l + ll, visited))
+                    unroll_to_depth4(nn, l + ll, d+1)
+            visited ^= n
+        unroll_to_depth4(start_,0,0)
+        for state in Q:
+            part.append((state, graph, end_))
+        parts.append(part)
+    return parts
+
+visited, mm = 0,0
+def start_dfs(data):
+    global visited,mm
+    state, graph, end_ = data
+    _, n, l, visited = state
     mm = 0
-    visited = 0
-
     def dfs(n, l):
         global mm, visited
         if visited & n:
@@ -98,6 +129,15 @@ for part1 in [True, False]:
             for nn, ll in graph[n]:
                 dfs(nn, l + ll)
         visited ^= n
+    dfs(n,l)
+    return mm
 
-    dfs(start_, 0)
-    print("Part", "1" if part1 else "2", mm)
+if __name__ == "__main__":
+    part1_data,part2_data = partition()
+    import concurrent.futures
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        results = executor.map(start_dfs, part1_data)
+        print(max(results))
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        results = executor.map(start_dfs, part2_data)
+        print(max(results))
