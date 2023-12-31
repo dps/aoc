@@ -1,62 +1,49 @@
 
 from utils import *
-import sympy as sym
+from z3 import *
 
-#input = [int(i.strip()) for i in open("input","r").readlines()]
-D = [i.strip() for i in open("input","r").readlines()]
+stones = lmap(ints, [i.strip() for i in open("input","r").readlines()])
 tot = 0
 
+def isect_sympy(s1,s2):
+    # Eqns computed by sympy as follows:
+    # n1,n2 = sym.Symbol('n1'), sym.Symbol('n2')
+    # s1x,s1y,s2x,s2y = sym.Symbol('s1x'),sym.Symbol('s1y'),sym.Symbol('s2x'),sym.Symbol('s2y')
+    # s1dx,s1dy,s2dx,s2dy = sym.Symbol('s1dx'),sym.Symbol('s1dy'),sym.Symbol('s2dx'),sym.Symbol('s2dy')
 
-def find_intersection(A, d1, B, d2):
-    a = A
-    b = (A[0]+d1[0], A[1]+d1[1])
-    c = B
-    d = (B[0]+d2[0], B[1]+d2[1])
-
-    a1 = b[1]-a[1]
-    b1 = a[0]-b[0]
-    c1 = a1*a[0] + b1*a[1]
-
-    a2 = d[1]-c[1]
-    b2 = c[0]-d[0]
-    c2 = a2*c[0] + b2*c[1]
-
-    determinant = a1*b2 - a2*b1
-
-    if (determinant == 0):
+    # ex = sym.Eq(s1x + n1 * s1dx, s2x + n2 * s2dx)
+    # ey = sym.Eq(s1y + n1 * s1dy, s2y + n2 * s2dy)
+    # result = sym.solve([ex, ey], n1, n2)
+    # print(result)
+    # #n,m = (eval(str(result[n1])),eval(str(result[n2])))
+    s1x,s1y,_,s1dx,s1dy,_ = s1
+    s2x,s2y,_,s2dx,s2dy,_ = s2
+    
+    try:
+        n1 = (-s1x*s2dy + s1y*s2dx - s2dx*s2y + s2dy*s2x)/(s1dx*s2dy - s1dy*s2dx)
+        n2 = (s1dx*s1y - s1dx*s2y - s1dy*s1x + s1dy*s2x)/(s1dx*s2dy - s1dy*s2dx)
+        ix = s1x + n1 * s1dx
+        iy = s1y + n1 * s1dy
+        return ix,iy,n1,n2
+    except ZeroDivisionError:
         return None
-    else:
-        x = (b2*c1 - b1*c2)/determinant
-        y = (a1*c2 - a2*c1)/determinant
-        return x,y
-
-stones = []
-for line in D:
-    stones.append(ints(line))
 
 for p,q in combinations(stones, 2):
-    i = find_intersection((p[0], p[1]), (p[3], p[4]), (q[0],q[1]), (q[3], q[4]))
+    i = isect_sympy(p,q)
     if i != None and 200000000000000 <= i[0] <= 400000000000000 and 200000000000000 <= i[1] <= 400000000000000:
-        n = (i[0] - p[0]) / p[3]
-        m = (i[0] - q[0]) / q[3]
+        n,m = i[2], i[3]
         if n > 0 and m > 0:
             tot += 1
 
 print("Part 1", tot)
 
-sx,sy,sz = sym.Symbol('sx'), sym.Symbol('sy'), sym.Symbol('sz')
-dx,dy,dz = sym.Symbol('dx'), sym.Symbol('dy'), sym.Symbol('dz')
-
-eqns = []
-vars = [sx, sy, sz, dx, dy, dz]
-for i,s in enumerate(stones[:3]):
-    nn = sym.Symbol("n"+str(i))
-    eqns.append(sym.Eq(sx + nn * dx, s[0] + nn * s[3]))
-    eqns.append(sym.Eq(sy + nn * dy, s[1] + nn * s[4]))
-    eqns.append(sym.Eq(sz + nn * dz, s[2] + nn * s[5]))
-    vars.append(nn)
-
-result = sym.solve(eqns, *vars)[0]
-print("Part 2", result[0]+result[1]+result[2])
-
-
+sx,sy,sz,dx,dy,dz = Real('sx'),Real('sy'),Real('sz'),Real('dx'),Real('dy'),Real('dz')
+T = [Real(f't{i}') for i in range(3)]
+solver = Solver()
+for i in range(3):
+  solver.add(sx + T[i]*dx - stones[i][0] - T[i]*stones[i][3] == 0)
+  solver.add(sy + T[i]*dy - stones[i][1] - T[i]*stones[i][4] == 0)
+  solver.add(sz + T[i]*dz - stones[i][2] - T[i]*stones[i][5] == 0)
+res = solver.check()
+model = solver.model()
+print("Part 2", model.eval(sx+sy+sz))
