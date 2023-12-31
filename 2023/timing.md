@@ -1,3 +1,5 @@
+| Problem | CPU | runtime (s) |
+| --- | --- | --- |
 | day01 | 85% cpu | 0.422 |
 | day02 | 97% cpu | 0.040 |
 | day03 | 98% cpu | 0.214 |
