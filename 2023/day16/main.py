@@ -1,10 +1,8 @@
 from utils import *
 
 D = [i.strip() for i in open("input", "r").readlines()]
-tot = 0
 
 g, w, h, _ = grid_from_strs(D)
-
 
 def trybeam(ix, iy, idx, idy):
     beams = deque([(ix, iy, idx, idy)])
@@ -20,7 +18,7 @@ def trybeam(ix, iy, idx, idy):
     }
     states = set()
     energize = set()
-    while len(beams):
+    while beams:
         beam = beams.popleft()
         x, y, dx, dy = beam
         if 0 <= x < w and 0 <= y < h:
@@ -30,6 +28,10 @@ def trybeam(ix, iy, idx, idy):
             states.add((x, y, dx, dy))
             m = g[y][x]
             if m == ".":
+                # Following all the "." right away is a 2x speedup
+                while 0 <= x + dx < w and 0 <= y+dy <h and  g[y + dy][x + dx] == ".":
+                    energize.add((x+dx,y+dy))
+                    x,y = x + dx, y + dy
                 beams.append((x + dx, y + dy, dx, dy))
             elif m == "|":
                 if abs(dy) == 1 and abs(dx) == 0:
@@ -50,7 +52,7 @@ def trybeam(ix, iy, idx, idy):
     return len(energize)
 
 
-print("Part 1", trybeam(0, 0, 1, 0))
+print("Part 1", trybeam(0, 0, 1, 0)) # 8021
 
 mm = 0
 for y in range(h):
@@ -61,3 +63,4 @@ for x in range(w):
     mm = max(mm, trybeam(x, h - 1, 0, -1))
 
 print("Part 2", mm)
+assert(mm == 8216)
