@@ -6,7 +6,6 @@ D = [i.strip() for i in open("input", "r").readlines()]
 def lmap(func, *iterables):
     return list(map(func, *iterables))
 
-
 def ints(s):
     return lmap(int, re.findall(r"-?\d+", s))  # thanks mserrano!
 
@@ -16,9 +15,9 @@ def ddfs(pattern, counts):
     if sum(counts)+(len(counts)-1) > len(pattern):
         return 0
 
-    # no more patterns to make, rest has to be "."
+    # no more patterns to make, rest has to be "." or "?"=>"."
     if len(counts) == 0:
-        if all([p=="?" or p=="." for p in pattern]):
+        if all([p != "#" for p in pattern]):
             return 1
         else:
             return 0
@@ -31,7 +30,7 @@ def ddfs(pattern, counts):
         tot += ddfs(pattern[1:], counts)
     
     # make a whole group here if we can
-    if all([c=="#" or c=="?" for c in pattern[0:counts[0]]]) and ((pattern[counts[0]] != "#") if len(pattern) > counts[0] else True):
+    if all([c != "." for c in pattern[0:counts[0]]]) and ((pattern[counts[0]] != "#") if len(pattern) > counts[0] else True):
         tot += ddfs(pattern[counts[0] + 1:], counts[1:])
 
     return tot
