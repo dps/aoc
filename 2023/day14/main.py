@@ -4,7 +4,7 @@ from utils import *
 D = [i.strip() for i in open("input","r").readlines()]
 
 def roll_north(g,w,h):
-    new_grid = copy(g)
+    new_grid = [r[:] for r in g]
     for j in range(h):
         for i in range(w):
             if g[j][i] == "O":
