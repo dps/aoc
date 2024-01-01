@@ -1,0 +1,50 @@
+day01
+pypy3 main.py >> ../times.txt 2>&1  0.08s user 0.01s system 97% cpu 0.086 total
+day02
+pypy3 main.py >> ../times.txt 2>&1  0.03s user 0.01s system 96% cpu 0.042 total
+day03
+pypy3 main.py >> ../times.txt 2>&1  0.21s user 0.01s system 99% cpu 0.218 total
+day04
+pypy3 main.py >> ../times.txt 2>&1  0.03s user 0.01s system 96% cpu 0.037 total
+day05
+pypy3 main.py >> ../times.txt 2>&1  0.03s user 0.01s system 95% cpu 0.039 total
+day06
+pypy3 main.py >> ../times.txt 2>&1  0.03s user 0.01s system 95% cpu 0.033 total
+day07
+pypy3 main.py >> ../times.txt 2>&1  0.07s user 0.02s system 93% cpu 0.092 total
+day08
+pypy3 main.py >> ../times.txt 2>&1  0.03s user 0.01s system 96% cpu 0.042 total
+day09
+pypy3 main.py >> ../times.txt 2>&1  0.06s user 0.02s system 90% cpu 0.081 total
+day10
+pypy3 main.py >> ../times.txt 2>&1  0.05s user 0.01s system 96% cpu 0.063 total
+day11
+pypy3 main.py >> ../times.txt 2>&1  0.05s user 0.02s system 91% cpu 0.078 total
+day12
+pypy3 main.py >> ../times.txt 2>&1  0.38s user 0.03s system 97% cpu 0.428 total
+day13
+pypy3 main.py >> ../times.txt 2>&1  0.04s user 0.01s system 96% cpu 0.051 total
+day14
+pypy3 main.py >> ../times.txt 2>&1  0.34s user 0.01s system 99% cpu 0.357 total
+day15
+pypy3 main.py >> ../times.txt 2>&1  0.05s user 0.01s system 97% cpu 0.058 total
+day16
+pypy3 main.py >> ../times.txt 2>&1  0.94s user 0.08s system 327% cpu 0.311 total
+day17
+pypy3 main.py >> ../times.txt 2>&1  0.49s user 0.01s system 99% cpu 0.500 total
+day18
+pypy3 main.py >> ../times.txt 2>&1  0.03s user 0.01s system 96% cpu 0.040 total
+day19
+pypy3 main.py >> ../times.txt 2>&1  0.06s user 0.01s system 97% cpu 0.063 total
+day20
+pypy3 main.py >> ../times.txt 2>&1  0.18s user 0.01s system 98% cpu 0.192 total
+day21
+pypy3 main.py >> ../times.txt 2>&1  0.10s user 0.01s system 97% cpu 0.110 total
+day22
+pypy3 main.py >> ../times.txt 2>&1  2.10s user 0.15s system 570% cpu 0.394 total
+day23
+pypy3 main.py >> ../times.txt 2>&1  4.27s user 0.35s system 519% cpu 0.891 total
+day24
+pypy3 main.py >> ../times.txt 2>&1  0.24s user 0.01s system 99% cpu 0.257 total
+day25
+pypy3 main.py >> ../times.txt 2>&1  0.17s user 0.03s system 97% cpu 0.210 total
