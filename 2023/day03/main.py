@@ -1,5 +1,6 @@
 
-from utils import *
+from itertools import product
+CDIR8 = [(1-1j), (-1-1j), (1+1j), (-1+1j), (1+0j), (-1+0j), -1j, 1j]
 
 input = [i.strip() for i in open("input","r").readlines()]
 
