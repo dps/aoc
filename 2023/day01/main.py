@@ -1,5 +1,4 @@
 
-from utils import *
 import string
 import regex as re
 
@@ -16,7 +15,7 @@ def part1():
     for line in input:
         l,r = digs(line)[0], digs(line)[-1]
         tot += int(l + r)        
-    aoc(tot)
+    print(tot)
 
 def part2():
     # gah they can overlap!
@@ -29,8 +28,7 @@ def part2():
     for line in input:
         l,r = dig[nums(line)[0]], dig[nums(line)[-1]]
         tot += int(str(l) + str(r))        
-    aoc(tot)
-
+    print(tot)
 
 part1()
 part2()
