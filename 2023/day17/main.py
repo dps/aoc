@@ -19,6 +19,8 @@ class BucketHeap:
             self.min_bucket = element[0]
 
     def delete_min(self):
+        # Note this is a LIFO within the bucket which works for this
+        # problem but may not be what you expect.
         min_element = self.heap[self.min_bucket].pop()
         if len(self.heap[self.min_bucket]) == 0:
             del self.heap[self.min_bucket]
