@@ -19,10 +19,8 @@ class BucketHeap:
             self.min_bucket = element[0]
 
     def delete_min(self):
-        min_element = self.heap[self.min_bucket][0]
-        if len(self.heap[self.min_bucket]) > 1:
-            self.heap[self.min_bucket] = self.heap[self.min_bucket][1:]
-        else:
+        min_element = self.heap[self.min_bucket].pop()
+        if len(self.heap[self.min_bucket]) == 0:
             del self.heap[self.min_bucket]
             try:
                 self.min_bucket = min(self.heap.keys())

@@ -1,6 +1,14 @@
-from utils import *
+from functools import cache
+import re
 
 D = [i.strip() for i in open("input", "r").readlines()]
+
+def lmap(func, *iterables):
+    return list(map(func, *iterables))
+
+
+def ints(s):
+    return lmap(int, re.findall(r"-?\d+", s))  # thanks mserrano!
 
 @cache
 def ddfs(pattern, counts):
@@ -34,24 +42,25 @@ def part1():
 
     for line in D:
         status = line.split(" ")[0].rstrip(".")
-        report = tuple(ints(line.split(" ")[1]))
+        report = tuple(map(int, line.split(" ")[1].split(",")))
         tot += ddfs(status, report)
-    aoc(tot)
+        
+    print(tot)
 
 def part2():
     global D
     tot = 0
 
-    for k, line in enumerate(D):
+    for line in D:
         status = line.split(" ")[0]
-        report = ints(line.split(" ")[1])
+        report = tuple(map(int, line.split(" ")[1].split(",")))
 
         status = "?".join([status] * 5)
         report = tuple(report * 5)
 
         tot += ddfs(status, report)
 
-    aoc(tot)
+    print(tot)
 
 
 part1()
