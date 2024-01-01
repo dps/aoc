@@ -1,8 +1,11 @@
-from utils import *
+import math
+from collections import defaultdict
 
 D = [i.strip() for i in open("input", "r").readlines()]
 
-g, w, h, _ = grid_ints_from_strs(D)
+g = [[int(ch) for ch in row] for row in D]
+h = len(g)
+w = len(g[0])
 end = ((w - 1), (h - 1))
 
 class BucketHeap:
