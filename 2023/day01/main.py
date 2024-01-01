@@ -3,7 +3,7 @@ from utils import *
 import string
 import regex as re
 
-input = [i.strip() for i in open("input","r").readlines()]
+input = [i.strip() for i in open("input", "r").readlines()]
 
 def digs(s):
     return re.findall(r"\d", s)
