@@ -17,21 +17,21 @@ def solve():
 
     times = ints(input[0])
     distances = ints(input[1])
-    for time, record in zip(times, distances):
-        c = 0
-        for i in range(1, time - 1):
-            if (time - i) * i > record:
-                c += 1
-        pt1 *= c
+    # for time, record in zip(times, distances):
+    #     c = 0
+    #     for i in range(1, time - 1):
+    #         if (time - i) * i > record:
+    #             c += 1
+    #     pt1 *= c
 
     time = ints(input[0].replace(" ", ""))[0]
     record = ints(input[1].replace(" ", ""))[0]
-    for i in range(1, time - 1):
-        if (time - i) * i > record:
-            pt2 += 1
-    print("Brute force", pt1, pt2)
+    # for i in range(1, time - 1):
+    #     if (time - i) * i > record:
+    #         pt2 += 1
+    # print("Brute force", pt1, pt2)
 
-    print("Quadratic method:")
+    #print("Quadratic method:")
     print("pt1:", reduce(operator.mul, [quadratic(t,r) for (t,r) in zip(times, distances)]))
     print("pt2:", quadratic(time, record))
 
