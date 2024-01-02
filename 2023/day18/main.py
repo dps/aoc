@@ -1,6 +1,5 @@
 
-from utils import *
-
+RLUD = {'R': (1, 0), 'L': (-1, 0), 'U': (0, -1), 'D': (0, 1)}
 D = [i.strip() for i in open("input","r").readlines()]
 
 def compute_vertices(part=1):
@@ -9,7 +8,7 @@ def compute_vertices(part=1):
     path_len = 0
     for line in D:
         p1dir,p1num,hex = line.split(" ")
-        num = int(p1num) if part==1 else from_base(hex[2:7].upper(), 16)
+        num = int(p1num) if part==1 else int(hex[2:7], 16)
         dir = p1dir if part==1 else {"0": "R", "1": "D", "2": "L", "3": "U"}[hex[7:8]]
         d = RLUD[dir]
         p = (p[0] + num*d[0], p[1] + num*d[1])
