@@ -1,63 +1,40 @@
 
 from utils import *
-import networkx as nx
+import random
 
 D = [i.strip() for i in open("input","r").readlines()]
 
-tot = 0
-
-graph = nx.DiGraph()
-
-conn = defaultdict(list)
-conns = set()
+vertices = defaultdict(set)
 for line in D:
     from_, to_ = line.split(":")
     to_ = to_.strip()
-    conn[from_] = to_.split(" ")
+    vertices[from_].update(to_.split(" "))
     for e in to_.split(" "):
-        l = sorted([from_, e])
-        conns.add((l[0], l[1]))
-        graph.add_edge(from_, e, capacity=1.0)
-        graph.add_edge(e, from_, capacity=1.0)
+        vertices[e].add(from_)
 
-for s,t in combinations(conn.keys(), 2):
-    val, parts = nx.minimum_cut(graph, s, t)
-    if val == 3 and len(parts) == 2:
-        aoc(len(parts[0])*len(parts[1]))
-        break
+def kargers(vertices):
+    while True:
+        # Implementation based on https://en.wikipedia.org/wiki/Karger%27s_algorithm
+        # V maps node name to a list of nodes connected via edges (incl. repeats!) and a set
+        # of the original nodes which have been merged in to n.
+        V = {n: (list(v), set([n])) for n,v in vertices.items()}
 
-# Brute force, which works for example but is way too slow for input.
-# print(len(conns))
-# i = 0
-# for dd in combinations(conns, 3):
-#     if (i % 10000) == 0:
-#         print(i)
-#         print(i/7219585036)
-#     cc = deepcopy(conns)
-#     for d in dd:
-#         cc.remove(d)
+        while len(V.keys()) > 2:
+            e = random.choice(list(V.keys()))
+            f = random.choice(V[e][0])
 
-#     parts = []
-#     for edge in cc:
-#         to_connect = []
-#         for p in parts:
-#             if edge[0] in p or edge[1] in p:
-#                 to_connect.append(p)
-#         if len(to_connect) == 0:
-#             parts.append(set([edge[0], edge[1]]))
-#             continue
-#         if len(to_connect) == 1:
-#             to_connect[0].add(edge[0])
-#             to_connect[0].add(edge[1])
-#         elif len(to_connect) == 2:
-#             to_connect[0].update(to_connect[1])
-#             parts.remove(to_connect[1])
-#         to_connect[0].add(edge[0])
-#         to_connect[0].add(edge[1])
+            u,v = V[e], V[f]
 
-#     if len(parts) == 2:
-#         aoc(len(parts[0])*len(parts[1]))
-#         sys.exit(0)
-#     i += 1
+            for edge in v[0]:
+                if edge != e and edge != f:
+                    u[0].append(edge)
+                    V[edge][0].remove(f)
+                    V[edge][0].append(e)
+            V[e] = ([d for d in u[0] if d != f], u[1]|v[1])
 
-# print("done")
+            del V[f]
+
+        if len(list(V.values())[0][0]) == 3:
+            return reduce(operator.mul, [len(v[1]) for v in V.values()])
+
+print(kargers(vertices))
