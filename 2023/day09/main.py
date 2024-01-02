@@ -21,7 +21,7 @@ def solve(part=1):
             diffs.append(diff)
             seq = diff
         
-        tot += s[-1] + sum(x[-1] for x in list(reversed(diffs))[1:])
+        tot += s[-1] + sum(x[-1] for x in diffs[0:-1])
 
     print(tot)
 
