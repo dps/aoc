@@ -32,8 +32,9 @@ def solve(part=1):
     hands=[]
     for line in input:
         hand, bid = line.split()
-        typ = Counter(hand)
-        if part == 2:
+        if part == 1:
+            typ = Counter(hand)
+        elif part == 2:
             h2 = best_joker(hand)
             typ = Counter(h2)
         nc = Counter(list(typ.values()))
