@@ -1402,4 +1402,4 @@ if __name__ == "__main__":
 
     concurrent.futures.wait(running, return_when=concurrent.futures.ALL_COMPLETED)
     END = time.time_ns()
-    print("****", START, END, (END-START)/1e9)
+    print("**** total time (s):", (END-START)/1e9)
