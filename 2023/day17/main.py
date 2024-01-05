@@ -1,92 +1,71 @@
-import math
-from collections import defaultdict
-
+# With thanks to azzal07, who adapted my previous bucket queue solution to massively improve
+# runtime. By:
+# - Translating the grid into 1D coordinates (and making neighbors match with faster
+#   math). It's very clever how (+/-) next_d = w//d gives the cw and ccw turns!
+# - inlining a fixed size bucket queue inside the dijkstra impl.
+# - using a fixed list for dijkstra mins instead of a dict.
+# - unrolling neighbors in the hot loop
 D = [i.strip() for i in open("input", "r").readlines()]
 
-g = [[int(ch) for ch in row] for row in D]
-h = len(g)
-w = len(g[0])
-end = ((w - 1), (h - 1))
+g = [int(ch) for row in D for ch in row]
+h = len(D)
+w = len(D[0])
+end = len(g) - 1
+MAX_SIZE = w * h * 9
 
-class BucketHeap:
-    def __init__(self):
-        self.heap = defaultdict(list)
-        self.min_bucket = math.inf
 
-    def insert(self, element):
-        self.heap[element[0]].append(element)
-        if element[0] < self.min_bucket:
-            self.min_bucket = element[0]
+def dynamic_dijkstra(minimum, maximum, end):
+    seen, mins = set(), [[MAX_SIZE] * (w + 2) for _ in range(w * h)]
+    bh = [[] for _ in range(MAX_SIZE)]
+    for state in (0, 1), (0, w):
+        for c, (yx, d) in neighbors(state, minimum, maximum):
+            mins[yx][d] = c
+            bh[c].append((yx, d))
+    for cost, vs in enumerate(bh):
+        for v in vs:
+            if v in seen:
+                continue
 
-    def delete_min(self):
-        # Note this is a LIFO within the bucket which works for this
-        # problem but may not be what you expect.
-        min_element = self.heap[self.min_bucket].pop()
-        if len(self.heap[self.min_bucket]) == 0:
-            del self.heap[self.min_bucket]
-            try:
-                self.min_bucket = min(self.heap.keys())
-            except:
-                self.min_bucket = math.inf
-        return min_element
-
-def dynamic_dijkstra(neighbors, start, end):
-    seen, mins = set(), {start: 0}
-    bh = BucketHeap()
-    bh.insert((0, start))
-    while True:
-        cost, v = bh.delete_min() #heapq.heappop(q)
-        if v not in seen:
-            seen.add(v)
             if v[0] == end:
                 return cost
 
-            for c, neighbor in neighbors(v):
-                if neighbor in seen:
-                    continue
-                prev = mins.get(neighbor, None)
-                next = cost + c
-                if prev is None or next < prev:
-                    mins[neighbor] = next
-                    bh.insert((next, neighbor))
-                    #heapq.heappush(q, (next, neighbor))
+            seen.add(v)
+
+            yx, d = v
+            next_d = w//d
+            next_cost = cost
+            for l in range(1, maximum):
+                yx += d
+                if yx < 0 or end < yx or (d == 1 and yx % w == 0) or (d == -1 and yx % w == (w-1)):
+                    break
+
+                next_cost += g[yx]
+                if l >= minimum:
+                    m = mins[yx]
+                    if next_cost < m[next_d]:
+                        m[next_d] = next_cost
+                        bh[next_cost].append((yx, next_d))
+                    if next_cost < m[-next_d]:
+                        m[-next_d] = next_cost
+                        bh[next_cost].append((yx, -next_d))
 
 
-def cw(d): return {(1, 0): (0, 1), (0, 1): (-1, 0), (-1, 0): (0, -1), (0, -1): (1, 0)}[d]
-def ccw(d): return {(1, 0): (0, -1), (0, 1): (1, 0), (-1, 0): (0, 1), (0, -1): (-1, 0)}[d]
+def neighbors(state, minimum, maximum):
+    yx, d = state
+    cc = 0
+    for l in range(1, maximum):
+        yx += d
+        if yx < 0 or end < yx or (d == 1 and yx % w == 0) or (d == -1 and yx % w == (w-1)):
+            break
 
-def in_bounds(p, d): return 0 <= p[0] + d[0] < w and 0 <= p[1] + d[1] < h
-def cost(p, d): return g[p[1] + d[1]][p[0] + d[0]]
+        cc += g[yx]
+        if l >= minimum:
+            yield (cc, (yx, -w//d))
+            yield (cc, (yx, w//d))
 
-def neighbors1(state):
-    r = []
-    for p, d in [((0, 0), (1, 0)), ((0, 0), (0, 1))] if state == ("start") else [state]:
-        cc = 0
-        for l in range(1, 4):
-            dl = (l * d[0], l * d[1])
-            if in_bounds(p, dl):
-                cc += cost(p, dl)
-                r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), cw(d))))
-                r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), ccw(d))))
-            else:
-                break
-    return r
 
-def neighbors2(state):
-    r = []
-    for p, d in [((0, 0), (1, 0)), ((0, 0), (0, 1))] if state == ("start") else [state]:
-        cc = 0
-        for l in range(1, 11):
-            dl = (l * d[0], l * d[1])
-            if in_bounds(p, dl):
-                cc += cost(p, dl)
-                if l >= 4:
-                    r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), cw(d))))
-                    r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), ccw(d))))
-            else:
-                break
-    return r
 
-# pypy3 main.py  0.55s user 0.02s system 99% cpu 0.571 total
-print(dynamic_dijkstra(neighbors1, ("start"), end))
-print(dynamic_dijkstra(neighbors2, ("start"), end))
+import time
+START = time.time_ns()
+print("day17", dynamic_dijkstra(1, 4, end), dynamic_dijkstra(4, 11, end))
+print(">>>", (time.time_ns()-START)/1e9)
