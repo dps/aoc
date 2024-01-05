@@ -1,9 +1,13 @@
-from utils import *
+from collections import defaultdict
+from functools import cache
+
 
 D = [i.strip() for i in open("input", "r").readlines()]
 tot = 0
 
-g, w, h, _ = grid_from_strs(D)
+g = [[ch for ch in row] for row in D]
+h = len(g)
+w = len(g[0])
 start = (1, 0)
 end = (w - 2, h - 1)
 
@@ -24,7 +28,7 @@ def grid_neighbors(p, part1=False):
             dd = (0, -1)
         elif g[p[1]][p[0]] == "v":
             dd = (0, 1)
-    for d in [dd] if dd else DIR:
+    for d in [dd] if dd else [(1, 0), (-1, 0), (0, 1), (0, -1)]:
         q = (p[0] + d[0], p[1] + d[1])
         if (
             q[0] < 0
@@ -69,7 +73,7 @@ def find_edges_from_isect_to_isect(isects, start, end, part1=False):
             if found:
                 dests.append((p[0], p[1], l))  # graph is origin -> (dest, len)
         graph[(o[0],o[1])] = dests
-    # Remap the whole graph to power of two integer node names so we
+    # Remap the whole graph to integer node names so we
     # can mark visited really quickly.
     gg = {}
     map_ = {}
@@ -79,7 +83,7 @@ def find_edges_from_isect_to_isect(isects, start, end, part1=False):
         gg[map_[k]] = [(map_[(x[0],x[1])],x[2]) for x in v]
     return gg,map_[start],map_[end]
 
-
+ans = []
 for part1 in [True, False]:
     isect = set(find_all_intersections(part1)) | {start, end}
     graph,start_,end_ = find_edges_from_isect_to_isect(isect, start, end, part1)
@@ -136,5 +140,7 @@ for part1 in [True, False]:
         for k in mid_points.keys():
             mid_points[k] = sorted(mid_points[k], reverse=True)
         return_dfs(end_, eadd, 0)
+    
+    ans.append(mm)
 
-    print("Part", "1" if part1 else "2", mm)
+print("day23", ans[0], ans[1])
