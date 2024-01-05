@@ -297,7 +297,9 @@ def day07(part=1):
 
         hands.append((score * 10000000000000 + hand_to_val(hand, part), hand, bid))
     hands = sorted(hands)
-    return sum([int(b[2]) * int(r) for r, b in enumerate(hands, 1)])
+    ans = sum([int(b[2]) * int(r) for r, b in enumerate(hands, 1)])
+    if VERBOSE: print("day07 part", part, ans)
+    return ans
 
 
 def day08():
@@ -954,8 +956,94 @@ def day21():
 
 from collections import deque
 
+def day16():
+    g = [[c for c in row] for row in D16]
+    w = len(g[0])
+    h = w  # This problem uses a square grid
 
-def day16(case):
+    def trybeam(ix, iy, idx, idy):
+        beams = deque([(ix, iy, idx, idy)])
+        exits = set()
+        GO = {
+            ("\\", 1, 0): (0, 1),
+            ("\\", -1, 0): (0, -1),
+            ("\\", 0, 1): (1, 0),
+            ("\\", 0, -1): (-1, 0),
+            ("/", 1, 0): (0, -1),
+            ("/", -1, 0): (0, 1),
+            ("/", 0, 1): (-1, 0),
+            ("/", 0, -1): (1, 0),
+        }
+        states = set()
+        energize = set()
+        while beams:
+            beam = beams.popleft()
+            x, y, dx, dy = beam
+            if 0 <= x < w and 0 <= y < h:
+                energize.add((x, y))
+                if (x, y, dx, dy) in states:
+                    continue
+                states.add((x, y, dx, dy))
+                m = g[y][x]
+                if m == ".":
+                    # Following all the "." right away is a 2x speedup
+                    while (
+                        0 <= x + dx < w and 0 <= y + dy < h and g[y + dy][x + dx] == "."
+                    ):
+                        energize.add((x + dx, y + dy))
+                        x, y = x + dx, y + dy
+                    beams.append((x + dx, y + dy, dx, dy))
+                elif m == "-":
+                    if abs(dx) == 1:
+                        beams.append((x + dx, y + dy, dx, dy))
+                    else:
+                        beams.append((x + 1, y, 1, 0))
+                        beams.append((x - 1, y, -1, 0))
+                elif m == "|":
+                    if abs(dy) == 1:
+                        beams.append((x + dx, y + dy, dx, dy))
+                    else:
+                        beams.append((x, y + 1, 0, 1))
+                        beams.append((x, y - 1, 0, -1))
+                else:
+                    dx, dy = GO[(m, dx, dy)]
+                    beams.append((x + dx, y + dy, dx, dy))
+            else:
+                exits.add((x, y))
+        return len(energize), exits
+
+    p1 = trybeam(0, 0, 1, 0)[0]
+
+    mm = 0
+    exits = set()
+    for y in range(h):
+        if (-1, y) not in exits:
+            mi, exits_ = trybeam(0, y, 1, 0)
+            if mi > mm:
+                mm = mi
+            exits.update(exits_)
+        if (w, y) not in exits:
+            mi, exits_ = trybeam(w - 1, y, -1, 0)
+            if mi > mm:
+                mm = mi
+            exits.update(exits_)
+
+    for x in range(w):
+        if (x, -1) not in exits:
+            mi, exits_ = trybeam(x, 0, 0, 1)
+            if mi > mm:
+                mm = mi
+            exits.update(exits_)
+        if (x, h) not in exits:
+            mi, exits_ = trybeam(x, h - 1, 0, -1)
+            if mi > mm:
+                mm = mi
+            exits.update(exits_)
+
+    if VERBOSE: print("day16", p1, mm)
+    return mm
+
+def day16_multi_process(case):
     g = [[c for c in row] for row in D16]
     w = len(g[0])
     h = w  # This problem uses a square grid
@@ -1030,107 +1118,67 @@ def day16(case):
 
     return mm
 
-
 def day17():
-    g = [[int(ch) for ch in row] for row in D17]
-    h = len(g)
-    w = len(g[0])
-    end = ((w - 1), (h - 1))
+    g = [int(ch) for row in D17 for ch in row]
+    h = len(D17)
+    w = len(D17[0])
+    end = len(g) - 1
+    MAX_SIZE = w * h * 9
 
-    class BucketHeap:
-        def __init__(self):
-            self.heap = defaultdict(list)
-            self.min_bucket = math.inf
 
-        def insert(self, element):
-            self.heap[element[0]].append(element)
-            if element[0] < self.min_bucket:
-                self.min_bucket = element[0]
+    def dynamic_dijkstra(minimum, maximum, end):
+        seen, mins = set(), [[MAX_SIZE] * (w + 2) for _ in range(w * h)]
+        bh = [[] for _ in range(MAX_SIZE)]
+        for state in (0, 1), (0, w):
+            for c, (yx, d) in neighbors(state, minimum, maximum):
+                mins[yx][d] = c
+                bh[c].append((yx, d))
+        for cost, vs in enumerate(bh):
+            for v in vs:
+                if v in seen:
+                    continue
 
-        def delete_min(self):
-            # Note this is a LIFO within the bucket which works for this
-            # problem but may not be what you expect.
-            min_element = self.heap[self.min_bucket].pop()
-            if len(self.heap[self.min_bucket]) == 0:
-                del self.heap[self.min_bucket]
-                try:
-                    self.min_bucket = min(self.heap.keys())
-                except:
-                    self.min_bucket = math.inf
-            return min_element
-
-    def dynamic_dijkstra(neighbors, start, end):
-        seen, mins = set(), {start: 0}
-        bh = BucketHeap()
-        bh.insert((0, start))
-        while True:
-            cost, v = bh.delete_min()  # heapq.heappop(q)
-            if v not in seen:
-                seen.add(v)
                 if v[0] == end:
                     return cost
 
-                for c, neighbor in neighbors(v):
-                    if neighbor in seen:
-                        continue
-                    prev = mins.get(neighbor, None)
-                    next = cost + c
-                    if prev is None or next < prev:
-                        mins[neighbor] = next
-                        bh.insert((next, neighbor))
-                        # heapq.heappush(q, (next, neighbor))
+                seen.add(v)
 
-    def cw(d):
-        return {(1, 0): (0, 1), (0, 1): (-1, 0), (-1, 0): (0, -1), (0, -1): (1, 0)}[d]
+                yx, d = v
+                next_d = w//d
+                next_cost = cost
+                for l in range(1, maximum):
+                    yx += d
+                    if yx < 0 or end < yx or (d == 1 and yx % w == 0) or (d == -1 and yx % w == (w-1)):
+                        break
 
-    def ccw(d):
-        return {(1, 0): (0, -1), (0, 1): (1, 0), (-1, 0): (0, 1), (0, -1): (-1, 0)}[d]
+                    next_cost += g[yx]
+                    if l >= minimum:
+                        m = mins[yx]
+                        if next_cost < m[next_d]:
+                            m[next_d] = next_cost
+                            bh[next_cost].append((yx, next_d))
+                        if next_cost < m[-next_d]:
+                            m[-next_d] = next_cost
+                            bh[next_cost].append((yx, -next_d))
 
-    def in_bounds(p, d):
-        return 0 <= p[0] + d[0] < w and 0 <= p[1] + d[1] < h
 
-    def cost(p, d):
-        return g[p[1] + d[1]][p[0] + d[0]]
+    def neighbors(state, minimum, maximum):
+        yx, d = state
+        cc = 0
+        for l in range(1, maximum):
+            yx += d
+            if yx < 0 or end < yx or (d == 1 and yx % w == 0) or (d == -1 and yx % w == (w-1)):
+                break
 
-    def neighbors1(state):
-        r = []
-        for p, d in (
-            [((0, 0), (1, 0)), ((0, 0), (0, 1))] if state == ("start") else [state]
-        ):
-            cc = 0
-            for l in range(1, 4):
-                dl = (l * d[0], l * d[1])
-                if in_bounds(p, dl):
-                    cc += cost(p, dl)
-                    r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), cw(d))))
-                    r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), ccw(d))))
-                else:
-                    break
-        return r
+            cc += g[yx]
+            if l >= minimum:
+                yield (cc, (yx, -w//d))
+                yield (cc, (yx, w//d))
 
-    def neighbors2(state):
-        r = []
-        for p, d in (
-            [((0, 0), (1, 0)), ((0, 0), (0, 1))] if state == ("start") else [state]
-        ):
-            cc = 0
-            for l in range(1, 11):
-                dl = (l * d[0], l * d[1])
-                if in_bounds(p, dl):
-                    cc += cost(p, dl)
-                    if l >= 4:
-                        r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), cw(d))))
-                        r.append((cc, ((p[0] + l * d[0], p[1] + l * d[1]), ccw(d))))
-                else:
-                    break
-        return r
 
-    if VERBOSE:
-        print(
-            "day17",
-            dynamic_dijkstra(neighbors1, ("start"), end),
-            dynamic_dijkstra(neighbors2, ("start"), end),
-        )
+    p1 = dynamic_dijkstra(1, 4, end)
+    p2 = dynamic_dijkstra(4, 11, end)
+    if VERBOSE: print("day17", p1, p2)
 
 
 def day22():
@@ -1207,17 +1255,18 @@ def day22():
         print("day22", p1, p2)
 
 
-from operator import itemgetter
 
-
-def day23_partition():
-    g, w, h, _ = grid_from_strs(D23)
+def day23():
+    g = [[ch for ch in row] for row in D23]
+    h = len(g)
+    w = len(g[0])
     start = (1, 0)
     end = (w - 2, h - 1)
 
+
     @cache
     def grid_neighbors(p, part1=False):
-        nonlocal g, w, h
+        global g, w, h
         width = w
         height = h
         r = []
@@ -1231,7 +1280,7 @@ def day23_partition():
                 dd = (0, -1)
             elif g[p[1]][p[0]] == "v":
                 dd = (0, 1)
-        for d in [dd] if dd else DIR:
+        for d in [dd] if dd else [(1, 0), (-1, 0), (0, 1), (0, -1)]:
             q = (p[0] + d[0], p[1] + d[1])
             if (
                 q[0] < 0
@@ -1244,6 +1293,7 @@ def day23_partition():
             r.append(q)
         return r
 
+
     def find_all_intersections(part1=False):
         res = []
         for x in range(w):
@@ -1251,6 +1301,7 @@ def day23_partition():
                 if g[y][x] == "." and len(grid_neighbors((x, y), part1)) > 2:
                     res.append((x, y))
         return res
+
 
     def find_edges_from_isect_to_isect(isects, start, end, part1=False):
         graph = {}
@@ -1273,71 +1324,79 @@ def day23_partition():
                     vv.add(p)
                 if found:
                     dests.append((p[0], p[1], l))  # graph is origin -> (dest, len)
-            graph[(o[0], o[1])] = dests
-        # Remap the whole graph to power of two integer node names so we
+            graph[(o[0],o[1])] = dests
+        # Remap the whole graph to integer node names so we
         # can mark visited really quickly.
         gg = {}
         map_ = {}
-        for i, k in enumerate(graph.keys()):
-            map_[k] = pow(2, i)
-        for k, v in graph.items():
-            gg[map_[k]] = [(map_[(x[0], x[1])], x[2]) for x in v]
-        return gg, map_[start], map_[end]
+        for i,k in enumerate(graph.keys()):
+            map_[k] = i
+        for k,v in graph.items():
+            gg[map_[k]] = [(map_[(x[0],x[1])],x[2]) for x in v]
+        return gg,map_[start],map_[end]
 
-    parts = []
+    ans = []
     for part1 in [True, False]:
-        part = []
         isect = set(find_all_intersections(part1)) | {start, end}
-        graph, start_, end_ = find_edges_from_isect_to_isect(isect, start, end, part1)
+        graph,start_,end_ = find_edges_from_isect_to_isect(isect, start, end, part1)
+        
+        mid_points = defaultdict(list)
 
-        Q = []
+        MID_DEPTH = int(len(graph.keys()) / 2) - 2
+        mm = 0
         visited = 0
 
-        def unroll_to_depth4(n, l, d):
-            nonlocal visited
-            if d > 3:
+        def outbound_dfs(n, l, d):
+            global mm, visited, mid_points
+            if visited & 1<<n:
                 return
-            if visited & n:
+            if not part1 and d == MID_DEPTH:
+                mid_points[n].append((l,visited))
                 return
-            visited |= n
-            for nn, ll in graph[n]:
-                if d == 3:
-                    Q.append((d, nn, l + ll, visited))
-                unroll_to_depth4(nn, l + ll, d + 1)
-            visited ^= n
+            visited |= 1<<n
+            if n == end_:
+                mm = max(l, mm)
+            else:
+                for nn, ll in graph[n]:
+                    outbound_dfs(nn, l + ll, d+1)
+            visited ^= 1<<n
 
+
+        def return_dfs(n, l, d):
+            global mm, visited, mid_points
+            if d == MID_DEPTH:
+                return
+            if visited & 1<<n:
+                return
+            visited |= 1<<n
+            if n == start_:
+                mm = max(l, mm)
+            else:
+                for nn, ll in graph[n]:
+                    if nn in mid_points:
+                        for l_, visited_ in mid_points[nn]:
+                            if l+ll+l_ < mm:
+                                break
+                            if (visited_|1<<nn) & visited == 0:
+                                mm = max(l+ll+l_, mm)
+                    return_dfs(nn, l + ll, d+1)
+            visited ^= 1<<n
+
+        sadd, eadd = 0,0
+        start_, sadd = graph[start_][0]
         if not part1:
-            unroll_to_depth4(start_, 0, 0)
-            for state in Q:
-                part.append((state, graph, end_))
-        else:
-            part.append(((0, start_, 0, 0), graph, end_))
-        parts.append(part)
-    return parts
+            end_, eadd = graph[end_][0]
 
+        outbound_dfs(start_, sadd, 0)
+        if not part1:
+            for k in mid_points.keys():
+                mid_points[k] = sorted(mid_points[k], reverse=True)
+            return_dfs(end_, eadd, 0)
+        
+        ans.append(mm)
+    print("day23", ans[0], ans[1])
 
-def day23(data):
-    visited, mm = 0, 0
-    state, graph, end_ = data
-    _, n, l, visited = state
-    mm = 0
-
-    def dfs(n, l):
-        nonlocal mm, visited
-        if visited & n:
-            return
-        visited |= n
-        if n == end_:
-            mm = max(l, mm)
-        else:
-            for nn, ll in graph[n]:
-                dfs(nn, l + ll)
-        visited ^= n
-
-    dfs(n, l)
-    return mm
-
-
+from operator import itemgetter
 import z3
 
 
@@ -1444,7 +1503,7 @@ if __name__ == "__main__":
 
     running = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        for i in range(20):
+        for i in range(10):
             running.append(executor.submit(prime_the_pump, i))
         concurrent.futures.wait(running, return_when=concurrent.futures.ALL_COMPLETED)
         if VERBOSE:
@@ -1462,10 +1521,7 @@ if __name__ == "__main__":
         running.append(executor.submit(day07, 1))
         running.append(executor.submit(day07, 2))
         running.append(executor.submit(day08))
-        day23_part1_data, day23_part2_data = day23_partition()
-
-        day23_results = executor.map(day23, day23_part2_data)
-
+        running.append(executor.submit(day23))
         running.append(executor.submit(day09, 1))
         running.append(executor.submit(day09, 2))
         running.append(executor.submit(day10))
@@ -1480,24 +1536,9 @@ if __name__ == "__main__":
         running.append(executor.submit(day19))
         running.append(executor.submit(day20))
         running.append(executor.submit(day21))
-        running.append(executor.submit(day16, 0))
+        running.append(executor.submit(day16))
         running.append(executor.submit(day24))
         running.append(executor.submit(day25))
-        day23_p1 = day23(day23_part1_data[0])
-        if VERBOSE:
-            print(day23_p1)
-
-        results = executor.map(day16, list(range(1, 5)))
-        if VERBOSE:
-            print("day16 pt2", max(results))
-        if VERBOSE:
-            print(
-                "day22",
-                sum([r[0] for r in day22_results]),
-                sum([r[1] for r in day22_results]),
-            )
-        if VERBOSE:
-            print("day23", max(day23_results))
 
     concurrent.futures.wait(running, return_when=concurrent.futures.ALL_COMPLETED)
     END = time.time_ns()
