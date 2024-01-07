@@ -57,7 +57,7 @@ def part2():
         status = line.split(" ")[0]
         report = tuple(map(int, line.split(" ")[1].split(",")))
 
-        status = "?".join([status] * 5)
+        status = ("?".join([status] * 5)).rstrip(".")
         report = tuple(report * 5)
 
         tot += ddfs(status, report)
