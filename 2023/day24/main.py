@@ -35,15 +35,97 @@ for p,q in combinations(stones, 2):
         if n > 0 and m > 0:
             tot += 1
 
-print("Part 1", tot)
+# sx + t0 dx = s00 + t0 s03
+# sy + t0 dy = s01 + t0 s04
 
-sx,sy,sz,dx,dy,dz = Real('sx'),Real('sy'),Real('sz'),Real('dx'),Real('dy'),Real('dz')
-T = [Real(f't{i}') for i in range(3)]
-solver = Solver()
-for i in range(3):
-  solver.add(sx + T[i]*dx - stones[i][0] - T[i]*stones[i][3] == 0)
-  solver.add(sy + T[i]*dy - stones[i][1] - T[i]*stones[i][4] == 0)
-  solver.add(sz + T[i]*dz - stones[i][2] - T[i]*stones[i][5] == 0)
-res = solver.check()
-model = solver.model()
-print("Part 2", model.eval(sx+sy+sz))
+# From (1)
+# t0 (dx - s03) = s00 - sx
+# t0 = (s00 - sx) / (dx - s03) (3)
+
+# From (2)
+# t0 (dy - s04) = s01 - sy
+# t0 = (s01 - sy) / (dy - s04) (4)
+
+# (3) == (4)
+# (s00 - sx) / (dx - s03) = (s01 - sy) / (dy - s04)
+# Cross-multiply
+# (dy - s04)(s00 - sx) = (s01 - sy)(dx - s03)
+# dy s00 - dy sx - s04 s00 + s04 sx = s01 dx - s01 s03 - sy dx + sy s03
+# Rearrange (- RHS from both sides)
+
+# dy s00 - dy sx - s04 s00 + s04 sx - s01 dx + s01 s03 + sy dx - sy s03 = 0  (3)
+# same for second hailstone:
+# dy s10 - dy sx - s14 s10 + s14 sx - s11 dx + s11 s13 + sy dx - sy s13 = 0  (4)
+
+# (3) - (4); dy . sx etc terms cancel, making it linear!
+
+# dy s00 - s04 s00 + s04 sx - s01 dx + s01 s03 - sy s03 - dy s10 + s14 s10 - s14 sx + s11 dx - s11 s13 + sy s13 = 0
+
+# collect sx,sy,dx,dy
+
+#sx: s04 - s14
+#sy: s13 - s03 
+#dx: s11 - s01
+#dy: s00 - s10   == s04 s00 - s01 s03 - s14 s10 + s11 s13
+
+#From stones 1 & 0 => 
+# sx (s04 - s14) + sy (s13 - s03) + dx (s11 - s01) + dy (s00 - s10) = s04 s00 - s01 s03 - s14 s10 + s11 s13
+#From stones 2 & 1 =>
+# sx (s14 - s24) + sy (s23 - s13) + dx (s21 - s11) + dy (s10 - s20) = s14 s10 - s11 s13 - s24 s20 + s21 s23
+#From stones 3 & 2 =>
+# sx (s24 - s34) + sy (s33 - s23) + dx (s31 - s21) + dy (s20 - s30) = s24 s20 - s21 s23 - s34 s30 + s31 s33
+#From stones 4 & 3 =>
+# sx (s34 - s44) + sy (s43 - s33) + dx (s41 - s31) + dy (s30 - s40) = s34 s30 - s31 s33 - s44 s40 + s41 s43
+
+# These form a system of linear equations of the form Ax = b so we can use any linalg solver / Gaussian elim
+# or Cramer's method.
+
+# numpy yields a correct but inexact answer:
+# x = np.linalg.solve(a, b)
+# print(x)
+# [ 2.70392224e+14  4.63714142e+14  2.60000000e+01 -3.31000000e+02]
+
+# import numpy as np
+
+# A = np.array([[s[0][4] - s[1][4], s[1][3] - s[0][3], s[1][1] - s[0][1], s[0][0] - s[1][0]],
+#     [s[1][4] - s[2][4], s[2][3] - s[1][3], s[2][1] - s[1][1], s[1][0] - s[2][0]],
+#     [s[2][4] - s[3][4], s[3][3] - s[2][3], s[3][1] - s[2][1], s[2][0] - s[3][0]],
+#     [s[3][4] - s[4][4], s[4][3] - s[3][3], s[4][1] - s[3][1], s[3][0] - s[4][0]]], dtype=np.double)
+# b = np.array([s[0][4] * s[0][0] - s[0][1] * s[0][3] - s[1][4] * s[1][0] + s[1][1] * s[1][3],
+#      s[1][4] * s[1][0] - s[1][1] * s[1][3] - s[2][4] * s[2][0] + s[2][1] * s[2][3],
+#      s[2][4] * s[2][0] - s[2][1] * s[2][3] - s[3][4] * s[3][0] + s[3][1] * s[3][3],
+#      s[3][4] * s[3][0] - s[3][1] * s[3][3] - s[4][4] * s[4][0] + s[4][1] * s[4][3]], dtype=np.double)
+
+# x = np.linalg.solve(A, b)
+
+# mpmath gives an exact answer
+import mpmath
+
+s = stones
+
+A = mpmath.matrix([[s[0][4] - s[1][4], s[1][3] - s[0][3], s[1][1] - s[0][1], s[0][0] - s[1][0]],
+    [s[1][4] - s[2][4], s[2][3] - s[1][3], s[2][1] - s[1][1], s[1][0] - s[2][0]],
+    [s[2][4] - s[3][4], s[3][3] - s[2][3], s[3][1] - s[2][1], s[2][0] - s[3][0]],
+    [s[3][4] - s[4][4], s[4][3] - s[3][3], s[4][1] - s[3][1], s[3][0] - s[4][0]]])
+b = mpmath.matrix([s[0][4] * s[0][0] - s[0][1] * s[0][3] - s[1][4] * s[1][0] + s[1][1] * s[1][3],
+     s[1][4] * s[1][0] - s[1][1] * s[1][3] - s[2][4] * s[2][0] + s[2][1] * s[2][3],
+     s[2][4] * s[2][0] - s[2][1] * s[2][3] - s[3][4] * s[3][0] + s[3][1] * s[3][3],
+     s[3][4] * s[3][0] - s[3][1] * s[3][3] - s[4][4] * s[4][0] + s[4][1] * s[4][3]])
+
+x = mpmath.lu_solve(A, b)
+
+sx, sy, dx, dy = x
+
+# From above.
+t0 = (s[0][0] - sx) / (dx - s[0][3])
+t1 = (s[1][0] - sx) / (dx - s[1][3])
+
+# This is just the equation for velocity between positions given time
+# elapsed.
+dz = ((s[1][2] + t1*s[1][5]) - (s[0][2] + t0*s[0][5])) / (t1 - t0)
+
+# sz + t1 dz - s12 - t1 s15 = 0
+# sz = -t1 dz +s12 + t1 s15
+sz = -t1 * dz + s[1][2] + t1*s[1][5]
+
+print("day24", tot, int(sx)+int(sy)+int(sz))
