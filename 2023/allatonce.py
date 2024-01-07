@@ -375,11 +375,10 @@ def day09(part=1):
             seq = diff
 
         tot += s[-1] + sum(x[-1] for x in diffs[0:-1])
-
+    if VERBOSE: print("day09", part, tot)
     return tot
 
 
-# if VERBOSE: print("day09", day09(1), day09(2))
 
 from collections import deque
 
@@ -504,10 +503,10 @@ def day11(part=1):
             if g[y][x] == "#":
                 galaxies.add(new_pos(x, y))
 
-    return sum((manhattan(a, b) for a, b in combinations(galaxies, 2)))
+    res = sum((manhattan(a, b) for a, b in combinations(galaxies, 2)))
+    if VERBOSE: print("day11", part, res)
 
-
-# if VERBOSE: print("day11", day11(1), day11(2))
+    return res
 
 
 @cache
@@ -548,6 +547,7 @@ def day12_1():
         report = tuple(map(int, line.split(" ")[1].split(",")))
         tot += ddfs(status, report)
 
+    if VERBOSE: print("day12 pt1", tot)
     return tot
 
 
@@ -564,6 +564,7 @@ def day12_2():
 
         tot += ddfs(status, report)
 
+    if VERBOSE: print("day12 pt2", tot)
     return tot
 
 
@@ -602,8 +603,7 @@ def day13():
         p1 += reflect(g, w, h, target_diff=0)
         p2 += reflect(g, w, h, target_diff=1)
 
-    if VERBOSE:
-        print("day13", p1, p2)
+    if VERBOSE: print("day13", p1, p2)
 
 
 def day14():
@@ -1266,7 +1266,7 @@ def day23():
 
     @cache
     def grid_neighbors(p, part1=False):
-        global g, w, h
+        nonlocal g, w, h
         width = w
         height = h
         r = []
@@ -1295,6 +1295,7 @@ def day23():
 
 
     def find_all_intersections(part1=False):
+        nonlocal w,h
         res = []
         for x in range(w):
             for y in range(h):
@@ -1347,7 +1348,7 @@ def day23():
         visited = 0
 
         def outbound_dfs(n, l, d):
-            global mm, visited, mid_points
+            nonlocal mm, visited, mid_points
             if visited & 1<<n:
                 return
             if not part1 and d == MID_DEPTH:
@@ -1363,7 +1364,7 @@ def day23():
 
 
         def return_dfs(n, l, d):
-            global mm, visited, mid_points
+            nonlocal mm, visited, mid_points
             if d == MID_DEPTH:
                 return
             if visited & 1<<n:
@@ -1394,13 +1395,14 @@ def day23():
             return_dfs(end_, eadd, 0)
         
         ans.append(mm)
-    print("day23", ans[0], ans[1])
+    if VERBOSE: print("day23", ans[0], ans[1])
 
 from operator import itemgetter
 import z3
 
 
 def day24():
+    d24t = time.perf_counter()
 
     stones = lmap(ints, [i.strip() for i in open("day24/input", "r").readlines()])
     tot = 0
@@ -1490,7 +1492,8 @@ def day24():
     # sz = -t1 dz +s12 + t1 s15
     sz = -t1 * dz + s[1][2] + t1*s[1][5]
 
-    if VERBOSE: print("day24", tot, int(sx)+int(sy)+int(sz))
+    d24t = time.perf_counter() - d24t
+    if VERBOSE: print("day24", tot, int(sx)+int(sy)+int(sz), f"time:{d24t}")
 
 
 import random
@@ -1499,7 +1502,7 @@ import random
 def day25():
 
     vertices = defaultdict(set)
-    for line in D:
+    for line in D25:
         from_, to_ = line.split(":")
         to_ = to_.strip()
         vertices[from_].update(to_.split(" "))
@@ -1531,7 +1534,8 @@ def day25():
             if len(list(V.values())[0][0]) == 3:
                 return reduce(operator.mul, [len(v[1]) for v in V.values()])
 
-    print("day25", kargers(vertices))
+    res = kargers(vertices)
+    if VERBOSE: print("day25", res)
 
 
 def prime_the_pump(i):
@@ -1550,6 +1554,8 @@ if __name__ == "__main__":
             print("primed")
         running = []
         START = time.time_ns()
+        running.append(executor.submit(day23))
+        running.append(executor.submit(day25))
         running.append(executor.submit(day17))
         running.append(executor.submit(day22))
         running.append(executor.submit(day01))
@@ -1561,7 +1567,6 @@ if __name__ == "__main__":
         running.append(executor.submit(day07, 1))
         running.append(executor.submit(day07, 2))
         running.append(executor.submit(day08))
-        running.append(executor.submit(day23))
         running.append(executor.submit(day09, 1))
         running.append(executor.submit(day09, 2))
         running.append(executor.submit(day10))
@@ -1578,7 +1583,6 @@ if __name__ == "__main__":
         running.append(executor.submit(day21))
         running.append(executor.submit(day16))
         running.append(executor.submit(day24))
-        running.append(executor.submit(day25))
 
     concurrent.futures.wait(running, return_when=concurrent.futures.ALL_COMPLETED)
     END = time.time_ns()
