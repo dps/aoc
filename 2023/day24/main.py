@@ -98,21 +98,90 @@ for p,q in combinations(stones, 2):
 
 # x = np.linalg.solve(A, b)
 
-# mpmath gives an exact answer
-import mpmath
-
 s = stones
 
-A = mpmath.matrix([[s[0][4] - s[1][4], s[1][3] - s[0][3], s[1][1] - s[0][1], s[0][0] - s[1][0]],
-    [s[1][4] - s[2][4], s[2][3] - s[1][3], s[2][1] - s[1][1], s[1][0] - s[2][0]],
-    [s[2][4] - s[3][4], s[3][3] - s[2][3], s[3][1] - s[2][1], s[2][0] - s[3][0]],
-    [s[3][4] - s[4][4], s[4][3] - s[3][3], s[4][1] - s[3][1], s[3][0] - s[4][0]]])
-b = mpmath.matrix([s[0][4] * s[0][0] - s[0][1] * s[0][3] - s[1][4] * s[1][0] + s[1][1] * s[1][3],
-     s[1][4] * s[1][0] - s[1][1] * s[1][3] - s[2][4] * s[2][0] + s[2][1] * s[2][3],
-     s[2][4] * s[2][0] - s[2][1] * s[2][3] - s[3][4] * s[3][0] + s[3][1] * s[3][3],
-     s[3][4] * s[3][0] - s[3][1] * s[3][3] - s[4][4] * s[4][0] + s[4][1] * s[4][3]])
+# mpmath gives an exact answer
+# import mpmath
 
-x = mpmath.lu_solve(A, b)
+# A = mpmath.matrix([[s[0][4] - s[1][4], s[1][3] - s[0][3], s[1][1] - s[0][1], s[0][0] - s[1][0]],
+#     [s[1][4] - s[2][4], s[2][3] - s[1][3], s[2][1] - s[1][1], s[1][0] - s[2][0]],
+#     [s[2][4] - s[3][4], s[3][3] - s[2][3], s[3][1] - s[2][1], s[2][0] - s[3][0]],
+#     [s[3][4] - s[4][4], s[4][3] - s[3][3], s[4][1] - s[3][1], s[3][0] - s[4][0]]])
+# b = mpmath.matrix([s[0][4] * s[0][0] - s[0][1] * s[0][3] - s[1][4] * s[1][0] + s[1][1] * s[1][3],
+#      s[1][4] * s[1][0] - s[1][1] * s[1][3] - s[2][4] * s[2][0] + s[2][1] * s[2][3],
+#      s[2][4] * s[2][0] - s[2][1] * s[2][3] - s[3][4] * s[3][0] + s[3][1] * s[3][3],
+#      s[3][4] * s[3][0] - s[3][1] * s[3][3] - s[4][4] * s[4][0] + s[4][1] * s[4][3]])
+
+# x = mpmath.lu_solve(A, b)
+# print(x)
+
+# sx, sy, dx, dy = x
+
+# # From above.
+# t0 = (s[0][0] - sx) / (dx - s[0][3])
+# t1 = (s[1][0] - sx) / (dx - s[1][3])
+
+# # This is just the equation for velocity between positions given time
+# # elapsed.
+# dz = ((s[1][2] + t1*s[1][5]) - (s[0][2] + t0*s[0][5])) / (t1 - t0)
+
+# # sz + t1 dz - s12 - t1 s15 = 0
+# # sz = -t1 dz +s12 + t1 s15
+# sz = -t1 * dz + s[1][2] + t1*s[1][5]
+
+# Alternative with Gaussian elimination which is slightly faster than using mpmath
+# --------------------------------------------------------------------------------
+
+def gaussian_elimination(A):
+    n = len(A)
+
+    # Forward elimination
+    for i in range(n):
+        # Search for maximum in this column
+        maxEl = abs(A[i][i])
+        maxRow = i
+        for k in range(i+1, n):
+            if abs(A[k][i]) > maxEl:
+                maxEl = abs(A[k][i])
+                maxRow = k
+
+        # Swap maximum row with current row
+        A[maxRow], A[i] = A[i], A[maxRow]
+
+        # Make all rows below this one 0 in current column
+        for k in range(i+1, n):
+            c = -A[k][i] / A[i][i]
+            for j in range(i, n+1):
+                if i == j:
+                    A[k][j] = 0
+                else:
+                    A[k][j] += c * A[i][j]
+
+    # Solve equation Ax=b for an upper triangular matrix A
+    x = [0 for i in range(n)]
+    for i in range(n-1, -1, -1):
+        x[i] = A[i][n] / A[i][i]
+        for k in range(i-1, -1, -1):
+            A[k][n] -= A[k][i] * x[i]
+
+    return x
+
+# A = [[s[0][4] - s[1][4], s[1][3] - s[0][3], s[1][1] - s[0][1], s[0][0] - s[1][0]],
+#     [s[1][4] - s[2][4], s[2][3] - s[1][3], s[2][1] - s[1][1], s[1][0] - s[2][0]],
+#     [s[2][4] - s[3][4], s[3][3] - s[2][3], s[3][1] - s[2][1], s[2][0] - s[3][0]],
+#     [s[3][4] - s[4][4], s[4][3] - s[3][3], s[4][1] - s[3][1], s[3][0] - s[4][0]]]
+# b = [s[0][4] * s[0][0] - s[0][1] * s[0][3] - s[1][4] * s[1][0] + s[1][1] * s[1][3],
+#      s[1][4] * s[1][0] - s[1][1] * s[1][3] - s[2][4] * s[2][0] + s[2][1] * s[2][3],
+#      s[2][4] * s[2][0] - s[2][1] * s[2][3] - s[3][4] * s[3][0] + s[3][1] * s[3][3],
+#      s[3][4] * s[3][0] - s[3][1] * s[3][3] - s[4][4] * s[4][0] + s[4][1] * s[4][3]]
+
+Ab = [[s[0][4] - s[1][4], s[1][3] - s[0][3], s[1][1] - s[0][1], s[0][0] - s[1][0], s[0][4] * s[0][0] - s[0][1] * s[0][3] - s[1][4] * s[1][0] + s[1][1] * s[1][3]],
+    [s[1][4] - s[2][4], s[2][3] - s[1][3], s[2][1] - s[1][1], s[1][0] - s[2][0], s[1][4] * s[1][0] - s[1][1] * s[1][3] - s[2][4] * s[2][0] + s[2][1] * s[2][3]],
+    [s[2][4] - s[3][4], s[3][3] - s[2][3], s[3][1] - s[2][1], s[2][0] - s[3][0], s[2][4] * s[2][0] - s[2][1] * s[2][3] - s[3][4] * s[3][0] + s[3][1] * s[3][3]],
+    [s[3][4] - s[4][4], s[4][3] - s[3][3], s[4][1] - s[3][1], s[3][0] - s[4][0], s[3][4] * s[3][0] - s[3][1] * s[3][3] - s[4][4] * s[4][0] + s[4][1] * s[4][3]]]
+
+# Solve using Gaussian Elimination
+x = [round(i) for i in gaussian_elimination(Ab)]
 
 sx, sy, dx, dy = x
 
