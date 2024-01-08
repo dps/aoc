@@ -28,7 +28,6 @@ D25 = [i.strip() for i in open("day25/input", "r").readlines()]
 
 VERBOSE = False
 
-
 def day01():
     dig = {
         "one": "1",
@@ -45,7 +44,7 @@ def day01():
     p1, p2 = 0, 0
     for line in D01:
         ns1, ns2 = [], []
-        for i, ch in enumerate(D01):
+        for i, ch in enumerate(line):
             if ch.isdigit():
                 ns1.append(ch)
                 ns2.append(ch)
@@ -283,24 +282,23 @@ def best_joker(hand):
     return h2
 
 
-def day07(part=1):
-    hands = []
-    for line in D07:
-        hand, bid = line.split()
-        if part == 1:
-            typ = Counter(hand)
-        elif part == 2:
-            h2 = best_joker(hand)
-            typ = Counter(h2)
-        nc = Counter(list(typ.values()))
-        score = max(typ.values()) * 100 + 10 * (nc[2] if 2 in nc else 0)
+def day07():
+    for part in [1,2]:
+        hands = []
+        for line in D07:
+            hand, bid = line.split()
+            if part == 1:
+                typ = Counter(hand)
+            elif part == 2:
+                h2 = best_joker(hand)
+                typ = Counter(h2)
+            nc = Counter(list(typ.values()))
+            score = max(typ.values()) * 100 + 10 * (nc[2] if 2 in nc else 0)
 
-        hands.append((score * 10000000000000 + hand_to_val(hand, part), hand, bid))
-    hands = sorted(hands)
-    ans = sum([int(b[2]) * int(r) for r, b in enumerate(hands, 1)])
-    if VERBOSE: print("day07 part", part, ans)
-    return ans
-
+            hands.append((score * 10000000000000 + hand_to_val(hand, part), hand, bid))
+        hands = sorted(hands)
+        ans = sum([int(b[2]) * int(r) for r, b in enumerate(hands, 1)])
+        if VERBOSE: print("day07 part", part, ans)
 
 def day08():
     def traverse(start, part=1):
@@ -363,19 +361,20 @@ def day08():
 from copy import copy
 
 
-def day09(part=1):
-    tot = 0
-    for line in D09:
-        seq = ints(line) if part == 1 else list(reversed(ints(line)))
-        s = copy(seq)
-        diffs, diff = [], [None]
-        while not all([d == 0 for d in diff]):
-            diff = [b - a for a, b in zip(seq, seq[1:])]
-            diffs.append(diff)
-            seq = diff
+def day09():
+    for part in [1,2]:
+        tot = 0
+        for line in D09:
+            seq = ints(line) if part == 1 else list(reversed(ints(line)))
+            s = copy(seq)
+            diffs, diff = [], [None]
+            while not all([d == 0 for d in diff]):
+                diff = [b - a for a, b in zip(seq, seq[1:])]
+                diffs.append(diff)
+                seq = diff
 
-        tot += s[-1] + sum(x[-1] for x in diffs[0:-1])
-    if VERBOSE: print("day09", part, tot)
+            tot += s[-1] + sum(x[-1] for x in diffs[0:-1])
+        if VERBOSE: print("day09", part, tot)
     return tot
 
 
@@ -476,96 +475,99 @@ def manhattan(p, q):
 def day11(part=1):
     global D11
 
-    g = [[ch for ch in row] for row in D11]
-    h = len(g)
-    w = h  # square grid
-    expand_rows = [y for y in range(h) if all((c == "." for c in g[y]))]
-    expand_cols = [x for x in range(w) if all((g[y][x] == "." for y in range(h)))]
+    for part in [1,2]:
+        g = [[ch for ch in row] for row in D11]
+        h = len(g)
+        w = h  # square grid
+        expand_rows = [y for y in range(h) if all((c == "." for c in g[y]))]
+        expand_cols = [x for x in range(w) if all((g[y][x] == "." for y in range(h)))]
 
-    # can we speed up new_pos? [minor speedup]
-    @cache
-    def exx(x):
-        return len([xx for xx in expand_cols if xx < x])
+        # can we speed up new_pos? [minor speedup]
+        @cache
+        def exx(x):
+            return len([xx for xx in expand_cols if xx < x])
 
-    @cache
-    def eyy(y):
-        return len([yy for yy in expand_rows if yy < y])
+        @cache
+        def eyy(y):
+            return len([yy for yy in expand_rows if yy < y])
 
-    def new_pos(x, y):
-        return (
-            x + (1 if part == 1 else 999999) * exx(x),
-            y + (1 if part == 1 else 999999) * eyy(y),
-        )
+        def new_pos(x, y):
+            return (
+                x + (1 if part == 1 else 999999) * exx(x),
+                y + (1 if part == 1 else 999999) * eyy(y),
+            )
 
-    galaxies = set()
-    for y in range(h):
-        for x in range(w):
-            if g[y][x] == "#":
-                galaxies.add(new_pos(x, y))
+        galaxies = set()
+        for y in range(h):
+            for x in range(w):
+                if g[y][x] == "#":
+                    galaxies.add(new_pos(x, y))
 
-    res = sum((manhattan(a, b) for a, b in combinations(galaxies, 2)))
-    if VERBOSE: print("day11", part, res)
+        res = sum((manhattan(a, b) for a, b in combinations(galaxies, 2)))
+        if VERBOSE: print("day11", part, res)
 
     return res
 
 
-@cache
-def ddfs(pattern, counts):
-    # Early termination if we don't have enough chars left
-    if sum(counts) + (len(counts) - 1) > len(pattern):
-        return 0
+def day12():
+    # This algorithm is by KayZGames, see
+    # https://www.reddit.com/r/adventofcode/comments/18ge41g/comment/kd0orps/
+    # rrutkows ported it to python. I still find it hard to believe this is so
+    # much faster than the DP version as they do ~~ the same thing.
+    # But it is - nice work folks!
+    def solutions(row, pattern):
+        permutations = defaultdict(int)
+        permutations[(0, 0)] = 1 # key is (group_id, group_amount)
+        for c in row:
+            next = []
+            for key, perm_count in permutations.items():
+                group_id, group_amount = key
+                if c != '#': #'.' or '?'
+                    if group_amount == 0:
+                        next.append((group_id, group_amount, perm_count))
+                    elif group_amount == pattern[group_id]:
+                        next.append((group_id + 1, 0, perm_count))
+                if c != '.': #'#' or '?'
+                    if group_id < len(pattern) and group_amount < pattern[group_id]:
+                        next.append((group_id, group_amount + 1, perm_count))
+            permutations.clear()
+            for group_id, group_amount, perm_count in next:
+                permutations[(group_id, group_amount)] += perm_count
 
-    # no more patterns to make, rest has to be "." or "?"=>"."
-    if len(counts) == 0:
-        if all([p != "#" for p in pattern]):
-            return 1
-        else:
-            return 0
-
-    if pattern[0] == ".":
-        return ddfs(pattern[1:], counts)
-
-    tot = 0
-    if pattern[0] == "?":  # consider the . case
-        tot += ddfs(pattern[1:], counts)
-
-    # make a whole group here if we can
-    if all([c != "." for c in pattern[0 : counts[0]]]) and (
-        (pattern[counts[0]] != "#") if len(pattern) > counts[0] else True
-    ):
-        tot += ddfs(pattern[counts[0] + 1 :], counts[1:])
-
-    return tot
-
-
-def day12_1():
-    global D12
-    tot = 0
-
-    for line in D12:
-        status = line.split(" ")[0].rstrip(".")
-        report = tuple(map(int, line.split(" ")[1].split(",")))
-        tot += ddfs(status, report)
-
-    if VERBOSE: print("day12 pt1", tot)
-    return tot
+        def is_valid(group_id, group_amount):
+            return group_id == len(pattern) or group_id == len(pattern) - 1 and group_amount == pattern[group_id]
+        return sum(v for k, v in permutations.items() if is_valid(*k))
 
 
-def day12_2():
-    global D12
-    tot = 0
+    def part1():
+        global D12
+        tot = 0
 
-    for line in D12:
-        status = line.split(" ")[0]
-        report = tuple(map(int, line.split(" ")[1].split(",")))
+        for line in D12:
+            status = line.split(" ")[0]
+            report = tuple(map(int, line.split(" ")[1].split(",")))
+            tot += solutions(status, report)
+            
+        return tot
 
-        status = "?".join([status] * 5)
-        report = tuple(report * 5)
+    def part2():
+        global D12
+        tot = 0
 
-        tot += ddfs(status, report)
+        for line in D12:
+            status = line.split(" ")[0]
+            report = tuple(map(int, line.split(" ")[1].split(",")))
 
-    if VERBOSE: print("day12 pt2", tot)
-    return tot
+            status = ("?".join([status] * 5))
+            report = tuple(report * 5)
+
+            tot += solutions(status, report)
+
+        return tot
+
+    p1,p2 = part1(), part2()
+
+    if VERBOSE: print("day12", p1, p2)
 
 
 def day13():
@@ -607,38 +609,91 @@ def day13():
 
 
 def day14():
+    g = list("".join(D14))
+    w = len(D14[0])
+    h = len(D14)
+
+
     def roll_north(g, w, h):
-        new_grid = [r[:] for r in g]
+        new_grid = g[:]
         for j in range(h):
             for i in range(w):
-                if g[j][i] == "O":
+                if g[w * j + i] == "O":
                     jj = j
                     while jj > 0 and not (
-                        new_grid[jj - 1][i] == "O" or new_grid[jj - 1][i] == "#"
+                        new_grid[(jj - 1) * w + i] == "O"
+                        or new_grid[(jj - 1) * w + i] == "#"
                     ):
                         jj -= 1
-                    new_grid[j][i] = "."
-                    new_grid[jj][i] = "O"
+                    new_grid[j * w + i] = "."
+                    new_grid[jj * w + i] = "O"
         return new_grid
 
-    def rotate_clock(g):
-        return [list(x) for x in list(zip(*g[::-1]))]
+
+    def roll_west(g, w, h):
+        new_grid = g[:]
+        for i in range(w):
+            for j in range(h):
+                if g[w * j + i] == "O":
+                    ii = i
+                    while ii > 0 and not (
+                        new_grid[j * w + (ii - 1)] == "O"
+                        or new_grid[j * w + (ii - 1)] == "#"
+                    ):
+                        ii -= 1
+                    new_grid[j * w + i] = "."
+                    new_grid[j * w + ii] = "O"
+        return new_grid
+
+
+    def roll_south(g, w, h):
+        new_grid = g[:]
+        for j in range(h - 1, -1, -1):
+            for i in range(w):
+                if g[w * j + i] == "O":
+                    jj = j
+                    while jj < (h - 1) and not (
+                        new_grid[(jj + 1) * w + i] == "O"
+                        or new_grid[(jj + 1) * w + i] == "#"
+                    ):
+                        jj += 1
+                    new_grid[j * w + i] = "."
+                    new_grid[jj * w + i] = "O"
+        return new_grid
+
+
+    def roll_east(g, w, h):
+        new_grid = g[:]
+        for i in range(w - 1, -1, -1):
+            for j in range(h):
+                if g[w * j + i] == "O":
+                    ii = i
+                    while ii < (w - 1) and not (
+                        new_grid[j * w + (ii + 1)] == "O"
+                        or new_grid[j * w + (ii + 1)] == "#"
+                    ):
+                        ii += 1
+                    new_grid[j * w + i] = "."
+                    new_grid[j * w + ii] = "O"
+        return new_grid
+
 
     def score(g, w, h):
-        return sum((h - j) for i in range(w) for j in range(h) if g[j][i] == "O")
+        return sum((h - j) for i in range(w) for j in range(h) if g[j * w + i] == "O")
 
-    g, w, h, _ = grid_from_strs(D14)
+
     p1 = score(roll_north(g, w, h), w, h)
 
     seen, reverse_seen = {}, {}
     start, mod = None, None
 
     for i in range(1000000000):
-        for _ in range(4):
-            g = roll_north(g, w, h)
-            g = rotate_clock(g)
+        g = roll_north(g, w, h)
+        g = roll_west(g, w, h)
+        g = roll_south(g, w, h)
+        g = roll_east(g, w, h)
 
-        fs = "".join(["".join(x) for x in g])
+        fs = "".join(g)
         if fs in seen:
             start = seen[fs]
             mod = i - start
@@ -646,14 +701,8 @@ def day14():
         seen[fs] = i
         reverse_seen[i] = g
 
-        # test is loop at 2 == 9, so every 7  2 + [((1000000000-2)%7)]
-        # input is loop at 175 == 184
-        # after 175 we loop every nine
-        # we need the value at 175 + [(1000000000-175) % 9] - 1
-
     g = reverse_seen[start + ((1000000000 - start) % mod) - 1]
-    if VERBOSE:
-        print("day14", p1, score(g, w, h))
+    if VERBOSE: print("day14", p1, score(g, w, h))
 
 
 def words(s):
@@ -1400,10 +1449,13 @@ def day23():
 from operator import itemgetter
 import z3
 
+def drun(func):
+    START = time.perf_counter()
+    func()
+    END = time.perf_counter()
+    print(f"{func.__name__} {END - START:.4f}s")
 
 def day24():
-    d24t = time.perf_counter()
-
     stones = lmap(ints, [i.strip() for i in open("day24/input", "r").readlines()])
     tot = 0
 
@@ -1492,8 +1544,7 @@ def day24():
     # sz = -t1 dz +s12 + t1 s15
     sz = -t1 * dz + s[1][2] + t1*s[1][5]
 
-    d24t = time.perf_counter() - d24t
-    if VERBOSE: print("day24", tot, int(sx)+int(sy)+int(sz), f"time:{d24t}")
+    if VERBOSE: print("day24", tot, int(sx)+int(sy)+int(sz))
 
 
 import random
@@ -1554,35 +1605,31 @@ if __name__ == "__main__":
             print("primed")
         running = []
         START = time.time_ns()
-        running.append(executor.submit(day23))
-        running.append(executor.submit(day25))
-        running.append(executor.submit(day17))
-        running.append(executor.submit(day22))
-        running.append(executor.submit(day01))
-        running.append(executor.submit(day02))
-        running.append(executor.submit(day03))
-        running.append(executor.submit(day04))
-        running.append(executor.submit(day05))
-        running.append(executor.submit(day06))
-        running.append(executor.submit(day07, 1))
-        running.append(executor.submit(day07, 2))
-        running.append(executor.submit(day08))
-        running.append(executor.submit(day09, 1))
-        running.append(executor.submit(day09, 2))
-        running.append(executor.submit(day10))
-        running.append(executor.submit(day11, 1))
-        running.append(executor.submit(day11, 2))
-        running.append(executor.submit(day12_1))
-        running.append(executor.submit(day12_2))
-        running.append(executor.submit(day13))
-        running.append(executor.submit(day14))
-        running.append(executor.submit(day15))
-        running.append(executor.submit(day18))
-        running.append(executor.submit(day19))
-        running.append(executor.submit(day20))
-        running.append(executor.submit(day21))
-        running.append(executor.submit(day16))
-        running.append(executor.submit(day24))
+        running.append(executor.submit(drun, day23))
+        running.append(executor.submit(drun, day25))
+        running.append(executor.submit(drun, day17))
+        running.append(executor.submit(drun, day22))
+        running.append(executor.submit(drun, day01))
+        running.append(executor.submit(drun, day02))
+        running.append(executor.submit(drun, day03))
+        running.append(executor.submit(drun, day04))
+        running.append(executor.submit(drun, day05))
+        running.append(executor.submit(drun, day06))
+        running.append(executor.submit(drun, day07))
+        running.append(executor.submit(drun, day08))
+        running.append(executor.submit(drun, day09))
+        running.append(executor.submit(drun, day10))
+        running.append(executor.submit(drun, day11))
+        running.append(executor.submit(drun, day12))
+        running.append(executor.submit(drun, day13))
+        running.append(executor.submit(drun, day14))
+        running.append(executor.submit(drun, day24))
+        running.append(executor.submit(drun, day15))
+        running.append(executor.submit(drun, day18))
+        running.append(executor.submit(drun, day19))
+        running.append(executor.submit(drun, day20))
+        running.append(executor.submit(drun, day21))
+        running.append(executor.submit(drun, day16))
 
     concurrent.futures.wait(running, return_when=concurrent.futures.ALL_COMPLETED)
     END = time.time_ns()
