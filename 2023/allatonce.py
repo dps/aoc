@@ -936,10 +936,12 @@ def day20():
                     transmit(dests[n], states[n], n)
             elif action == "&":
                 inv_states[n][from_] = signal
-                if all([v == True for v in inv_states[n].values()]):
-                    transmit(dests[n], False, n)
+                for v in inv_states[n].values():
+                    if v != True:
+                        transmit(dests[n], True, n)
+                        break
                 else:
-                    transmit(dests[n], True, n)
+                    transmit(dests[n], False, n)
             else:  # action == "broadcast":
                 transmit(dests[n], signal, n)
         if step == 999:
