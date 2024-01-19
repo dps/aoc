@@ -1,7 +1,7 @@
 
 from utils import *
 
-grid_serial = 7347
+grid_serial = int(open("input", "r").read())
 
 # https://en.wikipedia.org/wiki/Summed-area_table
 grid = [0] * (301*301)
@@ -20,10 +20,10 @@ mpx,mpy,mps = None,None,None
 
 def get_power(x,y,size):
     # A---B
-    # |   |
+    # |   |   Sum = I(D)+I(A)-I(B)-I(C)
     # C---D
-    # Sum = I(D)+I(A)-I(B)-I(C)
-    a,b,c,d = grid[y*300+x],grid[y*300+x+size],grid[(y+size)*300+x],grid[(y+size)*300+x+size]
+    a,b = grid[y*300+x], grid[y*300+x+size]
+    c,d = grid[(y+size)*300+x], grid[(y+size)*300+x+size]
     return d+a-b-c
 
 mp = -math.inf
