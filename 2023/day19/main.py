@@ -1,4 +1,26 @@
-from utils import *
+import operator
+from copy import copy
+from functools import reduce
+
+def bundles(inp):
+    """
+    Generator to turn input array from file with multi-line sequences divided by
+    blank lines into something you can loop over.
+    e.g.
+    ```
+    input = [i.strip() for i in open("input.txt","r").readlines()]
+
+    max([sum(map(int, line)) for line in bundles(inp)])
+    ```
+    """
+    r = []
+    for line in inp:
+        if line == "":
+            yield r
+            r = []
+        else:
+            r.append(line)
+    yield (r)
 
 D = [i.strip() for i in open("input", "r").readlines()]
 tot = 0
@@ -60,7 +82,7 @@ def dfs(ranges, node):
         return 0
     tot = 0
     rules = wf[node]
-    new_ranges = deepcopy(ranges)
+    new_ranges = copy(ranges)
     for rule in rules:
         if ":" in rule:
             ss = "<" if "<" in rule else ">"

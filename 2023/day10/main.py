@@ -6,12 +6,9 @@ D = [i.strip() for i in open("input", "r").readlines()]
 def trace_pipe():
     global D
     start = None
-    G, w, h = grid_from_strs(D)
-
-    for r in range(h):
-        for c in range(w):
-            if G[r][c] == "S":
-                start = (c, r)
+    G, w, h, start = grid_from_strs(D, find="S")
+    shoelace = 0
+    prev = None
 
     NEIGHBORS = {
         "S": [(0, 1)],
@@ -40,37 +37,13 @@ def trace_pipe():
                     h,
                     visited,
                     (((depth - 1) // 2) + 1 if depth % 2 == 1 else depth // 2),
+                    shoelace + pos[0]*d[1] - pos[1] * d[0]
                 )
             if not d in visited:
+                shoelace += pos[0]*d[1] - pos[1] * d[0]
                 bfs.append((d, depth + 1))
                 visited.add(d)
 
 
-g, w, h, on_loop, result = trace_pipe()
-print("Part 1: ", result)
-
-# Remove all the junk from the map
-for x in range(w):
-    for y in range(h):
-        if (x, y) not in on_loop:
-            g[y][x] = "."
-
-# Even/odd rule, with subpixel on corners. We pass under Js and Ls.
-# We know S is a |.
-tot = 0
-for y, row in enumerate(g):
-    for x, ch in enumerate(row):
-        if ch == ".":
-            xx, c = x - 1, 0  # Even/ odd rule - cast a ray out -x wards
-            while xx >= 0:
-                if (
-                    g[y][xx] == "|"
-                    or g[y][xx] == "F"
-                    or g[y][xx] == "7"
-                    or g[y][xx] == "S"
-                ):
-                    c += 1
-                xx -= 1
-            tot += 1 if c % 2 == 1 else 0
-
-print("Part 2: ", tot)
+g, w, h, on_loop, result, shoelace = trace_pipe()
+print("day10 ", result, abs(shoelace)/2 - result + 1)

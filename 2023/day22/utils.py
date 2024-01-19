@@ -84,7 +84,7 @@ import re
 import sys
 import heapq
 from collections import Counter, defaultdict, deque
-from copy import deepcopy
+from copy import copy, deepcopy
 from functools import cache, reduce
 from itertools import combinations, permutations, product
 import subprocess

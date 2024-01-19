@@ -43,22 +43,24 @@ while True:
         n,signal,from_ = Q.popleft()
         if n in critical_inputs and signal == False:
             loops[n].append(step)
-        if all([len(s) > 1 for _,s in loops.items()]):
-            print("Part 2", math.lcm(*[l[1] - l[0] for l in loops.values()]))
-            sys.exit(0)
+            if all([len(s) > 1 for _,s in loops.items()]):
+                print("Part 2", reduce(operator.mul, [l[1] - l[0] for l in loops.values()]))
+                sys.exit(0)
         action = types[n]
-        if action == "broadcast":
-            transmit(dests[n],signal,n)
         if action == "%":
             if not signal:
                 states[n] = not states[n]
                 transmit(dests[n],states[n],n)
-        if action == "&":
+        elif action == "&":
             inv_states[n][from_] = signal
-            if all([v == True for v in inv_states[n].values()]):
-                transmit(dests[n], False, n)
+            for v in inv_states[n].values():
+                if v != True:
+                    transmit(dests[n], True, n)
+                    break
             else:
-                transmit(dests[n], True, n)
+                transmit(dests[n], False, n)
+        else: # action == "broadcast":
+            transmit(dests[n],signal,n)
     if step == 999:
         print("Part 1", lows*highs)
     step += 1

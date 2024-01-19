@@ -1,10 +1,10 @@
 
-from utils import *
+from collections import Counter
 
 input = [i.strip() for i in open("input","r").readlines()]
 
-order1 = list(reversed(list("AKQJT98765432")))
-order2 = list(reversed(list("AKQT98765432J")))
+order1 = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+order2 = ['J', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'Q', 'K', 'A']
 
 def hand_to_val(hand, part=1):
     d = 0
@@ -32,8 +32,9 @@ def solve(part=1):
     hands=[]
     for line in input:
         hand, bid = line.split()
-        typ = Counter(hand)
-        if part == 2:
+        if part == 1:
+            typ = Counter(hand)
+        elif part == 2:
             h2 = best_joker(hand)
             typ = Counter(h2)
         nc = Counter(list(typ.values()))
@@ -41,7 +42,7 @@ def solve(part=1):
         
         hands.append((score*10000000000000 + hand_to_val(hand, part), hand, bid))
     hands = sorted(hands)        
-    aoc(sum([int(b[2])*int(r) for r,b in enumerate(hands, 1)]))
+    print(sum([int(b[2])*int(r) for r,b in enumerate(hands, 1)]))
 
 solve(1)
 solve(2)
