@@ -1,16 +1,9 @@
 
 from utils import *
 
-
-# Find the fuel cell's rack ID, which is its X coordinate plus 10.
-# Begin with a power level of the rack ID times the Y coordinate.
-# Increase the power level by the value of the grid serial number (your puzzle input).
-# Set the power level to itself multiplied by the rack ID.
-# Keep only the hundreds digit of the power level (so 12345 becomes 3; numbers with no hundreds digit become 0).
-# Subtract 5 from the power level.
-
 grid_serial = 7347
 
+# https://en.wikipedia.org/wiki/Summed-area_table
 grid = [0] * (301*301)
 for y in range(1, 301):
     for x in range(1, 301):
@@ -20,33 +13,30 @@ for y in range(1, 301):
         power_level *= rack_id
         power_level = (power_level // 100) % 10
         power_level -= 5
-        grid[y*300+x] = power_level
+        grid[y*300+x] = power_level + grid[y*300+x-1] + grid[(y-1)*300+x] - grid[(y-1)*300+x-1]
 
 mp = -math.inf
 mpx,mpy,mps = None,None,None
 
-DP = {}
-
 def get_power(x,y,size):
-    if (x,y,size) in DP:
-        return DP[(x,y,size)]
-    if size == 1:
-        DP[(x,y,size)] = grid[y*300+x]
-        return DP[(x,y,size)]
-    init = get_power(x,y,size-1)
-    for dy in range(size):
-        init += grid[(y+dy)*300+(x+size-1)]
-    for dx in range(size-1):
-        init += grid[(y+size-1)*300+(x+dx)]
-    DP[(x,y,size)] = init
-    return init
+    # A---B
+    # |   |
+    # C---D
+    # Sum = I(D)+I(A)-I(B)-I(C)
+    a,b,c,d = grid[y*300+x],grid[y*300+x+size],grid[(y+size)*300+x],grid[(y+size)*300+x+size]
+    return d+a-b-c
 
-for size in range(1,300,1):
+mp = -math.inf
+mpx,mpy,mps = None,None,None
+
+for size in range(1,300):
     for y in range(1,301-size):
         for x in range(1,301-size):
             s = get_power(x,y,size)
             if s > mp:
                 mp = s
-                mpx,mpy,mps = x,y,size
+                mpx,mpy,mps = x+1,y+1,size
+    if size == 3:
+        print(f"Part 1: {mpx},{mpy}\t\t[{mp}]")        
 
-print(f"{mpx},{mpy},{mps}")
+print(f"Part 2: {mpx},{mpy},{mps}\t[{mp}]")
