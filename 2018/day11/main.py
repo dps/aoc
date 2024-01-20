@@ -22,6 +22,8 @@ def get_power(x,y,size):
     # A---B
     # |   |   Sum = I(D)+I(A)-I(B)-I(C)
     # C---D
+    x=x-1 # defn is x0 < x <= x1 so -1!
+    y=y-1
     a,b = grid[y*300+x], grid[y*300+x+size]
     c,d = grid[(y+size)*300+x], grid[(y+size)*300+x+size]
     return d+a-b-c
@@ -35,7 +37,7 @@ for size in range(1,300):
             s = get_power(x,y,size)
             if s > mp:
                 mp = s
-                mpx,mpy,mps = x+1,y+1,size
+                mpx,mpy,mps = x,y,size
     if size == 3:
         print(f"Part 1: {mpx},{mpy}\t\t[{mp}]")        
 
