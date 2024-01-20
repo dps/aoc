@@ -1,5 +1,5 @@
-
-from utils import *
+from collections import deque, Counter
+import math
 
 D = [i.strip() for i in open("input","r").readlines()]
 G = list("".join(D))
@@ -7,11 +7,6 @@ N = len(G)
 w,h = len(D[0]), len(D)
 
 U = {}
-
-def points(found):
-    global U
-    u = U[found[0]+found[1]]
-    return u[2]*10000+u[0]
 
 def opponent(ch):
     return ('E' if ch == 'G' else 'G')
@@ -21,8 +16,8 @@ def hp_then_p(unit):
     return (hp,p)
 
 def is_combat(unit):
-    global G
-    p,ch,hp,power,name = unit
+    global G, U
+    p,ch,_,_,_ = unit
     enemy = opponent(ch)
     could_fight = []
     for d in [-w,-1,1,w]:
@@ -36,7 +31,7 @@ def is_combat(unit):
 
 def move(unit):
     global G
-    p,ch,hp,power,name = unit
+    p,ch,_,_,_ = unit
     enemy = opponent(ch)
     Q, visited, found_at, found = deque([(p,0,None)]),set([p]),math.inf,[]
     while Q:
@@ -74,6 +69,7 @@ def battle(epower, stop_on_elf_death=False):
         units.sort()
                 
         to_delete = set()
+        to_consider = set([v[4] for v in units])
         for u in units:
             if u[4] in to_delete:
                 continue
@@ -91,23 +87,26 @@ def battle(epower, stop_on_elf_death=False):
 
             if combat:
                 p_,ch_,hp_,power_,name_ = U[where]
-                #assert(ch_ == opponent(ch))
-                #assert(p_ == where)
+                assert(ch_ == opponent(ch))
+                assert(p_ == where)
                 U[where] = (p_,ch_,hp_-power,power_,name_)
                 if hp_-power <= 0:
                     if stop_on_elf_death and ch_ == 'E':
                         return False, None
                     to_delete.add(name_)
+                    to_consider -= {name_}
                     G[where] = '.'
                     del(U[where])
+                    if len(Counter([v[1] for v in U.values()]).keys()) == 1:
+                        final_vals = sum([v[2] for v in U.values()])
+                        if len(to_consider) == 1:
+                            return True, (rounds + 1) * final_vals
+                        else:
+                            return True, rounds * final_vals
+            to_consider.remove(name)
 
         units = [u for u in U.values() if u[4] not in to_delete]
-        if len(Counter([u[1] for u in units]).keys()) > 1:
-            rounds += 1
-        else:
-            return True, rounds * sum([u[2] for u in units])
-
-
+        rounds += 1
 
 print("Part 1", battle(3, stop_on_elf_death=False)[1])
 
