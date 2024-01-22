@@ -5,31 +5,11 @@ D = [i.strip() for i in open("input","r").readlines()]
 
 clay = set()
 
-def print_world(clay, settled, visited):
-    mix = int(min([k[0] for k in clay]))
-    miy = int(min([k[1] for k in clay]))
-    mx = int(max([k[0] for k in clay]))
-    my = int(max([k[1] for k in clay]))
-
-    for y in range(miy, my + 1):
-        for x in range(mix, mx + 1):
-            if (x, y) in clay:
-                print("#", end="")
-            elif (x, y) in settled:
-                print("~", end="")
-            elif (x, y) in visited:
-                print("|", end="")
-            else:
-                print(".", end="")
-        print()
-
 def ranges(s, coord):
     return list(map(int, re.findall(coord + r"=[0-9.]*", s)[0].split("=")[1].split("..")))
 
 for line in D:
     xr, yr = ranges(line, "x"), ranges(line, "y")
-    assert(xr[0]<=xr[-1])
-    assert(yr[0]<=yr[-1])
     for x in range(xr[0],xr[-1]+1):
         for y in range(yr[0],yr[-1]+1):
             clay.add((x,y))
@@ -53,7 +33,6 @@ def can_settle(p,dx):
         if ((p[0]+i*dx,p[1]+1) not in clay) and ((p[0]+i*dx,p[1]+1) not in settled):
             return False
 
-outer_done = False
 prev_settled, prev_visited = 0,0
 while True:
     p = spring
@@ -66,7 +45,6 @@ while True:
             continue
 
         local_visited.add(p)
-
 
         # First, always try to move down
         q = (p[0], p[1]+1)
@@ -101,8 +79,6 @@ for p in vs:
             q = (p[0]+i,p[1])
         if q in settled:
             settled.add(p)
-
-#print_world(clay, settled, visited)
 
 print(len(settled | visited))
 print(len(settled))
