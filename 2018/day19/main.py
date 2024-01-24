@@ -69,5 +69,6 @@ def find_divisors(n):
             divisors.append(n // i)
     return sorted(divisors)
 
+print(bignum)
 divisors = find_divisors(bignum)
 print("part 2", sum(divisors))
