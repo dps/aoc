@@ -41,15 +41,13 @@ try:
     while True:
         ip = R[ipr]
         if ip == 28:
-            if tuple(R) in state:
-                break
-            state.add(tuple(R))
-
             if part1 == None:
                 part1 = R[1]
             if R[1] not in seen:
                 seen.add(R[1])
                 k=R[1]
+            else:
+                break
         ins, a,b,c = P[ip]
         ins(a,b,c)
         R[ipr] += 1
