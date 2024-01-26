@@ -1,0 +1,37 @@
+a,b,c,d,ip,f
+0,1,2,3,4 ,5
+
+0 seti 123 0 1          #[] b = 123
+1 bani 1 456 1          #[] b = b & 456
+2 eqri 1 72 1           #[] b = b == 72
+3 addr 1 4 4            #[] if b == 1 jmp 5 else jmp 4
+4 seti 0 0 4            #[] jmp 0
+5 seti 0 6 1            #b=0
+6 bori 1 65536 3        #d=b|65536       <-- jmps back here
+7 seti 6780005 8 1      #b=6780005
+8 bani 3 255 2          #c=d&255
+9 addr 1 2 1            #b=b+c
+10 bani 1 16777215 1    #b=b&16777215
+11 muli 1 65899 1       #b=b*65899
+12 bani 1 16777215 1    #b=b&16777215
+13 gtir 256 3 2         #c=(256>d)?1:0
+14 addr 2 4 4           #jmp 16 if (256>d) else jmp 15
+15 addi 4 1 4           #jmp 17
+16 seti 27 5 4          #jmp 28  ## executed if 256>d
+17 seti 0 5 2           #c=0     
+18 addi 2 1 5           #f=c+1
+19 muli 5 256 5         #f=f*256
+20 gtrr 5 3 5           #f=f>d?1:0
+21 addr 5 4 4           #    jmp 26 [if f>d] #jmp 23 [if f>d]
+22 addi 4 1 4           #jmp 24
+23 seti 25 4 4          #jmp 26
+24 addi 2 1 2           #c=c+b
+25 seti 17 7 4          #jmp 18
+26 setr 2 1 3           #d=c
+27 seti 7 3 4           #jmp 8
+28 eqrr 1 0 2           #c=(a==b)?1:0
+29 addr 2 4 4           #terminate #if (a==b)
+30 seti 5 4 4           #jmp 6
+
+a,b,c,d,ip,f
+0,1,2,3,4 ,5
