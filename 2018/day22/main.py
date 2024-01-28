@@ -91,5 +91,46 @@ def neighbors(state):
         elif ntype == 2 and (e == 0 or e == 1):
             yield (1, (nx,ny,e))
 
+def dynamic_a_star(next_fn, start, end, heuristic):
+    """
+    next_fn is a funtion taking vertex => [(weight, neighbor), ...] 
+    heuristic is a function that takes in a vertex and returns an estimated cost
+    to reach the end from that vertex
+    returns (sum(path weights), path)
+    """
 
-print(dynamic_dijkstra(neighbors, start, target)[0])
+    # Initialize data structures
+    distances = defaultdict(lambda: math.inf)
+    distances[start] = 0
+    previous = defaultdict(lambda: None)
+    queue = []
+    heapq.heappush(queue, (0, 0, start))
+
+    # Loop until the queue is empty
+    while queue:
+        _, current_distance, current_vertex = heapq.heappop(queue)
+
+        # End search if we have reached the end
+        if current_vertex == end:
+            break
+
+        # Update the distances and previous vertices of the neighbors
+        for weight, neighbor in next_fn(current_vertex):
+            distance = current_distance + weight
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                previous[neighbor] = current_vertex
+                priority = distance + heuristic(neighbor, end)
+                heapq.heappush(queue, (priority, distance, neighbor))
+
+    # Build the path
+    path = []
+    current_vertex = end
+    while current_vertex is not None:
+        path.append(current_vertex)
+        current_vertex = previous[current_vertex]
+
+    return (distances[end], path[::-1])
+
+#print(dynamic_dijkstra(neighbors, start, target)[0])
+print(dynamic_a_star(neighbors, start,target, lambda z,e:manhattan((z[0],z[1]), target))[0])
