@@ -1,20 +1,8 @@
 
 from utils import *
 
-# * The region at `0,0` (the mouth of the cave) has a geologic index of `0`.
-# * The region at the coordinates of the target has a geologic index of `0`.
-# * If the region's `Y` coordinate is `0`, the geologic index is its `X` coordinate times `16807`.
-# * If the region's `X` coordinate is `0`, the geologic index is its `Y` coordinate times `48271`.
-# * Otherwise, the region's geologic index is the result of multiplying the erosion *levels* of the regions at `X-1,Y` and `X,Y-1`.
-
-# A region's *erosion level* is its *geologic index* plus the cave system's *depth*, all [modulo] `20183`. Then:
-
-
 depth = 7740
 target = (12,763)
-
-# depth = 510
-# target = (10,10)
 
 def elevel(n):
     return (n+depth)%20183
@@ -29,42 +17,9 @@ def geo_index(x,y):
         return y * 48271
     else:
         return ((geo_index(x-1,y)+depth)%20183) * ((geo_index(x,y-1)+depth)%20183)
-    
-
-# * If the *erosion level modulo `3`* is `0`, the region's type is *rocky*.
-# * If the *erosion level modulo `3`* is `1`, the region's type is *wet*.
-# * If the *erosion level modulo `3`* is `2`, the region's type is *narrow*.
 
 print(sum(elevel(geo_index(x,y))%3 for x in range(target[0]+1) for y in range(target[1]+1)))
 
-def dynamic_dijkstra(neighbors, start, end):
-    """
-    neighbors is a function which takes current node and returns a list of (weight, neighbor)
-    pairs or () if no neighbors exist.
-    returns (sum(path weights), path)
-    """
-    q, seen, mins = [(0, start, [])], set(), {start: 0}
-    while q:
-        (cost, v, path) = heapq.heappop(q)
-        if v not in seen:
-            seen.add(v)
-            path = path + [v]
-            if v == end:
-                return (cost, path)
-
-            for c, neighbor in neighbors(v):
-                if neighbor in seen:
-                    continue
-                prev = mins.get(neighbor, None)
-                next = cost + c
-                if prev is None or next < prev:
-                    mins[neighbor] = next
-                    heapq.heappush(q, (next, neighbor, path))
-
-    return math.inf, None
-
-# 0 => rocky, 1 => wet, 2 => narrow
-# 0 => neither, 1 => torch, 2 => climbing gear
 target = (12, 763, 1)
 start = (0,0,1)
 
@@ -91,46 +46,4 @@ def neighbors(state):
         elif ntype == 2 and (e == 0 or e == 1):
             yield (1, (nx,ny,e))
 
-def dynamic_a_star(next_fn, start, end, heuristic):
-    """
-    next_fn is a funtion taking vertex => [(weight, neighbor), ...] 
-    heuristic is a function that takes in a vertex and returns an estimated cost
-    to reach the end from that vertex
-    returns (sum(path weights), path)
-    """
-
-    # Initialize data structures
-    distances = defaultdict(lambda: math.inf)
-    distances[start] = 0
-    previous = defaultdict(lambda: None)
-    queue = []
-    heapq.heappush(queue, (0, 0, start))
-
-    # Loop until the queue is empty
-    while queue:
-        _, current_distance, current_vertex = heapq.heappop(queue)
-
-        # End search if we have reached the end
-        if current_vertex == end:
-            break
-
-        # Update the distances and previous vertices of the neighbors
-        for weight, neighbor in next_fn(current_vertex):
-            distance = current_distance + weight
-            if distance < distances[neighbor]:
-                distances[neighbor] = distance
-                previous[neighbor] = current_vertex
-                priority = distance + heuristic(neighbor, end)
-                heapq.heappush(queue, (priority, distance, neighbor))
-
-    # Build the path
-    path = []
-    current_vertex = end
-    while current_vertex is not None:
-        path.append(current_vertex)
-        current_vertex = previous[current_vertex]
-
-    return (distances[end], path[::-1])
-
-#print(dynamic_dijkstra(neighbors, start, target)[0])
 print(dynamic_a_star(neighbors, start,target, lambda z,e:manhattan((z[0],z[1]), target))[0])
