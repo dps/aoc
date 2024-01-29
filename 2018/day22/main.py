@@ -27,13 +27,6 @@ def neighbors(state):
     x,y,e = state
     stype = elevel(geo_index(x,y))%3
 
-    if stype == 0:
-        yield (7, (x,y,2 if e == 1 else 1))
-    elif stype == 1:
-        yield (7, (x,y,0 if e == 2 else 2))
-    elif stype == 2:
-        yield (7, (x,y,1 if e == 0 else 0))
-
     for d in [(0,1),(0,-1),(1,0),(-1,0)]:
         nx,ny = x + d[0], y + d[1]
         if nx < 0 or ny < 0:
@@ -45,5 +38,12 @@ def neighbors(state):
             yield (1, (nx,ny,e))
         elif ntype == 2 and (e == 0 or e == 1):
             yield (1, (nx,ny,e))
+
+    if stype == 0:
+        yield (7, (x,y,2 if e == 1 else 1))
+    elif stype == 1:
+        yield (7, (x,y,0 if e == 2 else 2))
+    elif stype == 2:
+        yield (7, (x,y,1 if e == 0 else 0))
 
 print(dynamic_a_star(neighbors, start,target, lambda z,e:manhattan((z[0],z[1]), target))[0])
