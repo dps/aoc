@@ -26,7 +26,7 @@ def hex_dir(p, dir):
 D = open("input","r").read().strip().split(",")
 
 p = (0,0)
-mmx,mmp = 0, 0
+mmp = 0, 0
 for step in D:
     d = hex_dir(p, step)
     p = (p[0]+d[0],p[1]+d[1])
