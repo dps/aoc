@@ -30,7 +30,7 @@ def part2():
 
     return "".join(
         [
-            f"{reduce(lambda x,y: x^y, vl[s:s+16]):#0{4}x}"[-2:]
+            f"{reduce(lambda x,y: x^y, vl[s:s+16]):0{2}x}"
             for s in range(0, 256, 16)
         ]
     )
