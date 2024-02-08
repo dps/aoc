@@ -1,4 +1,5 @@
-from utils import *
+from collections import deque
+from functools import reduce
 from itertools import islice
 
 D = list(map(int, open("input", "r").read().split(",")))
