@@ -20,24 +20,20 @@ def probe(w):
     sev = 0
     for p in range(mx+1):
         if p in layers:
-            l = looplen(layers[p])
-            pp = (p+w)%l
-            if pp == 0:
-                sev += p*layers[p] if p > 0 else 1
+            if (p+w) % looplen(layers[p]) == 0:
+                sev += p*layers[p]
     return sev
 
 def probe_break_early(w):
     for p in range(mx+1):
         if p in layers:
-            l = looplen(layers[p])
-            pp = (p+w)%l
-            if pp == 0:
+            if (p+w)%looplen(layers[p]) == 0:
                 return False
     return True
 
-print(probe(0)-1)
+print(probe(0))
 
-for i in range(20000000):
+for i in range(10000000):
     if probe_break_early(i):
         print(i)
         break
