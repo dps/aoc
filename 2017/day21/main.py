@@ -14,7 +14,12 @@ rules = {}
 for line in D:
     ##.#/.#./#.# => ..#./##.#/..../....
     l,r = line.split(" => ")
-    dest = tuple(tuple(s) for s in r.split("/"))
+    dest = set()
+    for y, row in enumerate(r.split("/")):
+        for x, ch in enumerate(row):
+            if ch == '#':
+                dest.add((x,y))
+
     o = tuple(tuple(s) for s in l.split("/"))
     rules[o] = dest
     rules[flip_h(o)] = dest
@@ -49,10 +54,8 @@ for iter in range(18):
             tile = tuple(tile)
             if tile in rules:
                 expand = rules[tile]
-                for y, row in enumerate(expand):
-                    for x, ch in enumerate(row):
-                        if ch == "#":
-                            new_world.add((ix*m+x,iy*m+y))
+                for (x,y) in expand:
+                    new_world.add((ix*m+x,iy*m+y))
     world = new_world
     w += w//d
     h += h//d
