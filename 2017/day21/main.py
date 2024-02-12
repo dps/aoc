@@ -1,6 +1,4 @@
 
-from utils import *
-
 D = [i.strip() for i in open("input","r").readlines()]
 
 def rotate_cw(g):
@@ -12,30 +10,22 @@ def flip_h(g):
 def flip_v(g):
     return tuple(g[::-1])
 
-board = [".#.","..#","###"]
-board = tuple(tuple(l) for l in board)
-
 rules = {}
 for line in D:
     ##.#/.#./#.# => ..#./##.#/..../....
     l,r = line.split(" => ")
     dest = tuple(tuple(s) for s in r.split("/"))
-    o = [tuple(s) for s in l.split("/")]
-    rules[tuple(o)] = dest
+    o = tuple(tuple(s) for s in l.split("/"))
+    rules[o] = dest
     rules[flip_h(o)] = dest
     rules[flip_v(o)] = dest
     for deg in [90,180,270]:
         o = rotate_cw(o)
-        rules[tuple(o)] = dest
+        rules[o] = dest
         rules[flip_h(o)] = dest
         rules[flip_v(o)] = dest
 
-world = set()
-for x, row in enumerate(board):
-    for y, ch in enumerate(row):
-        if ch == '#':
-            world.add((x,y))
-
+world = {(0, 1), (1, 2), (2, 0), (2, 1), (2, 2)}
 w,h = 3,3
 
 for iter in range(18):
