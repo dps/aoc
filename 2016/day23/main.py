@@ -1,5 +1,6 @@
 
 from collections import defaultdict
+import math
 D = [i.strip() for i in open("input","r").readlines()]
 
 toggled = defaultdict(bool)
@@ -57,12 +58,7 @@ def run(part):
 def pt2(eggs):
     # By analysis of the program, making some assumptions about what
     # might be different in other people's input, obviously.
-    a = eggs*(eggs-1)
-    b = 10
-    c = 20
-    for _ in range(b,1,-1):
-        a *= (c//2)
-        c -= 2
+    a = math.factorial(eggs)
     a += int(D[19].split(" ")[1]) * int(D[20].split(" ")[1])
     print(a)
 
