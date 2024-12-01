@@ -1,21 +1,10 @@
 
 from utils import *
 
-D = [i.strip() for i in open("input","r").readlines()]
-
-p1, p2 = 0, 0
-a,b = [], []
-for line in D:
-    ii = ints(line)
-    a.append(ii[0])
-    b.append(ii[1])
-
-a = sorted(a)
-b = sorted(b)
-c = Counter(b)
-
-for i, x in enumerate(a):
-    p1 += abs(a[i] - b[i])
-    p2 += x * c[x]
+A,B = zip(*[ints(i) for i in open("input","r").readlines()])
+A,B = sorted(A), sorted(B)
+p1 = sum([abs(a - b) for a,b in zip(A,B)])
+C = Counter(B)
+p2 = sum([x * C[x] for x in A])
 
 print(p1, p2)
