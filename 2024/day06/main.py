@@ -5,17 +5,19 @@ D = [i.strip() for i in open("input","r").readlines()]
 
 p1, p2 = 0, 0
 
-p = None
+P = None
 d = -1j
 R = len(D)
 C = len(D[0])
 for x in range(C):
     for y in range(R):
         if D[y][x] == "^":
-            p = (x + 1j*y)
-P = p
+            P = (x + 1j*y)
+
+p1visited = set()
 
 def isloop(obs):
+    global p1visited
     p = P
     d = -1j
     visited, p1visited = set(), set()
@@ -28,6 +30,7 @@ def isloop(obs):
             d = d * 1j
             q = p + d
         p = q
+
         if (p,d) in visited:
             return 1
         visited.add((p,d))
@@ -38,8 +41,7 @@ def isloop(obs):
 
 p1 = isloop(None)
 
-for x in range(C):
-    for y in range(R):
-        p2 += isloop((x+1j*y))
+for obs in p1visited:
+    p2 += isloop(obs)
 
 print(p1, p2)
