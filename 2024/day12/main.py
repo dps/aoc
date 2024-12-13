@@ -20,7 +20,7 @@ while len(proc) > 0:
         for d in [1, -1, 1j, -1j]:
             if (k + d in grid and grid[k + d] != v) or (k + d not in grid):
                 sides.add((str(d), k.real, k.imag))
-        for d in [1, -1, 1j, -1j]:
+
             nk = k + d
             if nk in grid and nk not in visited and grid[nk] == v:
                 queue.append(nk)
